@@ -5,7 +5,6 @@ require 'pry-byebug'
 
 require 'dotenv'
 Dotenv.load
-Dotenv.load('test.env')
 
 require 'twister'
 
