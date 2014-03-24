@@ -2,23 +2,27 @@ require 'minitest/autorun'
 require 'minitest/pride'
 require 'pry'
 require 'pry-byebug'
+require 'vcr'
 
 $LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))
 
 require 'dotenv'
 Dotenv.load
-# ENV['DATABASE_URL'] = 'sqlite://development'
 
-require 'sequel'
-Sequel.extension :migration
-DB = Sequel.connect(ENV.fetch('DATABASE_URL'))
-Sequel::Migrator.run(DB, 'db/migrations')
+VCR.configure do |c|
+  c.cassette_library_dir = 'fixtures/vcr'
+  c.hook_into :webmock
+end
 
 module Twister
   class Test < Minitest::Test
     def run
       result = nil
-      Sequel::Model.db.transaction(rollback: :always) { result = super }
+      Sequel::Model.db.transaction(rollback: :always) do
+        VCR.use_cassette('twister') do
+          result = super
+        end
+      end
       result
     end
   end

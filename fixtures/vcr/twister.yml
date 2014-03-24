@@ -1,0 +1,233 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api.twitter.com/1.1/account/verify_credentials.json
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.8.9
+      Authorization:
+      - OAuth oauth_consumer_key="3KOZgmHSiX4sM3EwYPtbg", oauth_nonce="6969af7dba67c563e4ddae64f52c7483",
+        oauth_signature="fraZ9d2QVeHTPkr7LT7BMp3bRSc%3D", oauth_signature_method="HMAC-SHA1",
+        oauth_timestamp="1395635338", oauth_token="715073-utqV01U7Cdv6f4fBXCSDJsCadrWStpxAqXfssS8Pgz3",
+        oauth_version="1.0"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, no-store, must-revalidate, pre-check=0, post-check=0
+      Content-Length:
+      - '1212'
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Mon, 24 Mar 2014 04:28:58 GMT
+      Expires:
+      - Tue, 31 Mar 1981 05:00:00 GMT
+      Last-Modified:
+      - Mon, 24 Mar 2014 04:28:58 GMT
+      Pragma:
+      - no-cache
+      Server:
+      - tfe
+      Set-Cookie:
+      - guest_id=v1%3A139563533851174383; Domain=.twitter.com; Path=/; Expires=Wed,
+        23-Mar-2016 04:28:58 UTC
+      - lang=en
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631138519
+      X-Access-Level:
+      - read
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Rate-Limit-Limit:
+      - '15'
+      X-Rate-Limit-Remaining:
+      - '14'
+      X-Rate-Limit-Reset:
+      - '1395636238'
+      X-Transaction:
+      - 2e6de3d2c0279c5d
+      X-Xss-Protection:
+      - 1; mode=block
+    body:
+      encoding: UTF-8
+      string: "{\"id\":715073,\"id_str\":\"715073\",\"name\":\"Alpha Chen\",\"screen_name\":\"kejadlen\",\"location\":\"\",\"description\":\"\",\"url\":\"http:\\/\\/t.co\\/Vf9ujUJlQn\",\"entities\":{\"url\":{\"urls\":[{\"url\":\"http:\\/\\/t.co\\/Vf9ujUJlQn\",\"expanded_url\":\"http:\\/\\/blog.kejadlen.net\\/\",\"display_url\":\"blog.kejadlen.net\",\"indices\":[0,22]}]},\"description\":{\"urls\":[]}},\"protected\":false,\"followers_count\":446,\"friends_count\":421,\"listed_count\":17,\"created_at\":\"Sat
+        Jan 27 18:58:23 +0000 2007\",\"favourites_count\":207,\"utc_offset\":-25200,\"time_zone\":\"Pacific
+        Time (US & Canada)\",\"geo_enabled\":true,\"verified\":false,\"statuses_count\":16722,\"lang\":\"en\",\"status\":{\"created_at\":\"Mon
+        Mar 24 00:49:15 +0000 2014\",\"id\":447897900773683201,\"id_str\":\"447897900773683201\",\"text\":\"RT
+        @edyong209: Google Flu has been a spectacular failure. When it comes to Big
+        Data, you can't polish a turd. http:\\/\\/t.co\\/hjpHwJqwyz HT @ph\\u2026\",\"source\":\"\\u003ca
+        href=\\\"http:\\/\\/www.osfoora.com\\/mac\\\" rel=\\\"nofollow\\\"\\u003eOsfoora
+        for Mac\\u003c\\/a\\u003e\",\"truncated\":false,\"in_reply_to_status_id\":null,\"in_reply_to_status_id_str\":null,\"in_reply_to_user_id\":null,\"in_reply_to_user_id_str\":null,\"in_reply_to_screen_name\":null,\"geo\":null,\"coordinates\":null,\"place\":null,\"contributors\":null,\"retweeted_status\":{\"created_at\":\"Sun
+        Mar 23 16:37:53 +0000 2014\",\"id\":447774241254297600,\"id_str\":\"447774241254297600\",\"text\":\"Google
+        Flu has been a spectacular failure. When it comes to Big Data, you can't polish
+        a turd. http:\\/\\/t.co\\/hjpHwJqwyz HT @phylogenomics\",\"source\":\"web\",\"truncated\":false,\"in_reply_to_status_id\":null,\"in_reply_to_status_id_str\":null,\"in_reply_to_user_id\":null,\"in_reply_to_user_id_str\":null,\"in_reply_to_screen_name\":null,\"geo\":null,\"coordinates\":null,\"place\":null,\"contributors\":null,\"retweet_count\":73,\"favorite_count\":48,\"entities\":{\"hashtags\":[],\"symbols\":[],\"urls\":[{\"url\":\"http:\\/\\/t.co\\/hjpHwJqwyz\",\"expanded_url\":\"http:\\/\\/genome.fieldofscience.com\\/2014\\/03\\/why-google-flu-is-failure-hubris-of-big.html?spref=tw\",\"display_url\":\"genome.fieldofscience.com\\/2014\\/03\\/why-go\\u2026\",\"indices\":[95,117]}],\"user_mentions\":[{\"screen_name\":\"phylogenomics\",\"name\":\"Jonathan
+        Eisen\",\"id\":15154811,\"id_str\":\"15154811\",\"indices\":[121,135]}]},\"favorited\":false,\"retweeted\":true,\"possibly_sensitive\":false,\"lang\":\"en\"},\"retweet_count\":73,\"favorite_count\":0,\"entities\":{\"hashtags\":[],\"symbols\":[],\"urls\":[{\"url\":\"http:\\/\\/t.co\\/hjpHwJqwyz\",\"expanded_url\":\"http:\\/\\/genome.fieldofscience.com\\/2014\\/03\\/why-google-flu-is-failure-hubris-of-big.html?spref=tw\",\"display_url\":\"genome.fieldofscience.com\\/2014\\/03\\/why-go\\u2026\",\"indices\":[110,132]}],\"user_mentions\":[{\"screen_name\":\"edyong209\",\"name\":\"Ed
+        Yong \",\"id\":19767193,\"id_str\":\"19767193\",\"indices\":[3,13]},{\"screen_name\":\"phylogenomics\",\"name\":\"Jonathan
+        Eisen\",\"id\":15154811,\"id_str\":\"15154811\",\"indices\":[136,140]}]},\"favorited\":false,\"retweeted\":true,\"possibly_sensitive\":false,\"lang\":\"en\"},\"contributors_enabled\":false,\"is_translator\":false,\"is_translation_enabled\":false,\"profile_background_color\":\"352726\",\"profile_background_image_url\":\"http:\\/\\/abs.twimg.com\\/images\\/themes\\/theme5\\/bg.gif\",\"profile_background_image_url_https\":\"https:\\/\\/abs.twimg.com\\/images\\/themes\\/theme5\\/bg.gif\",\"profile_background_tile\":false,\"profile_image_url\":\"http:\\/\\/pbs.twimg.com\\/profile_images\\/1822967606\\/sheep_normal.png\",\"profile_image_url_https\":\"https:\\/\\/pbs.twimg.com\\/profile_images\\/1822967606\\/sheep_normal.png\",\"profile_link_color\":\"D02B55\",\"profile_sidebar_border_color\":\"829D5E\",\"profile_sidebar_fill_color\":\"99CC33\",\"profile_text_color\":\"3E4415\",\"profile_use_background_image\":true,\"default_profile\":false,\"default_profile_image\":false,\"following\":false,\"follow_request_sent\":false,\"notifications\":false}"
+    http_version: 
+  recorded_at: Mon, 24 Mar 2014 04:28:58 GMT
+- request:
+    method: get
+    uri: https://api.twitter.com/1.1/account/verify_credentials.json
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.8.9
+      Authorization:
+      - OAuth oauth_consumer_key="3KOZgmHSiX4sM3EwYPtbg", oauth_nonce="d0e8671df9bb5233c2d8fe4df2532859",
+        oauth_signature="PbVycmRcZdKxFhHpZddxutXAjYU%3D", oauth_signature_method="HMAC-SHA1",
+        oauth_timestamp="1395635338", oauth_token="715073-utqV01U7Cdv6f4fBXCSDJsCadrWStpxAqXfssS8Pgz3",
+        oauth_version="1.0"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, no-store, must-revalidate, pre-check=0, post-check=0
+      Content-Length:
+      - '1212'
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Mon, 24 Mar 2014 04:28:58 GMT
+      Expires:
+      - Tue, 31 Mar 1981 05:00:00 GMT
+      Last-Modified:
+      - Mon, 24 Mar 2014 04:28:58 GMT
+      Pragma:
+      - no-cache
+      Server:
+      - tfe
+      Set-Cookie:
+      - guest_id=v1%3A139563533882819323; Domain=.twitter.com; Path=/; Expires=Wed,
+        23-Mar-2016 04:28:58 UTC
+      - lang=en
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631138519
+      X-Access-Level:
+      - read
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Rate-Limit-Limit:
+      - '15'
+      X-Rate-Limit-Remaining:
+      - '13'
+      X-Rate-Limit-Reset:
+      - '1395636238'
+      X-Transaction:
+      - b3fc8b5821cc6dca
+      X-Xss-Protection:
+      - 1; mode=block
+    body:
+      encoding: UTF-8
+      string: "{\"id\":715073,\"id_str\":\"715073\",\"name\":\"Alpha Chen\",\"screen_name\":\"kejadlen\",\"location\":\"\",\"description\":\"\",\"url\":\"http:\\/\\/t.co\\/Vf9ujUJlQn\",\"entities\":{\"url\":{\"urls\":[{\"url\":\"http:\\/\\/t.co\\/Vf9ujUJlQn\",\"expanded_url\":\"http:\\/\\/blog.kejadlen.net\\/\",\"display_url\":\"blog.kejadlen.net\",\"indices\":[0,22]}]},\"description\":{\"urls\":[]}},\"protected\":false,\"followers_count\":446,\"friends_count\":421,\"listed_count\":17,\"created_at\":\"Sat
+        Jan 27 18:58:23 +0000 2007\",\"favourites_count\":207,\"utc_offset\":-25200,\"time_zone\":\"Pacific
+        Time (US & Canada)\",\"geo_enabled\":true,\"verified\":false,\"statuses_count\":16722,\"lang\":\"en\",\"status\":{\"created_at\":\"Mon
+        Mar 24 00:49:15 +0000 2014\",\"id\":447897900773683201,\"id_str\":\"447897900773683201\",\"text\":\"RT
+        @edyong209: Google Flu has been a spectacular failure. When it comes to Big
+        Data, you can't polish a turd. http:\\/\\/t.co\\/hjpHwJqwyz HT @ph\\u2026\",\"source\":\"\\u003ca
+        href=\\\"http:\\/\\/www.osfoora.com\\/mac\\\" rel=\\\"nofollow\\\"\\u003eOsfoora
+        for Mac\\u003c\\/a\\u003e\",\"truncated\":false,\"in_reply_to_status_id\":null,\"in_reply_to_status_id_str\":null,\"in_reply_to_user_id\":null,\"in_reply_to_user_id_str\":null,\"in_reply_to_screen_name\":null,\"geo\":null,\"coordinates\":null,\"place\":null,\"contributors\":null,\"retweeted_status\":{\"created_at\":\"Sun
+        Mar 23 16:37:53 +0000 2014\",\"id\":447774241254297600,\"id_str\":\"447774241254297600\",\"text\":\"Google
+        Flu has been a spectacular failure. When it comes to Big Data, you can't polish
+        a turd. http:\\/\\/t.co\\/hjpHwJqwyz HT @phylogenomics\",\"source\":\"web\",\"truncated\":false,\"in_reply_to_status_id\":null,\"in_reply_to_status_id_str\":null,\"in_reply_to_user_id\":null,\"in_reply_to_user_id_str\":null,\"in_reply_to_screen_name\":null,\"geo\":null,\"coordinates\":null,\"place\":null,\"contributors\":null,\"retweet_count\":73,\"favorite_count\":48,\"entities\":{\"hashtags\":[],\"symbols\":[],\"urls\":[{\"url\":\"http:\\/\\/t.co\\/hjpHwJqwyz\",\"expanded_url\":\"http:\\/\\/genome.fieldofscience.com\\/2014\\/03\\/why-google-flu-is-failure-hubris-of-big.html?spref=tw\",\"display_url\":\"genome.fieldofscience.com\\/2014\\/03\\/why-go\\u2026\",\"indices\":[95,117]}],\"user_mentions\":[{\"screen_name\":\"phylogenomics\",\"name\":\"Jonathan
+        Eisen\",\"id\":15154811,\"id_str\":\"15154811\",\"indices\":[121,135]}]},\"favorited\":false,\"retweeted\":true,\"possibly_sensitive\":false,\"lang\":\"en\"},\"retweet_count\":73,\"favorite_count\":0,\"entities\":{\"hashtags\":[],\"symbols\":[],\"urls\":[{\"url\":\"http:\\/\\/t.co\\/hjpHwJqwyz\",\"expanded_url\":\"http:\\/\\/genome.fieldofscience.com\\/2014\\/03\\/why-google-flu-is-failure-hubris-of-big.html?spref=tw\",\"display_url\":\"genome.fieldofscience.com\\/2014\\/03\\/why-go\\u2026\",\"indices\":[110,132]}],\"user_mentions\":[{\"screen_name\":\"edyong209\",\"name\":\"Ed
+        Yong \",\"id\":19767193,\"id_str\":\"19767193\",\"indices\":[3,13]},{\"screen_name\":\"phylogenomics\",\"name\":\"Jonathan
+        Eisen\",\"id\":15154811,\"id_str\":\"15154811\",\"indices\":[136,140]}]},\"favorited\":false,\"retweeted\":true,\"possibly_sensitive\":false,\"lang\":\"en\"},\"contributors_enabled\":false,\"is_translator\":false,\"is_translation_enabled\":false,\"profile_background_color\":\"352726\",\"profile_background_image_url\":\"http:\\/\\/abs.twimg.com\\/images\\/themes\\/theme5\\/bg.gif\",\"profile_background_image_url_https\":\"https:\\/\\/abs.twimg.com\\/images\\/themes\\/theme5\\/bg.gif\",\"profile_background_tile\":false,\"profile_image_url\":\"http:\\/\\/pbs.twimg.com\\/profile_images\\/1822967606\\/sheep_normal.png\",\"profile_image_url_https\":\"https:\\/\\/pbs.twimg.com\\/profile_images\\/1822967606\\/sheep_normal.png\",\"profile_link_color\":\"D02B55\",\"profile_sidebar_border_color\":\"829D5E\",\"profile_sidebar_fill_color\":\"99CC33\",\"profile_text_color\":\"3E4415\",\"profile_use_background_image\":true,\"default_profile\":false,\"default_profile_image\":false,\"following\":false,\"follow_request_sent\":false,\"notifications\":false}"
+    http_version: 
+  recorded_at: Mon, 24 Mar 2014 04:28:58 GMT
+- request:
+    method: get
+    uri: https://api.twitter.com/1.1/friends/ids.json?user_id=715073
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.8.9
+      Authorization:
+      - OAuth oauth_consumer_key="3KOZgmHSiX4sM3EwYPtbg", oauth_nonce="d469d16863918d2cba2cf25e5d7f1345",
+        oauth_signature="70Hx8WhO3NZVpaz%2BRIvh2X2Z2UI%3D", oauth_signature_method="HMAC-SHA1",
+        oauth_timestamp="1395635413", oauth_token="715073-utqV01U7Cdv6f4fBXCSDJsCadrWStpxAqXfssS8Pgz3",
+        oauth_version="1.0"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache, no-store, must-revalidate, pre-check=0, post-check=0
+      Content-Length:
+      - '2095'
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Mon, 24 Mar 2014 04:30:13 GMT
+      Expires:
+      - Tue, 31 Mar 1981 05:00:00 GMT
+      Last-Modified:
+      - Mon, 24 Mar 2014 04:30:13 GMT
+      Pragma:
+      - no-cache
+      Server:
+      - tfe
+      Set-Cookie:
+      - guest_id=v1%3A139563541372450793; Domain=.twitter.com; Path=/; Expires=Wed,
+        23-Mar-2016 04:30:13 UTC
+      - lang=en
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631138519
+      X-Access-Level:
+      - read
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Rate-Limit-Limit:
+      - '15'
+      X-Rate-Limit-Remaining:
+      - '14'
+      X-Rate-Limit-Reset:
+      - '1395636313'
+      X-Transaction:
+      - ae93095435630fc2
+      X-Xss-Protection:
+      - 1; mode=block
+    body:
+      encoding: UTF-8
+      string: "{\"ids\":[1569839659,2396724386,609602865,2356763192,2339397540,15212317,51119588,1874122668,14338572,2341106586,1687306902,40603,1227011947,138753057,1024516946,917704051,286537964,15044050,308270371,16440882,16472748,783680210,911228826,16018306,1526228120,133486420,13205432,462323976,46852648,75942399,235516647,7669762,281336977,26356464,132685491,86328927,41343046,792386382,17397582,16997374,1158286466,22872728,263836119,8526432,9070452,14271974,1371254156,198661893,103086746,15067554,35954885,20941662,14623181,26558552,38699900,823615,22386062,216806575,2998581,78333,15166940,385494873,58117314,1359740918,1447930087,796994144,1676509068,1411434049,51334194,17143528,226228265,1447894963,190103616,1270746139,61493510,48916095,14343698,28182181,54430133,1613464501,54636730,54336309,1631815051,14101520,208628843,29351552,65164079,5915562,1247514590,1419547135,372338922,9252942,119942992,14300282,53278941,1480592052,156319367,56464140,41807888,486055942,67470316,1455824616,171390040,106789200,15784090,506830441,339198735,795447620,1195186633,148976450,6481972,20720944,242832494,1223277152,1217686699,8920872,172404284,107511795,6052822,17795885,19641879,339315028,1325416682,6424172,24994925,14629399,397757663,757768165,23237934,14049570,549696919,18072456,222976579,950908628,30887458,6844292,6253282,9022272,129007138,3259381,2136011,32665109,140109654,347520294,752430234,20258391,14290339,9118712,20415893,113988145,12854372,13134132,543811409,257752888,16861448,231614679,15378263,1144151,24946566,989841691,8129542,14149400,30281013,218626468,25993,16555958,13066872,7723572,996164461,92162698,532641016,9885102,25775479,250319499,916313221,283891492,18749914,52593,63245277,907664455,19601257,207765183,14553314,117102031,25101704,202723307,495663839,201850201,6602252,16470470,196302235,20719205,73375191,279713029,52405966,7349382,18926552,259903891,222992267,111984637,18368214,23173210,28187205,436485648,72345380,173279135,372140408,142111734,84249568,39421066,243343930,19725644,373798422,6480682,71855589,57451576,382890833,23420895,59253078,344891328,342973774,315967486,89123936,290355596,301734713,325773946,55525953,15267982,311253628,307733391,20423295,185901474,76855088,265819021,29329275,91190919,16669898,273060588,85704847,274709839,104059582,154684428,67482788,14761655,46023,118279350,219397615,21892111,14517478,79033767,105836355,18175908,13889622,41751901,8000842,16240267,7440462,663463,122104257,18359595,85856281,195634100,189250924,210164186,8142952,18396147,56808301,208703632,15655467,204223574,202711941,9363302,45198675,130971495,13059172,112484196,15837981,184642325,24960841,145970048,14948162,96848570,164747717,14859054,5506262,23849978,33506729,53801238,17237911,19850521,41483518,132988269,10348432,30923,142950600,115978517,21672965,38341317,32964891,14231571,10890952,17633660,48842354,126413302,14171371,99048367,123930213,115231192,24507593,2911221,636923,89499649,50393960,33423,20793194,103616816,103093659,91136345,101692924,17374056,18098674,21897334,95970095,45241945,23689639,86397070,86132382,84117950,32616710,43362974,19673448,18398839,14817235,63767601,59141100,26702359,26789672,62046545,63379593,63306661,14601784,56533902,40321943,41074077,57548326,9891572,56596249,51178625,18035578,43893158,21139222,50548231,47886093,45768134,14286960,47212870,22344052,43977550,16458079,16024474,43153525,41210581,14345762,16458900,18317233,19057326,22412950,23811661,14862483,14610285,7040932,23232500,29499755,27478849,15101283,14981508,16203032,17121685,21714759,21442633,20070659,19239853,18807805,12571852,18167525,9933872,16584311,5720312,14835135,15249156,14205968,783214,15392996,14306045,14693823,7767782,6977642,46413,14475298,14550047,12384652,14350570,13484272,14324661,14280232,14203536,7228322,12663302,12543812,99723,11723452,643443,9366422,9321632,9088342,5901002,8882372,8916272,8891592,7694102,8057822],\"next_cursor\":0,\"next_cursor_str\":\"0\",\"previous_cursor\":0,\"previous_cursor_str\":\"0\"}"
+    http_version: 
+  recorded_at: Mon, 24 Mar 2014 04:30:13 GMT
+recorded_with: VCR 2.8.0

@@ -12,6 +12,8 @@ group :test do
   gem 'guard-minitest'
   gem 'minitest'
   gem 'sqlite3'
+  gem 'webmock', '~> 1.16.0'
+  gem 'vcr'
 end
 
 group :development do

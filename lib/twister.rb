@@ -1,13 +1,12 @@
 require 'logger'
 
 require 'faraday_middleware'
-require 'sequel'
+
+require_relative 'twister/db'
 
 module Twister
   API_KEY = ENV.fetch('API_KEY')
   API_SECRET = ENV.fetch('API_SECRET')
-  DB = Sequel.connect(ENV.fetch('DATABASE_URL'))
-  DB.loggers << Logger.new(STDOUT)
 
   class User < Sequel::Model
     many_to_one :friend
@@ -35,5 +34,13 @@ module Twister
 
   class Friend < Sequel::Model
     one_to_one :user
+
+    # We only fetch the first page of friend ids since I'm lazy
+    def fetch_friends
+      # TODO handle rate limiting here
+      resp = user.connection.get('friends/ids.json', user_id: twitter_id)
+      self.friend_ids = resp.body['ids'].map(&:to_s)
+      save
+    end
   end
 end
