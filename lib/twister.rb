@@ -12,8 +12,9 @@ module Twister
     many_to_one :friend
 
     def after_create
+      # TODO handle rate limiting
       resp = connection.get('account/verify_credentials.json')
-      self.friend = Friend.create(twitter_id: resp.body['id_str'],
+      self.friend = Friend.create(twitter_id: resp.body['id'],
                                   screen_name: resp.body['screen_name'])
     end
 
