@@ -31,28 +31,34 @@ module Twister
         conn.adapter Faraday.default_adapter
       end
     end
+
+    # We only fetch the first page of friend ids since I'm lazy
+    def fetch_friends(twitter_id, hydrate=false)
+      resp = connection.get('friends/ids.json', user_id: twitter_id)
+      friend.update(friend_ids: resp.body['ids'].map(&:to_s))
+
+      hydrate_friends if hydrate
+    end
+
+    def hydrate_friends
+      existing_friends = Friend.select(:twitter_id).where(twitter_id: friend.friend_ids.to_a).to_a
+      missing_friends = (friend.friend_ids - existing_friends)
+
+      missing_friends.each_slice(100) do |slice|
+        resp = connection.get('users/lookup.json', user_id: slice.join(','))
+        resp.body.each do |user|
+          Friend.create(twitter_id: user['id'],
+                        screen_name: user['screen_name'])
+        end
+      end
+
+      missing_friends.each do |friend_id|
+        fetch_friends(friend_id)
+      end
+    end
   end
 
   class Friend < Sequel::Model
     one_to_one :user
-
-    # We only fetch the first page of friend ids since I'm lazy
-    def fetch_friends(**kwargs)
-      # TODO handle rate limiting here
-      resp = user.connection.get('friends/ids.json', user_id: twitter_id)
-      self.friend_ids = resp.body['ids'].map(&:to_s)
-      save
-
-      hydrate_friends if kwargs.fetch(:hydrate, false)
-    end
-  end
-
-  def hydrate_friends
-    binding.pry
-    existing_friends = Friend.select(:twitter_id).where(twitter_id: friend_ids)
-    (friend_ids - existing_friends).each do |friend_id|
-      friend = Friend.create(twitter_id: friend_id)
-      friend.fetch_friends
-    end
   end
 end
