@@ -20,5 +20,6 @@ group :development do
   gem 'foreman'
   gem 'pry'
   gem 'pry-byebug'
+  gem 'pry-rescue'
   gem 'rake'
 end
