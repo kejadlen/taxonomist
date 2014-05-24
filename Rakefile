@@ -1,4 +1,5 @@
 require 'dotenv/tasks'
+require 'rake/testtask'
 
 namespace :db do
   desc 'Run migrations'
@@ -14,4 +15,8 @@ namespace :db do
       Sequel::Migrator.run(db, 'db/migrations')
     end
   end
+end
+
+Rake::TestTask.new do |t|
+  t.pattern = 'test/test_*.rb'
 end

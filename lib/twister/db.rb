@@ -1,6 +1,7 @@
 require 'logger'
 
 require 'sequel'
+Sequel.default_timezone = :utc
 Sequel::Model.plugin :timestamps
 
 module Twister
