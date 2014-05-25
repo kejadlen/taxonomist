@@ -65,17 +65,18 @@ module Twister
   end
 
   class InitialFetcher
-    attr_reader :user
+    attr_reader :connection, :friend
 
     def initialize(user)
-      @user = user
+      @connection = user.connection
+      @friend = user.friend
     end
 
     def run
-      user.friend.fetch_friends(user.connection)
-      user.friend.hydrate_friends(user.connection)
-      user.friend.friends.each do |friend|
-        friend.fetch_friends(user.connection)
+      friend.fetch_friends(connection)
+      friend.hydrate_friends(connection)
+      friend.friends.each do |friend|
+        friend.fetch_friends(connection)
       end
     end
   end
