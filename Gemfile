@@ -6,6 +6,11 @@ gem 'sequel'
 gem 'sequel_pg', require: false
 gem 'simple_oauth'
 
+# gem 'bitters'
+# gem 'bourbon'
+# gem 'neat'
+gem 'sinatra'
+
 group :test do
   gem 'dotenv'
   gem 'guard'
