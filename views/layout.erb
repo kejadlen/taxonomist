@@ -5,24 +5,27 @@
   <meta charset="utf-8">
   <title>Twister Lister</title>
   <script src="http://d3js.org/d3.v3.min.js"  charset="utf-8"></script>
+  <script src="/jquery-2.1.1.min.js"  charset="utf-8"></script>
   <style>
-    .bar {
-      fill: steelblue;
+    .node {
+      stroke: #fff;
+      stroke-width: 1.5px;
     }
 
-    .axis text {
+    .link {
+      stroke: #999;
+      stroke-opacity: .6;
+    }
+
+    circle {
+      fill: #ccc;
+      stroke: #fff;
+      stroke-width: 1.5px;
+    }
+
+    text {
       font: 10px sans-serif;
-    }
-
-    .axis path,
-    .axis line {
-      fill: none;
-      stroke: #000;
-      shape-rendering: crispEdges;
-    }
-
-    .x.axis path {
-      display: none;
+      pointer-events: none;
     }
   </style>
 </head>

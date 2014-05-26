@@ -27,4 +27,5 @@ group :development do
   gem 'pry-byebug'
   gem 'pry-rescue'
   gem 'rake'
+  gem 'rerun'
 end
