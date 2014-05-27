@@ -11,16 +11,21 @@ module Twister
                                         [2, 3] => 3,
                                         [3, 4] => 2,
                                         [4, 2] => -1 })
+      fw.calculate!
 
-      result = fw.shortest_paths
-      assert_equal(2, result[2][3])
-      assert_equal(3, result[4][1])
-      assert_equal(1, result[4][3])
-      assert_equal(0, result[1][4])
-      assert_equal(4, result[2][4])
-      assert_equal(1, result[3][2])
-      assert_equal(5, result[3][1])
-      assert_equal(-1, result[1][2])
+      assert_equal(2, fw.dist[[2,3]])
+      assert_equal(3, fw.dist[[4,1]])
+      assert_equal(1, fw.dist[[4,3]])
+      assert_equal(0, fw.dist[[1,4]])
+      assert_equal(4, fw.dist[[2,4]])
+      assert_equal(1, fw.dist[[3,2]])
+      assert_equal(5, fw.dist[[3,1]])
+      assert_equal(-1, fw.dist[[1,2]])
+
+      assert_equal([2,1,3], fw.path(2,3))
+      assert_equal([4,2,1,3], fw.path(4,3))
+      assert_equal([2,1,3,4], fw.path(2,4))
+      assert_equal([1,3,4,2], fw.path(1,2))
     end
   end
 end
