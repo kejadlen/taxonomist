@@ -2,8 +2,6 @@ var width = $( ".force" ).width(),
     height = $( window ).height();
 
 var force = d3.layout.force()
-    // .charge(-500)
-    // .gravity(0.6)
     .size([width, height]);
 
 var svg = d3.select(".force").append("svg")
@@ -47,8 +45,14 @@ d3.json("friends.json", function(error, data) {
     text.attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")"; });
   });
 
-  d3.select("#start").on("click", function() {
-    force.start();
+  d3.select("#startstop").on("click", function() {
+    if (this.value == "Stop") {
+      this.value = "Start";
+      force.stop();
+    } else {
+      this.value = "Stop";
+      force.start();
+    }
   });
 
   d3.select("#stop").on("click", function() {

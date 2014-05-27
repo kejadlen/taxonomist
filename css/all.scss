@@ -6,6 +6,6 @@
 
 .container {
   @include outer-container;
-  .sidebar { @include span-columns(3); }
-  .force { @include span-columns(9); @include omega(); }
+  .sidebar { @include span-columns(2); }
+  .force { @include span-columns(10); @include omega(); }
 }
