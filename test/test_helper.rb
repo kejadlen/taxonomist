@@ -1,14 +1,15 @@
+require 'dotenv'
+Dotenv.load
+
 require 'minitest/autorun'
 require 'minitest/pride'
 require 'pry'
 require 'pry-byebug'
 require 'pry-rescue/minitest'
+require 'sequel'
 require 'vcr'
 
 $LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))
-
-require 'dotenv'
-Dotenv.load
 
 VCR.configure do |c|
   c.cassette_library_dir = 'fixtures/vcr'
@@ -16,7 +17,7 @@ VCR.configure do |c|
 end
 
 module Twister
-  class Test < Minitest::Test
+  class DBTest < Minitest::Test
     def run
       result = nil
       Sequel::Model.db.transaction(rollback: :always) do

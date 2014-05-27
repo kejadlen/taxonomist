@@ -3,7 +3,7 @@ require_relative 'test_helper'
 require 'twister'
 
 module Twister
-  class TestUser < Test
+  class TestUser < DBTest
     def setup
       @user = Twister::User.create(access_token: ENV['ACCESS_TOKEN'],
                                    access_token_secret: ENV['ACCESS_TOKEN_SECRET'])
@@ -27,7 +27,7 @@ module Twister
     end
   end
 
-  class TestFriend < Test
+  class TestFriend < DBTest
     def setup
       @user = Twister::User.create(access_token: ENV['ACCESS_TOKEN'],
                                    access_token_secret: ENV['ACCESS_TOKEN_SECRET'])
