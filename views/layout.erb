@@ -4,8 +4,11 @@
 <head>
   <meta charset="utf-8">
   <title>Twister Lister</title>
+  <link rel="stylesheet" type="text/css" href="/css/all.css" />
+  <link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.10.4.min.css" />
   <script src="http://d3js.org/d3.v3.min.js"  charset="utf-8"></script>
-  <script src="/jquery-2.1.1.min.js"  charset="utf-8"></script>
+  <script src="/jquery-2.1.1.min.js"></script>
+  <script src="/js/jquery-ui-1.10.4.min.js"></script>
   <style>
     .node {
       stroke: #fff;
@@ -31,7 +34,9 @@
 </head>
 
 <body>
-  <%= yield %>
+  <div class="container">
+    <%= yield %>
+  </div>
 </body>
 
 </html>

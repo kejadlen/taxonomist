@@ -1,12 +1,12 @@
-var width = $(window).width(),
-    height = $(window).height();
+var width = $( ".force" ).width(),
+    height = $( window ).height();
 
 var force = d3.layout.force()
-    .charge(-500)
-    .gravity(0.6)
+    // .charge(-500)
+    // .gravity(0.6)
     .size([width, height]);
 
-var svg = d3.select("svg")
+var svg = d3.select(".force").append("svg")
     .attr("width", width)
     .attr("height", height);
 
@@ -45,5 +45,21 @@ d3.json("friends.json", function(error, data) {
 
     circle.attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")"; });
     text.attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")"; });
+  });
+
+  d3.select("#start").on("click", function() {
+    force.start();
+  });
+
+  d3.select("#stop").on("click", function() {
+    force.stop();
+  });
+
+  d3.select("#charge").on("change", function() {
+    force.charge(this.value).start();
+  });
+
+  d3.select("#gravity").on("change", function() {
+    force.gravity(this.value).start();
   });
 });

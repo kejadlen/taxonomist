@@ -22,10 +22,15 @@ group :test do
 end
 
 group :development do
-  gem 'foreman'
   gem 'pry'
   gem 'pry-byebug'
   gem 'pry-rescue'
+
+  gem 'bourbon'
+  gem 'bitters'
+  gem 'neat'
+
+  gem 'foreman'
   gem 'rake'
   gem 'rerun'
 end

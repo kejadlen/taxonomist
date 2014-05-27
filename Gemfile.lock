@@ -2,6 +2,13 @@ GEM
   remote: https://rubygems.org/
   specs:
     addressable (2.3.5)
+    bitters (0.9.5)
+      bourbon (>= 3.1)
+      sass (>= 3.2)
+      thor
+    bourbon (4.0.2)
+      sass (~> 3.3)
+      thor
     byebug (2.7.0)
       columnize (~> 0.3)
       debugger-linecache (~> 1.2)
@@ -44,6 +51,9 @@ GEM
     method_source (0.8.2)
     minitest (5.3.1)
     multipart-post (1.2.0)
+    neat (1.6.0)
+      bourbon (>= 3.1)
+      sass (>= 3.3)
     nio4r (1.0.0)
     pg (0.17.1)
     pry (0.9.12.6)
@@ -66,6 +76,7 @@ GEM
     rerun (0.9.0)
       listen (~> 2.7)
     safe_yaml (1.0.1)
+    sass (3.3.7)
     sequel (4.8.0)
     sequel_pg (1.6.9)
       pg (>= 0.8.0)
@@ -89,6 +100,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bitters
+  bourbon
   dotenv
   faraday
   faraday_middleware
@@ -96,6 +109,7 @@ DEPENDENCIES
   guard
   guard-minitest
   minitest
+  neat
   pry
   pry-byebug
   pry-rescue
