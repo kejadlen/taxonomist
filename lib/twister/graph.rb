@@ -3,28 +3,6 @@ require 'set'
 module Twister
   Node = Struct.new(:id, :neighbors)
 
-  class Graph
-    # attr_reader :nodes, :links
-
-    # def initialize(friend)
-    #   @nodes = friend.friend_ids.reject {|id| id == friend.twitter_id }
-    #   @links = friend.friends.reject {|f| f == friend }
-    #                          .each.with_object(Set.new) do |friend, links|
-    #     friend.friend_ids.reject {|id| id == friend.twitter_id }
-    #                      .each do |friend_id|
-    #       links << [friend.twitter_id, friend_id]
-    #       links << [friend_id, friend.twitter_id]
-    #     end
-    #   end
-    # end
-
-    # def betweenness
-    #   fw = FloydWarshall.new(nodes,
-    #                          links.each.with_object({}) {|l,h| h[l] = 1 })
-    #   fw.calculate!
-    # end
-  end
-
   class Brandes
     def self.from_friend(friend)
       friends = friend.friends.reject {|f| f == friend }
@@ -41,9 +19,26 @@ module Twister
       @neighbors = neighbors
     end
 
+    def invert
+      self.class.new(
+        vertices.each.with_object({}) do |i,h|
+          neighbors[i].each do |j|
+            key = [i,j].sort
+            next if h.has_key?(key)
+
+            h[key] = []
+            neighbors[i].each {|k| h[key] << [i,k].sort }
+            neighbors[j].each {|k| h[key] << [j,k].sort }
+            h[key].delete(key)
+          end
+        end
+      )
+    end
+
     def betweenness_centrality
       c_b = Hash.new(0)
-      neighbors.keys.each do |s|
+      b_k = Hash.new(1.0)
+      vertices.each do |s|
         stack = []
         p = Hash.new {|h,k| h[k] = [] }
         𝜎 = Hash.new(0); 𝜎[s] = 1
@@ -71,6 +66,10 @@ module Twister
         end
       end
       c_b
+    end
+
+    def vertices
+      neighbors.keys
     end
   end
 
