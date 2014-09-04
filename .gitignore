@@ -1,0 +1,9 @@
+# virtualenv
+.Python
+bin
+include
+lib
+share
+
+# dotenv
+*.env
