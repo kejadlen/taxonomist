@@ -3,7 +3,7 @@ module Twister
     attr_reader :connection, :friend
 
     def initialize(user)
-      @connection = user.connection
+      @connection = RateLimitedConnection.new(user.connection)
       @friend = user.friend
     end
 
@@ -13,6 +13,18 @@ module Twister
       friend.friends.each do |friend|
         friend.fetch_friends(connection)
       end
+    end
+  end
+
+  class Fetcher
+    attr_reader :connection, :friend
+
+    def initialize(user)
+      @connection = user.connection
+      @friend = user.friend
+    end
+
+    def run
     end
   end
 end

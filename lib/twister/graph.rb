@@ -13,6 +13,13 @@ module Twister
       new(neighbors)
     end
 
+    def self.from_gml(gml)
+      edges = gml.scan(/edge\s*\[\s*source\s*(\w+)\s*target\s*(\w+)\s*\]/m)
+      neighbors = edges.each.with_object({}) do |edge,n|
+      end
+      p edges
+    end
+
     attr_reader :neighbors
 
     def initialize(neighbors)

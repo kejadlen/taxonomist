@@ -17,8 +17,10 @@ module Twister
       response
     rescue RateLimited
       reset = Time.at(response.headers['x-rate-limit-reset'].to_i)
-      LOG.warn("Got rate limited; sleeping until #{reset}")
-      sleep reset - Time.now + 1
+      time = reset - Time.now + 1
+      time = 1 if time < 0
+      LOG.warn("Got rate limited; sleeping for #{time} (until #{reset})")
+      sleep(time)
       retry
     end
   end
