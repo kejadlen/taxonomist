@@ -50,8 +50,8 @@ def shutdown_session(exception=None):
 
 @app.route("/")
 def index():
-    # TODO Detect if signed in
-    return render_template("signin.html")
+    template = "index.html" if session.get("user_id") else "signin.html"
+    return render_template(template)
 
 @app.route("/signin")
 def signin():
@@ -61,6 +61,11 @@ def signin():
     session["oauth_token_secret"] = request_token.get("oauth_token_secret")
 
     return redirect("https://api.twitter.com/oauth/authenticate?oauth_token=%s" % session['oauth_token'])
+
+@app.route("/signout")
+def signout():
+    session.pop("user_id")
+    return redirect(url_for("index"))
 
 @app.route("/callback")
 def callback():
