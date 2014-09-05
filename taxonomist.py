@@ -1,15 +1,16 @@
 from flask import g, redirect, render_template, request, session, url_for
 from flask import Flask
 
+import db
 from twitter import Twitter
-from user import db_session, Base, User
+from user import User
 
 app = Flask(__name__)
 app.secret_key = "$zpWg$Mne7uj8eag"
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
-    db_session.remove()
+    db.session.remove()
 
 @app.route("/")
 def index():
@@ -50,8 +51,8 @@ def callback():
         user.screen_name = screen_name
         user.oauth_token = oauth_token
         user.oauth_token_secret = oauth_token_secret
-        db_session.add(user)
-        db_session.commit()
+        db.session.add(user)
+        db.session.commit()
     session["user_id"] = user.id
 
     return redirect(url_for("index"))

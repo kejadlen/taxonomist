@@ -31,4 +31,5 @@ class Twitter:
 
     def friends_ids(self, user_id):
         params = {"user_id":user_id}
-        return self.oauth.get(self.BASE_URL + "/1.1/friends/ids.json", params=params)
+        response = self.oauth.get(self.BASE_URL + "/1.1/friends/ids.json", params=params)
+        return (response.json().get("ids"), response)

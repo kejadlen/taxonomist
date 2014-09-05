@@ -1,23 +1,13 @@
 import datetime
 import os
 
-from sqlalchemy import BigInteger, Column, DateTime, Integer, String
-from sqlalchemy import create_engine, text
+import db
+from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import scoped_session, sessionmaker
 
 from twitter import Twitter
 
-engine = create_engine(os.environ['DATABASE'], echo=True)
-db_session = scoped_session(sessionmaker(autocommit=False,
-                                         autoflush=False,
-                                         bind=engine))
-
-Base = declarative_base()
-Base.query = db_session.query_property()
-
-class User(Base):
+class User(db.Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
@@ -41,6 +31,3 @@ class User(Base):
             return None
         else:
             return Twitter(self.oauth_token, self.oauth_token_secret)
-
-def init_db():
-    Base.metadata.create_all(bind=engine)
