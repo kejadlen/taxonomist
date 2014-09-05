@@ -24,9 +24,10 @@ class FriendUpdater:
         db.session.commit()
 
     def hydrate_friends(self, friend_ids):
+        users = User.query.filter(User.twitter_id.in_(friend_ids))
+
         # Only hydrate users that don't have names already in the DB.
-        users_with_names = User.query.filter(User.twitter_id.in_(friend_ids),
-                                             User.screen_name != None)
+        users_with_names = users.filter(User.screen_name != None)
         user_ids = [id for (id, ) in users_with_names.values(User.twitter_id)]
         dehydrated_ids = [id for id in friend_ids if id not in user_ids]
 
@@ -43,7 +44,6 @@ class FriendUpdater:
                     db.session.add(User(profile['id'], profile['screen_name']))
         db.session.commit()
 
-        users = User.query.filter(User.twitter_id.in_(friend_ids)).all()
         for user in users:
             self.update(user)
 

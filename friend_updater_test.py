@@ -74,25 +74,29 @@ class TestFriendUpdater(unittest.TestCase):
         profiles = [{'id':2, 'screen_name':"Eve"},
                     {'id':3, 'screen_name':"Mallory"},
                     {'id':4, 'screen_name':"Trent"}]
-        mock = Mock(return_value=(profiles, None))
-        self.twitter.users_lookup = mock
+        self.twitter.users_lookup = Mock(return_value=(profiles, None))
         self.friend_updater.update = Mock()
 
         ids = range(1, 6)
         self.friend_updater.hydrate_friends(ids)
 
-        mock.assert_called_with([2, 3, 4])
+        self.twitter.users_lookup.assert_called_with([2, 3, 4])
+        self.assertEqual(len(self.friend_updater.update.call_args_list), 5)
 
         for profile in profiles:
             user = User.query.filter(User.twitter_id == profile['id']).first()
             self.assertEqual(user.screen_name, profile['screen_name'])
 
     def test_hydrate_lots_of_friends(self):
-        mock = Mock(return_value=([], None))
-        self.twitter.users_lookup = mock
+        def side_effect(ids):
+            profiles = [{'id':id, 'screen_name':str(id)} for id in ids]
+            return (profiles, None)
+        self.twitter.users_lookup = Mock(side_effect=side_effect)
+        self.friend_updater.update = Mock()
 
         ids = range(1, 151)
         self.friend_updater.hydrate_friends(ids)
 
-        self.assertEqual(mock.call_args_list,
+        self.assertEqual(self.twitter.users_lookup.call_args_list,
                          [call(range(1, 101)), call(range(101, 151))])
+        self.assertEqual(len(self.friend_updater.update.call_args_list), 150)
