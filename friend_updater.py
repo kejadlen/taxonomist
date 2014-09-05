@@ -31,6 +31,13 @@ class FriendUpdater:
         for ids in izip_longest(*([iter(friend_ids)] * 100)):
             ids = [id for id in ids if id is not None]
             profiles, _ = self.twitter.users_lookup(ids)
+            for profile in profiles:
+                user = User.query.filter(User.twitter_id == profile['id']).first()
+                if user is None:
+                    db.session.add(User(profile['id'], profile['screen_name']))
+                else:
+                    user.screen_name = profile['screen_name']
+        db.session.commit()
 
     @classmethod
     def is_stale(cls, user):
@@ -117,6 +124,10 @@ class TestFriendUpdater(unittest.TestCase):
         self.friend_updater.hydrate_friends(ids)
 
         mock.assert_called_with([2, 3, 4])
+
+        for profile in profiles:
+            user = User.query.filter(User.twitter_id == profile['id']).first()
+            self.assertEqual(user.screen_name, profile['screen_name'])
 
     def test_hydrate_lots_of_friends(self):
         mock = Mock(return_value=([], None))
