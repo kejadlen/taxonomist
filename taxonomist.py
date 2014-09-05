@@ -47,8 +47,7 @@ def callback():
 
     user = User.query.filter(User.twitter_id == user_id).first()
     if not user:
-        user = User(user_id)
-        user.screen_name = screen_name
+        user = User(user_id, screen_name)
         user.oauth_token = oauth_token
         user.oauth_token_secret = oauth_token_secret
         db.session.add(user)
