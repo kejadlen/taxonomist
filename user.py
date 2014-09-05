@@ -7,6 +7,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 
 from twitter import Twitter
 
+
 class User(db.Base):
     __tablename__ = 'users'
 

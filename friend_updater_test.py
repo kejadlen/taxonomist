@@ -26,8 +26,8 @@ class TestFriendUpdater(unittest.TestCase):
 
         self.transaction = self.connection.begin()
         db.session = scoped_session(sessionmaker(autocommit=False,
-                                                   autoflush=False,
-                                                   bind=self.connection))
+                                                 autoflush=False,
+                                                 bind=self.connection))
         db.Base.query = db.session.query_property()
         db.Base.metadata.create_all(bind=self.connection)
 
@@ -71,9 +71,9 @@ class TestFriendUpdater(unittest.TestCase):
         db.session.add_all([User(1, "Alice"), User(3), User(5, "Bob")])
         db.session.commit()
 
-        profiles = [{'id':2, 'screen_name':"Eve"},
-                    {'id':3, 'screen_name':"Mallory"},
-                    {'id':4, 'screen_name':"Trent"}]
+        profiles = [{'id': 2, 'screen_name': "Eve"},
+                    {'id': 3, 'screen_name': "Mallory"},
+                    {'id': 4, 'screen_name': "Trent"}]
         self.twitter.users_lookup = Mock(return_value=(profiles, None))
         self.friend_updater.update = Mock()
 
@@ -84,12 +84,12 @@ class TestFriendUpdater(unittest.TestCase):
         self.assertEqual(len(self.friend_updater.update.call_args_list), 5)
 
         for profile in profiles:
-            user = User.query.filter(User.twitter_id == profile['id']).first()
+            user = User.query.filter(User.twitter_id == profile['id']).scalar()
             self.assertEqual(user.screen_name, profile['screen_name'])
 
     def test_hydrate_lots_of_friends(self):
         def side_effect(ids):
-            profiles = [{'id':id, 'screen_name':str(id)} for id in ids]
+            profiles = [{'id': id, 'screen_name': str(id)} for id in ids]
             return (profiles, None)
         self.twitter.users_lookup = Mock(side_effect=side_effect)
         self.friend_updater.update = Mock()

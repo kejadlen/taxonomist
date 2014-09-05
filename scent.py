@@ -1,5 +1,6 @@
 from sniffer.api import runnable
 
+
 @runnable
 def unittest_discover(*args):
     import unittest
