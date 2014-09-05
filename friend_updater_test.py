@@ -43,16 +43,16 @@ class TestFriendUpdater(unittest.TestCase):
         db.Base.query = db.session.query_property()
 
     def test_is_stale(self):
-        self.user.created_at = None
+        self.user.updated_at = None
         self.assertTrue(FriendUpdater.is_stale(self.user))
 
         one_day = datetime.timedelta(days=1)
-        base_created_at = datetime.datetime.now() - FriendUpdater.STALE
+        base_updated_at = datetime.datetime.now() - FriendUpdater.STALE
 
-        self.user.created_at = base_created_at - one_day
+        self.user.updated_at = base_updated_at - one_day
         self.assertTrue(FriendUpdater.is_stale(self.user))
 
-        self.user.created_at = base_created_at + one_day
+        self.user.updated_at = base_updated_at + one_day
         self.assertFalse(FriendUpdater.is_stale(self.user))
 
     def test_update_friends(self):
@@ -76,6 +76,7 @@ class TestFriendUpdater(unittest.TestCase):
                     {'id':4, 'screen_name':"Trent"}]
         mock = Mock(return_value=(profiles, None))
         self.twitter.users_lookup = mock
+        self.friend_updater.update = Mock()
 
         ids = range(1, 6)
         self.friend_updater.hydrate_friends(ids)

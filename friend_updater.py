@@ -11,11 +11,11 @@ class FriendUpdater:
     def __init__(self, twitter):
         self.twitter = twitter
 
-    def update(user, hydrate_friends=False):
-        if is_stale(user):
+    def update(self, user, hydrate_friends=False):
+        if self.is_stale(user):
             self.update_friends(user)
 
-        if hydrate_friends:
+        if self.hydrate_friends:
             self.hydrate_friends(user.friend_ids)
 
     def update_friends(self, user):
@@ -43,6 +43,10 @@ class FriendUpdater:
                     db.session.add(User(profile['id'], profile['screen_name']))
         db.session.commit()
 
+        users = User.query.filter(User.twitter_id.in_(friend_ids)).all()
+        for user in users:
+            self.update(user)
+
     @classmethod
     def is_stale(cls, user):
-        return user.created_at is None or datetime.datetime.now() - user.created_at > cls.STALE
+        return user.updated_at is None or datetime.datetime.now() - user.updated_at > cls.STALE
