@@ -1,3 +1,5 @@
+import os
+
 from flask import g, redirect, render_template, request, session, url_for
 from flask import Flask
 
@@ -7,7 +9,7 @@ from twitter import Twitter
 from user import User
 
 app = Flask(__name__)
-app.secret_key = "$zpWg$Mne7uj8eag"
+app.secret_key = os.environ['FLASK_SECRET']
 
 
 @app.teardown_appcontext
