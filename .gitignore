@@ -1,3 +1,6 @@
+# python
+*.pyc
+
 # virtualenv
 .Python
 bin
@@ -5,5 +8,5 @@ include
 lib
 share
 
-# dotenv
+# honcho
 *.env
