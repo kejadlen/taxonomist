@@ -30,6 +30,13 @@ class Twitter:
                                    resource_owner_secret=oauth_token_secret)
 
     def friends_ids(self, user_id):
-        params = {"user_id":user_id}
-        response = self.oauth.get(self.BASE_URL + "/1.1/friends/ids.json", params=params)
+        payload = {"user_id":user_id}
+        response = self.oauth.get(self.BASE_URL + "/1.1/friends/ids.json",
+                                  params=payload)
         return (response.json().get("ids"), response)
+
+    def users_lookup(self, user_ids):
+        payload = {'user_id':','.join([str(id) for id in user_ids])}
+        response = self.oauth.post(self.BASE_URL + '/1.1/users/lookup.json',
+                                   data=payload)
+        return (response.json(), response)
