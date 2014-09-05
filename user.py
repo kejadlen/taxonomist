@@ -19,11 +19,12 @@ class User(db.Base):
     oauth_token = Column(String(255))
     oauth_token_secret = Column(String(255))
 
-    def __init__(self, twitter_id):
+    def __init__(self, twitter_id, screen_name=None):
         self.twitter_id = twitter_id
+        self.screen_name = screen_name
 
     def __repr__(self):
-        return '<User %r>' % (self.twitter_id)
+        return '<User %r, %r>' % (self.twitter_id, self.screen_name)
 
     @property
     def twitter(self):

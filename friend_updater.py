@@ -1,4 +1,5 @@
 import datetime
+from itertools import izip_longest
 
 import db
 
@@ -13,10 +14,23 @@ class FriendUpdater:
         if is_stale(user):
             self.update_friends(user)
 
+        if hydrate_friends:
+            self.hydrate_friends(user.friend_ids)
+
     def update_friends(self, user):
         ids, _ = self.twitter.friends_ids(user.twitter_id)
         user.friend_ids = ids
         db.session.commit()
+
+    def hydrate_friends(self, friend_ids):
+        user_ids = User.query.filter(User.twitter_id.in_(range(1,6)),
+                                     User.screen_name != None).values(User.twitter_id)
+        user_ids = [id for (id, ) in user_ids]
+        friend_ids = [id for id in friend_ids if id not in user_ids]
+
+        for ids in izip_longest(*([iter(friend_ids)] * 100)):
+            ids = [id for id in ids if id is not None]
+            profiles, _ = self.twitter.users_lookup(ids)
 
     @classmethod
     def is_stale(cls, user):
@@ -24,7 +38,7 @@ class FriendUpdater:
 
 import unittest
 
-from mock import Mock
+from mock import call, Mock
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
@@ -81,10 +95,35 @@ class TestFriendUpdater(unittest.TestCase):
         db.session.add(self.user)
         db.session.commit()
 
-        ids = [1, 2, 3, 4, 5]
+        ids = range(1, 6)
         self.twitter.friends_ids = Mock(return_value=(ids, None))
 
         self.friend_updater.update_friends(self.user)
 
         user = User.query.get(self.user.id)
         self.assertEqual(user.friend_ids, ids)
+
+    def test_hydrate_existing_friends(self):
+        db.session.add_all([User(1, "Alice"), User(3), User(5, "Bob")])
+        db.session.commit()
+
+        profiles = [{'id':2, 'screen_name':"Eve"},
+                    {'id':3, 'screen_name':"Mallory"},
+                    {'id':4, 'screen_name':"Trent"}]
+        mock = Mock(return_value=(profiles, None))
+        self.twitter.users_lookup = mock
+
+        ids = range(1, 6)
+        self.friend_updater.hydrate_friends(ids)
+
+        mock.assert_called_with([2, 3, 4])
+
+    def test_hydrate_lots_of_friends(self):
+        mock = Mock(return_value=([], None))
+        self.twitter.users_lookup = mock
+
+        ids = range(1, 151)
+        self.friend_updater.hydrate_friends(ids)
+
+        self.assertEqual(mock.call_args_list,
+                         [call(range(1, 101)), call(range(101, 151))])
