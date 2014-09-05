@@ -2,6 +2,7 @@ from flask import g, redirect, render_template, request, session, url_for
 from flask import Flask
 
 import db
+from friend_updater import FriendUpdater
 from twitter import Twitter
 from user import User
 
@@ -58,8 +59,15 @@ def callback():
 
 @app.route("/update_friends")
 def update_friends():
-    if not session.get('user_id'):
+    user_id = session.get('user_id')
+    if not user_id:
         abort(401)
+
+    user = User.query.get(user_id)
+    friend_updater = FriendUpdater(user.twitter)
+    friend_updater.update(user)
+
+    return redirect(url_for('index'))
 
 if __name__ == "__main__":
     app.run(debug=True)
