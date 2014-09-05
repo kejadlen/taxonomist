@@ -51,7 +51,7 @@ def shutdown_session(exception=None):
 @app.route("/")
 def index():
     # TODO Detect if signed in
-    return app.send_static_file("index.html")
+    return render_template("signin.html")
 
 @app.route("/signin")
 def signin():
