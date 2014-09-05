@@ -42,5 +42,5 @@ class TestFriendUpdater(unittest.TestCase):
         self.user.created_at = base_created_at + one_day
         self.assertFalse(FriendUpdater.is_stale(self.user))
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_update_friends(self):
+        pass
