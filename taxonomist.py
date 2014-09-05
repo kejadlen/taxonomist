@@ -13,7 +13,8 @@ def shutdown_session(exception=None):
 
 @app.route("/")
 def index():
-    template = "index.html" if session.get("user_id") else "signin.html"
+    user_id = session.get("user_id")
+    template = "index.html" if user_id else "signin.html"
     return render_template(template)
 
 @app.route("/signin")

@@ -7,6 +7,8 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
+from twitter import Twitter
+
 engine = create_engine(os.environ['DATABASE'], echo=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
@@ -32,6 +34,10 @@ class User(Base):
 
     def __repr__(self):
         return '<User %r>' % (self.twitter_id)
+
+    @property
+    def twitter(self):
+        return Twitter(self.oauth_token, self.oauth_token_secret)
 
 def init_db():
     Base.metadata.create_all(bind=engine)
