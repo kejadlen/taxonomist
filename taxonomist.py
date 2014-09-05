@@ -46,7 +46,7 @@ def callback():
     screen_name = access_token.get("screen_name")
 
     user = User.query.filter(User.twitter_id == user_id).first()
-    if user is None:
+    if not user:
         user = User(user_id)
         user.screen_name = screen_name
         user.oauth_token = oauth_token
@@ -56,6 +56,11 @@ def callback():
     session["user_id"] = user.id
 
     return redirect(url_for("index"))
+
+@app.route("/update_friends")
+def update_friends():
+    if not session.get('user_id'):
+        abort(401)
 
 if __name__ == "__main__":
     app.run(debug=True)

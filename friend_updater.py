@@ -37,10 +37,10 @@ class FriendUpdater:
             profiles, _ = self.twitter.users_lookup(ids)
             for profile in profiles:
                 user = User.query.filter(User.twitter_id == profile['id']).first()
-                if user is None:
-                    db.session.add(User(profile['id'], profile['screen_name']))
-                else:
+                if user:
                     user.screen_name = profile['screen_name']
+                else:
+                    db.session.add(User(profile['id'], profile['screen_name']))
         db.session.commit()
 
     @classmethod

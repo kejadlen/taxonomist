@@ -28,7 +28,7 @@ class User(db.Base):
 
     @property
     def twitter(self):
-        if self.oauth_token is None or self.oauth_token_secret is None:
+        if not self.oauth_token or not self.oauth_token_secret:
             return None
         else:
             return Twitter(self.oauth_token, self.oauth_token_secret)
