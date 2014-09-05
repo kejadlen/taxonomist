@@ -37,7 +37,10 @@ class User(Base):
 
     @property
     def twitter(self):
-        return Twitter(self.oauth_token, self.oauth_token_secret)
+        if self.oauth_token is None or self.oauth_token_secret is None:
+            return None
+        else:
+            return Twitter(self.oauth_token, self.oauth_token_secret)
 
 def init_db():
     Base.metadata.create_all(bind=engine)
