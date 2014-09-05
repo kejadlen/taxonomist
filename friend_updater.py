@@ -23,11 +23,14 @@ class FriendUpdater:
         db.session.commit()
 
     def hydrate_friends(self, friend_ids):
+        # Only hydrate users that don't have names already in the DB.
         users_with_names = User.query.filter(User.twitter_id.in_(friend_ids),
                                              User.screen_name != None)
         user_ids = [id for (id, ) in users_with_names.values(User.twitter_id)]
         dehydrated_ids = [id for id in friend_ids if id not in user_ids]
 
+        # Since users_lookup takes a maximum of 100 ids, we slice the
+        # list of dehydrated ids into chunks of 100 to hydrate them.
         for ids in izip_longest(*([iter(dehydrated_ids)] * 100)):
             ids = [id for id in ids if id is not None]
             profiles, _ = self.twitter.users_lookup(ids)
