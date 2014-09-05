@@ -44,11 +44,13 @@ class TestFriendUpdater(unittest.TestCase):
         cls.connection.close()
 
     def setUp(self):
+        self.original_session = db.session
+
         self.transaction = self.connection.begin()
-        self.session = scoped_session(sessionmaker(autocommit=False,
+        db.session = scoped_session(sessionmaker(autocommit=False,
                                                    autoflush=False,
                                                    bind=self.connection))
-        db.Base.query = self.session.query_property()
+        db.Base.query = db.session.query_property()
         db.Base.metadata.create_all(bind=self.connection)
 
         self.user = User(12345)
@@ -56,9 +58,10 @@ class TestFriendUpdater(unittest.TestCase):
         self.friend_updater = FriendUpdater(self.twitter)
 
     def tearDown(self):
-        self.session.close()
+        db.session.close()
         self.transaction.rollback()
 
+        db.session = self.original_session
         db.Base.query = db.session.query_property()
 
     def test_is_stale(self):
@@ -75,8 +78,13 @@ class TestFriendUpdater(unittest.TestCase):
         self.assertFalse(FriendUpdater.is_stale(self.user))
 
     def test_update_friends(self):
+        db.session.add(self.user)
+        db.session.commit()
+
         ids = [1, 2, 3, 4, 5]
         self.twitter.friends_ids = Mock(return_value=(ids, None))
 
         self.friend_updater.update_friends(self.user)
-        self.assertEqual(self.user.friend_ids, 1)
+
+        user = User.query.get(self.user.id)
+        self.assertEqual(user.friend_ids, ids)
