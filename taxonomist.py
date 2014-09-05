@@ -39,7 +39,6 @@ def init_db():
 from flask import g, redirect, render_template, request, session, url_for
 from flask import Flask
 from twitter import Twitter
-from requests_oauthlib import OAuth1Session
 
 app = Flask(__name__)
 app.secret_key = "$zpWg$Mne7uj8eag"
