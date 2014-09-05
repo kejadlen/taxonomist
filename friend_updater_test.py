@@ -68,12 +68,12 @@ class TestFriendUpdater(unittest.TestCase):
         self.assertEqual(user.friend_ids, ids)
 
     def test_hydrate_existing_friends(self):
-        db.session.add_all([User(1, "Alice"), User(3), User(5, "Bob")])
+        db.session.add_all([User(1, 'Alice'), User(3), User(5, 'Bob')])
         db.session.commit()
 
-        profiles = [{'id': 2, 'screen_name': "Eve"},
-                    {'id': 3, 'screen_name': "Mallory"},
-                    {'id': 4, 'screen_name': "Trent"}]
+        profiles = [{'id': 2, 'screen_name': 'Eve'},
+                    {'id': 3, 'screen_name': 'Mallory'},
+                    {'id': 4, 'screen_name': 'Trent'}]
         self.twitter.users_lookup = Mock(return_value=(profiles, None))
         self.friend_updater.update = Mock()
 

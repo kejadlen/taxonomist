@@ -17,44 +17,44 @@ def shutdown_session(exception=None):
     db.session.remove()
 
 
-@app.route("/")
+@app.route('/')
 def index():
-    user_id = session.get("user_id")
-    template = "index.html" if user_id else "signin.html"
+    user_id = session.get('user_id')
+    template = 'index.html' if user_id else 'signin.html'
     return render_template(template)
 
 
-@app.route("/signin")
+@app.route('/signin')
 def signin():
     request_token = Twitter.request_token()
 
-    session["oauth_token"] = request_token.get("oauth_token")
-    session["oauth_token_secret"] = request_token.get("oauth_token_secret")
+    session['oauth_token'] = request_token.get('oauth_token')
+    session['oauth_token_secret'] = request_token.get('oauth_token_secret')
 
-    url = "https://api.twitter.com/oauth/authenticate?oauth_token=%s"
+    url = 'https://api.twitter.com/oauth/authenticate?oauth_token=%s'
     return redirect(url % session['oauth_token'])
 
 
-@app.route("/signout")
+@app.route('/signout')
 def signout():
-    session.pop("user_id")
-    return redirect(url_for("index"))
+    session.pop('user_id')
+    return redirect(url_for('index'))
 
 
-@app.route("/callback")
+@app.route('/callback')
 def callback():
-    oauth_token = session.pop("oauth_token")
-    oauth_token_secret = session.pop("oauth_token_secret")
-    oauth_verifier = request.args.get("oauth_verifier")
+    oauth_token = session.pop('oauth_token')
+    oauth_token_secret = session.pop('oauth_token_secret')
+    oauth_verifier = request.args.get('oauth_verifier')
 
     access_token = Twitter.access_token(oauth_token,
                                         oauth_token_secret,
                                         oauth_verifier)
 
-    oauth_token = access_token.get("oauth_token")
-    oauth_token_secret = access_token.get("oauth_token_secret")
-    user_id = access_token.get("user_id")
-    screen_name = access_token.get("screen_name")
+    oauth_token = access_token.get('oauth_token')
+    oauth_token_secret = access_token.get('oauth_token_secret')
+    user_id = access_token.get('user_id')
+    screen_name = access_token.get('screen_name')
 
     user = User.query.filter(User.twitter_id == user_id).scalar()
     if not user:
@@ -63,12 +63,12 @@ def callback():
         user.oauth_token_secret = oauth_token_secret
         db.session.add(user)
         db.session.commit()
-    session["user_id"] = user.id
+    session['user_id'] = user.id
 
-    return redirect(url_for("index"))
+    return redirect(url_for('index'))
 
 
-@app.route("/update_friends")
+@app.route('/update_friends')
 def update_friends():
     user_id = session.get('user_id')
     if not user_id:
@@ -80,5 +80,5 @@ def update_friends():
 
     return redirect(url_for('index'))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
