@@ -1,10 +1,18 @@
 import datetime
 
-class FriendsUpdater:
+class FriendUpdater:
     STALE = datetime.timedelta(weeks=4)
 
     def __init__(self, twitter):
         self.twitter = twitter
+
+    def update(user, hydrate_friends=False):
+        if is_stale(user):
+            self.update_friends(user)
+
+    def update_friends(self, user):
+        response = twitter.friends_ids(user.twitter_id)
+        response.json()
 
     @classmethod
     def is_stale(cls, user):
@@ -13,23 +21,26 @@ class FriendsUpdater:
 import unittest
 from collections import namedtuple
 
-MockUser = namedtuple('MockUser', 'created_at')
+from mock import Mock
 
 class TestFriendUpdater(unittest.TestCase):
+    def setUp(self):
+        self.user = Mock()
+        self.twitter = Mock()
+        self.friend_updater = FriendUpdater(self.twitter)
+
     def test_is_stale(self):
-        user = MockUser(created_at=None)
-        self.assertTrue(FriendsUpdater.is_stale(user))
+        self.user.created_at = None
+        self.assertTrue(FriendUpdater.is_stale(self.user))
 
         one_day = datetime.timedelta(days=1)
-        base_created_at = datetime.datetime.now() - FriendsUpdater.STALE
+        base_created_at = datetime.datetime.now() - FriendUpdater.STALE
 
-        created_at = base_created_at - one_day
-        user = MockUser(created_at=created_at)
-        self.assertTrue(FriendsUpdater.is_stale(user))
+        self.user.created_at = base_created_at - one_day
+        self.assertTrue(FriendUpdater.is_stale(self.user))
 
-        created_at = base_created_at + one_day
-        user = MockUser(created_at=created_at)
-        self.assertFalse(FriendsUpdater.is_stale(user))
+        self.user.created_at = base_created_at + one_day
+        self.assertFalse(FriendUpdater.is_stale(self.user))
 
 if __name__ == '__main__':
     unittest.main()
