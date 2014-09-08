@@ -22,10 +22,20 @@ class UserRefresher:
     def friends(self):
         return User.query.filter(User.twitter_id.in_(self.user.friend_ids))
 
-    def refresh_friends(self):
+    @property
+    def stale_friends(self):
+        return [friend for friend in self.friends if self.is_stale(friend)]
+
+    def refresh_friends(self, hydrate=False, refresh_stale=False):
         ids, _ = self.twitter.friends_ids(self.user.twitter_id)
         self.user.friend_ids = ids
         db.session.commit()
+
+        if hydrate:
+            self.hydrate_friends()
+
+        if refresh_stale:
+            self.refresh_stale_friends()
 
     def hydrate_friends(self):
         named_friends = self.friends.filter(User.screen_name.isnot(None))
@@ -34,6 +44,11 @@ class UserRefresher:
                                for id in self.user.friend_ids
                                if id not in named_friend_ids]
         self.hydrate_users(dehydrated_user_ids)
+
+    def refresh_stale_friends(self):
+        for friend in self.stale_friends:
+            twitter = friend.twitter or self.twitter
+            self.__class__(friend, twitter).refresh_friends()
 
     def hydrate_users(self, user_ids):
         if not user_ids:

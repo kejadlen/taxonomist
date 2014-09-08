@@ -76,7 +76,7 @@ def update_friends():
 
     user = User.query.get(user_id)
     user_refresher = UserRefresher(user)
-    user_refresher.refresh_friends()
+    user_refresher.refresh_friends(hydrate=True, refresh_stale=True)
 
     return redirect(url_for('index'))
 
