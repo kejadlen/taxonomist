@@ -1,6 +1,15 @@
 import os
 
+import requests
 from requests_oauthlib import OAuth1Session
+
+
+class RateLimitedError(Exception):
+    def __init__(self, response):
+        self.response = response
+
+    def __str__(self):
+        return repr(self.response)
 
 
 class Twitter:
@@ -45,7 +54,7 @@ class Twitter:
 
     def users_lookup(self, user_ids):
         payload = {'user_id': ','.join([str(id) for id in user_ids])}
-        response = self.http(self.oauth.get,
+        response = self.http(self.oauth.post,
                              '/1.1/users/lookup.json',
                              data=payload)
         # response = self.oauth.post(self.url_for('/1.1/users/lookup.json'),
@@ -53,8 +62,8 @@ class Twitter:
         return (response.json(), response)
 
     def http(self, func, endpoint, **kwargs):
-        response = func(self.url_for(endpoint), kwargs)
+        response = func(self.url_for(endpoint), **kwargs)
         if response.status_code == requests.codes.too_many_requests:
-            pass
+            raise RateLimitedError(response)
         response.raise_for_status()
         return response

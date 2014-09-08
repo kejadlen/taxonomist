@@ -76,7 +76,7 @@ def update_friends():
 
     user = User.query.get(user_id)
     friend_updater = FriendUpdater(user.twitter)
-    friend_updater.update(user)
+    friend_updater.update(user, hydrate_friends=True)
 
     return redirect(url_for('index'))
 

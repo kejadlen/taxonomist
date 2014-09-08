@@ -15,7 +15,7 @@ class FriendUpdater:
         if self.is_stale(user):
             self.update_friends(user)
 
-        if self.hydrate_friends:
+        if hydrate_friends:
             self.hydrate_friends(user.friend_ids)
 
     def update_friends(self, user):
@@ -30,6 +30,9 @@ class FriendUpdater:
         users_with_names = users.filter(User.screen_name.isnot(None))
         user_ids = [id for (id, ) in users_with_names.values(User.twitter_id)]
         dehydrated_ids = [id for id in friend_ids if id not in user_ids]
+
+        if not dehydrated_ids:
+            return
 
         # Since users_lookup takes a maximum of 100 ids, we slice the
         # list of dehydrated ids into chunks of 100 to hydrate them.
