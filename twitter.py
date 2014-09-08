@@ -14,6 +14,7 @@ class RateLimitedError(Exception):
 
 class Twitter:
     BASE_URL = 'https://api.twitter.com'
+    USERS_LOOKUP_CHUNK_SIZE = 100
 
     @classmethod
     def url_for(cls, endpoint):

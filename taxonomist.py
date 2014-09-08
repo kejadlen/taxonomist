@@ -4,7 +4,7 @@ from flask import g, redirect, render_template, request, session, url_for
 from flask import Flask
 
 import db
-from friend_updater import FriendUpdater
+from user_refresher import UserRefresher
 from twitter import Twitter
 from user import User
 
@@ -75,8 +75,8 @@ def update_friends():
         abort(401)
 
     user = User.query.get(user_id)
-    friend_updater = FriendUpdater(user.twitter)
-    friend_updater.update(user, hydrate_friends=True)
+    user_refresher = UserRefresher(user)
+    user_refresher.refresh_friends()
 
     return redirect(url_for('index'))
 
