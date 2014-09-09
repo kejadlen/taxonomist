@@ -2,34 +2,16 @@ import unittest
 from datetime import datetime, timedelta
 
 from mock import call, Mock
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
 
 import db
+from test import TestCase
 from user import User
 from user_refresher import UserRefresher
 
 
-class TestUserRefresher(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.engine = create_engine('postgresql://localhost/taxonomist_test',
-                                   echo=True)
-        cls.connection = cls.engine.connect()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.connection.close()
-
+class TestUserRefresher(TestCase):
     def setUp(self):
-        self.original_session = db.session
-
-        self.transaction = self.connection.begin()
-        db.session = scoped_session(sessionmaker(autocommit=False,
-                                                 autoflush=False,
-                                                 bind=self.connection))
-        db.Base.query = db.session.query_property()
-        db.Base.metadata.create_all(bind=self.connection)
+        super(TestUserRefresher, self).setUp()
 
         self.user = User(12345)
         self.twitter = Mock()
@@ -37,13 +19,6 @@ class TestUserRefresher(unittest.TestCase):
 
         db.session.add(self.user)
         db.session.commit()
-
-    def tearDown(self):
-        db.session.close()
-        self.transaction.rollback()
-
-        db.session = self.original_session
-        db.Base.query = db.session.query_property()
 
     def test_is_stale(self):
         self.user.updated_at = None
