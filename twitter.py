@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 
 import requests
@@ -10,6 +11,11 @@ class RateLimitedError(Exception):
 
     def __str__(self):
         return repr(self.response)
+
+    @property
+    def rate_limit_reset(self):
+        reset = self.response.headers['x-rate-limit-reset']
+        return datetime.fromtimestamp(int(reset))
 
 
 class Twitter:

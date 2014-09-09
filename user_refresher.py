@@ -26,16 +26,20 @@ class UserRefresher:
     def stale_friends(self):
         return [friend for friend in self.friends if self.is_stale(friend)]
 
-    def refresh_friends(self, hydrate=False, refresh_stale=False):
-        ids, _ = self.twitter.friends_ids(self.user.twitter_id)
-        self.user.friend_ids = ids
-        db.session.commit()
+    def run(self, hydrate=False, refresh_stale=False):
+        if not self.is_stale(self.user):
+            self.refresh_friends()
 
         if hydrate:
             self.hydrate_friends()
 
         if refresh_stale:
             self.refresh_stale_friends()
+
+    def refresh_friends(self):
+        ids, _ = self.twitter.friends_ids(self.user.twitter_id)
+        self.user.friend_ids = ids
+        db.session.commit()
 
     def hydrate_friends(self):
         named_friends = self.friends.filter(User.screen_name.isnot(None))

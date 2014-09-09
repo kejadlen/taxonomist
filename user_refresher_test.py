@@ -68,7 +68,7 @@ class TestUserRefresher(unittest.TestCase):
         self.assertEqual(user.friend_ids, ids)
 
     def test_hydrate_existing_friends(self):
-        self.user.friend_ids = range(1,6)
+        self.user.friend_ids = range(1, 6)
         db.session.add_all([User(1, 'Alice'), User(3), User(5, 'Bob')])
         db.session.commit()
 
@@ -86,7 +86,7 @@ class TestUserRefresher(unittest.TestCase):
             self.assertEqual(user.screen_name, profile['screen_name'])
 
     def test_hydrate_lots_of_friends(self):
-        self.user.friend_ids = range(1,151)
+        self.user.friend_ids = range(1, 151)
         db.session.commit()
 
         def side_effect(ids):
