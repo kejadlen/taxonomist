@@ -1,5 +1,5 @@
-import datetime
 import os
+from datetime import datetime
 
 import db
 from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
@@ -16,7 +16,7 @@ class User(db.Base):
     screen_name = Column(String(32))
     friend_ids = Column(ARRAY(BigInteger))
     created_at = Column(DateTime, server_default=text('current_timestamp'))
-    updated_at = Column(DateTime, onupdate=datetime.datetime.now)
+    updated_at = Column(DateTime, onupdate=datetime.now)
     oauth_token = Column(String(255))
     oauth_token_secret = Column(String(255))
 

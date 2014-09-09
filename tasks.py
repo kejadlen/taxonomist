@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from celery import Celery
 
@@ -13,6 +13,6 @@ def refresh_user(self, user):
     try:
         UserRefresher(user).run(hydrate=True, refresh_stale=True)
     except RateLimitedError as exc:
-        delta = exc.rate_limit_reset - datetime.datetime.now()
+        delta = exc.rate_limit_reset - datetime.now()
         countdown = delta.total_seconds() + 1
         raise self.retry(exc=exc, countdown=countdown)

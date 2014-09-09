@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 from itertools import izip_longest
 
 import db
@@ -7,12 +7,12 @@ from user import User
 
 
 class UserRefresher:
-    STALE = datetime.timedelta(weeks=4)
+    STALE = timedelta(weeks=4)
 
     @classmethod
     def is_stale(cls, user):
         return (user.updated_at is None or
-                datetime.datetime.now() - user.updated_at > cls.STALE)
+                datetime.now() - user.updated_at > cls.STALE)
 
     def __init__(self, user, twitter=None):
         self.user = user

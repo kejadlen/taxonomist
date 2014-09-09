@@ -1,5 +1,5 @@
-import datetime
 import unittest
+from datetime import datetime, timedelta
 
 from mock import call, Mock
 from sqlalchemy import create_engine
@@ -49,8 +49,8 @@ class TestUserRefresher(unittest.TestCase):
         self.user.updated_at = None
         self.assertTrue(UserRefresher.is_stale(self.user))
 
-        one_day = datetime.timedelta(days=1)
-        base_updated_at = datetime.datetime.now() - UserRefresher.STALE
+        one_day = timedelta(days=1)
+        base_updated_at = datetime.now() - UserRefresher.STALE
 
         self.user.updated_at = base_updated_at - one_day
         self.assertTrue(UserRefresher.is_stale(self.user))
