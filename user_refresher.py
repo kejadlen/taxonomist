@@ -1,4 +1,3 @@
-from datetime import datetime, timedelta
 from itertools import izip_longest
 
 import db
@@ -7,27 +6,12 @@ from user import User
 
 
 class UserRefresher:
-    STALE = timedelta(weeks=4)
-
-    @classmethod
-    def is_stale(cls, user):
-        return (user.updated_at is None or
-                datetime.now() - user.updated_at > cls.STALE)
-
     def __init__(self, user, twitter=None):
         self.user = user
         self.twitter = twitter or user.twitter
 
-    @property
-    def friends(self):
-        return User.query.filter(User.twitter_id.in_(self.user.friend_ids))
-
-    @property
-    def stale_friends(self):
-        return [friend for friend in self.friends if self.is_stale(friend)]
-
     def run(self, hydrate=False, refresh_stale=False):
-        if not self.is_stale(self.user):
+        if not self.user.is_stale:
             self.refresh_friends()
 
         if hydrate:
@@ -42,7 +26,7 @@ class UserRefresher:
         db.session.commit()
 
     def hydrate_friends(self):
-        named_friends = self.friends.filter(User.screen_name.isnot(None))
+        named_friends = self.user.friends.filter(User.screen_name.isnot(None))
         named_friend_ids = [friend.twitter_id for friend in named_friends]
         dehydrated_user_ids = [id
                                for id in self.user.friend_ids
@@ -50,7 +34,7 @@ class UserRefresher:
         self.hydrate_users(dehydrated_user_ids)
 
     def refresh_stale_friends(self):
-        for friend in self.stale_friends:
+        for friend in self.user.stale_friends:
             twitter = friend.twitter or self.twitter
             self.__class__(friend, twitter).refresh_friends()
 

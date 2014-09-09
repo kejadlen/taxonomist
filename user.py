@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import db
 from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
@@ -10,6 +10,8 @@ from twitter import Twitter
 
 class User(db.Base):
     __tablename__ = 'users'
+
+    STALE = timedelta(weeks=4)
 
     id = Column(Integer, primary_key=True)
     twitter_id = Column(BigInteger, nullable=False, unique=True)
@@ -26,6 +28,19 @@ class User(db.Base):
 
     def __repr__(self):
         return '<User %r, %r>' % (self.twitter_id, self.screen_name)
+
+    @property
+    def is_stale(self):
+        return (self.updated_at is None or
+                datetime.now() - self.updated_at > self.STALE)
+
+    @property
+    def friends(self):
+        return User.query.filter(User.twitter_id.in_(self.friend_ids))
+
+    @property
+    def stale_friends(self):
+        return [friend for friend in self.friends if friend.is_stale]
 
     @property
     def twitter(self):

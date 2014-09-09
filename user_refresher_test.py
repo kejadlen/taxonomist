@@ -1,5 +1,4 @@
 import unittest
-from datetime import datetime, timedelta
 
 from mock import call, Mock
 
@@ -19,19 +18,6 @@ class TestUserRefresher(TestCase):
 
         db.session.add(self.user)
         db.session.commit()
-
-    def test_is_stale(self):
-        self.user.updated_at = None
-        self.assertTrue(UserRefresher.is_stale(self.user))
-
-        one_day = timedelta(days=1)
-        base_updated_at = datetime.now() - UserRefresher.STALE
-
-        self.user.updated_at = base_updated_at - one_day
-        self.assertTrue(UserRefresher.is_stale(self.user))
-
-        self.user.updated_at = base_updated_at + one_day
-        self.assertFalse(UserRefresher.is_stale(self.user))
 
     def test_refresh_friends(self):
         ids = range(1, 6)

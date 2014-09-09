@@ -8,7 +8,7 @@ from user_refresher import UserRefresher
 app = Celery('tasks', backend='redis://localhost', broker='redis://localhost')
 
 
-@app.task(bind=True, acks_late=True)
+@app.task(bind=True, acks_late=True, max_retries=None)
 def refresh_user(self, user):
     try:
         UserRefresher(user).run(hydrate=True, refresh_stale=True)
