@@ -2,6 +2,7 @@ import os
 from datetime import datetime, timedelta
 
 import db
+import networkx as nx
 from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import ARRAY
 
@@ -28,6 +29,17 @@ class User(db.Base):
 
     def __repr__(self):
         return '<User %r, %r>' % (self.twitter_id, self.screen_name)
+
+    @property
+    def graph(self):
+        graph = nx.Graph()
+        for friend in [friend for friend in self.friends if friend.friend_ids]:
+            edges = [(friend.twitter_id, friend_id)
+                        for friend_id in friend.friend_ids
+                        if friend_id in self.friend_ids and
+                        friend_id != self.twitter_id]
+            graph.add_edges_from(edges)
+        return graph
 
     @property
     def is_stale(self):

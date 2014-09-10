@@ -30,8 +30,9 @@ class TestFriendGraph(TestCase):
         friend_graph = FriendGraph(user)
 
         cliques = friend_graph.cliques(k=3)
-        self.assertEqual(cliques[0],
-                         frozenset([0, 1, 2, 3, 32, 7, 8, 12, 13, 17, 19, 21]))
+        self.assertEqual([user.twitter_id for user in cliques[0]],
+                         [1, 2, 3, 7, 13])
 
         cliques = friend_graph.cliques(k=4)
-        self.assertEqual(cliques[0], frozenset([0, 1, 2, 3, 7, 13]))
+        self.assertEqual([user.twitter_id for user in cliques[0]],
+                         [1, 2, 3, 7, 13])
