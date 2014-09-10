@@ -1,7 +1,9 @@
+import json
 import os
 
 from flask import g, redirect, render_template, request, session, url_for
 from flask import Flask
+from networkx.readwrite import json_graph
 
 import db
 from user_refresher import UserRefresher
@@ -12,6 +14,13 @@ app = Flask(__name__)
 app.secret_key = os.environ['FLASK_SECRET']
 
 
+@app.before_request
+def before_request():
+    g.user = None
+    if 'user_id' in session:
+        g.user = User.query.get(session['user_id'])
+
+
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     db.session.remove()
@@ -19,8 +28,7 @@ def shutdown_session(exception=None):
 
 @app.route('/')
 def index():
-    user_id = session.get('user_id')
-    template = 'index.html' if user_id else 'signin.html'
+    template = 'index.html' if g.user else 'signin.html'
     return render_template(template)
 
 
@@ -70,15 +78,19 @@ def callback():
 
 @app.route('/update_friends')
 def update_friends():
-    user_id = session.get('user_id')
-    if not user_id:
+    if not g.user:
         abort(401)
 
-    user = User.query.get(user_id)
     user_refresher = UserRefresher(user)
     user_refresher.run(hydrate=True, refresh_stale=True)
 
     return redirect(url_for('index'))
+
+
+@app.route('/friends.json')
+def friends():
+    data = json_graph.node_link_data(g.user.graph)
+    return json.dumps(data)
 
 if __name__ == '__main__':
     app.run(debug=True)
