@@ -1,10 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="utf-8">
 <title>Taxonomist</title>
+<link href="/static/site.css" rel="stylesheet" type="text/css" />
 </head>
+
 <body>
-{% block body %}{% endblock %}
+{% block body %}
+<a href="/update_friends">update friends</a>
+<a href="/signout">sign out</a>
+<div id="force"></div>
+<script src="/static/jquery.min.js"  charset="utf-8"></script>
+<script src="/static/d3.min.js"  charset="utf-8"></script>
+<script src="/static/force.js"  charset="utf-8"></script>
+{% endblock %}
 </body>
+
 </html>

@@ -45,7 +45,7 @@ def signin():
 
 @app.route('/signout')
 def signout():
-    session.pop('user_id')
+    session.pop('user_id', None)
     return redirect(url_for('index'))
 
 

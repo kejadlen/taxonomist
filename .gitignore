@@ -11,3 +11,6 @@ share
 
 # honcho
 *.env
+
+# bower
+bower_components
