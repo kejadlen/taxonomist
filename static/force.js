@@ -1,15 +1,25 @@
 var width = $( "#force" ).width(),
     height = $( window ).height();
 
+var zoom = d3.behavior.zoom()
+    .scaleExtent([0.1, 10])
+    .on("zoom", zoomed);
+
 var force = d3.layout.force()
     .size([width, height]);
 
 var svg = d3.select("#force").append("svg")
     .attr("width", width)
-    .attr("height", height);
+    .attr("height", height)
+    .call(zoom);
+var container = svg.append("g");
 
 var link = svg.selectAll(".link"),
     node = svg.selectAll(".node");
+
+function zoomed() {
+    container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+}
 
 d3.json("friends.json", function(error, data) {
   force
@@ -17,18 +27,18 @@ d3.json("friends.json", function(error, data) {
       .links(data.links)
       .start();
 
-  var link = svg.append("g").selectAll(".link")
+  var link = container.append("g").selectAll(".link")
       .data(data.links)
     .enter().append("line")
       .attr("class", "link");
 
-  var circle = svg.append("g").selectAll("circle")
+  var circle = container.append("g").selectAll("circle")
       .data(data.nodes)
     .enter().append("circle")
       .attr("r", 5)
       .call(force.drag);
 
-  var text = svg.append("g").selectAll("text")
+  var text = container.append("g").selectAll("text")
       .data(data.nodes)
     .enter().append("text")
       .attr("x", 8)
