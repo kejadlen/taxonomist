@@ -1,6 +1,7 @@
 import json
 import os
 
+import networkx as nx
 from flask import g, redirect, render_template, request, session, url_for
 from flask import Flask
 from networkx.readwrite import json_graph
@@ -28,7 +29,7 @@ def shutdown_session(exception=None):
 
 @app.route('/')
 def index():
-    template = 'index.html' if g.user else 'signin.html'
+    template = 'index.html' # if g.user else 'signin.html'
     return render_template(template)
 
 
@@ -89,7 +90,11 @@ def update_friends():
 
 @app.route('/friends.json')
 def friends():
-    data = json_graph.node_link_data(g.user.graph)
+    # data = json_graph.node_link_data(g.user.graph)
+    graph = nx.karate_club_graph()
+    for node in graph.nodes():
+        graph.node[node]['screen_name'] = node
+    data = json_graph.node_link_data(graph)
     return json.dumps(data)
 
 if __name__ == '__main__':

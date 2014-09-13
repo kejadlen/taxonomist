@@ -1,1 +1,14 @@
 {% extends "layout.html" %}
+{% block body %}
+<input type="button" id="startstop" value="Stop" />
+<label for="charge">Charge</label>
+<input type="range" id="charge" min="-1000" value="-30" max="0" step="10">
+<label for="gravity">Gravity</label>
+<input type="range" id="gravity" min="0" value="0.1" max="1" step="0.1">
+<a href="/update_friends">update friends</a>
+<a href="/signout">sign out</a>
+<div id="force"></div>
+<script src="/static/jquery.min.js"  charset="utf-8"></script>
+<script src="/static/d3.min.js"  charset="utf-8"></script>
+<script src="/static/force.js"  charset="utf-8"></script>
+{% endblock %}

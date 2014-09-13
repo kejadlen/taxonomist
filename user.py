@@ -6,6 +6,7 @@ import networkx as nx
 from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import ARRAY
 
+from friend_graph import SLPA
 from twitter import Twitter
 
 
@@ -34,6 +35,7 @@ class User(db.Base):
     def graph(self):
         graph = nx.Graph()
         for friend in [friend for friend in self.friends if friend.friend_ids]:
+            graph.add_node(friend.twitter_id, screen_name=friend.screen_name)
             edges = [(friend.twitter_id, friend_id)
                         for friend_id in friend.friend_ids
                         if friend_id in self.friend_ids and
@@ -60,3 +62,10 @@ class User(db.Base):
             return None
         else:
             return Twitter(self.oauth_token, self.oauth_token_secret)
+
+    def cliques(self, algorithm=None, **kwargs):
+        algorithm = algorithm or SLPA
+        cliques = algorithm(self.graph).cliques(**kwargs)
+        friends = self.friends
+        friends = {friend.twitter_id:friend for friend in friends}
+        return [[friends[id] for id in clique] for clique in cliques]
