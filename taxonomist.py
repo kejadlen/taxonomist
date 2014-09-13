@@ -4,6 +4,7 @@ import os
 import networkx as nx
 from flask import g, redirect, render_template, request, session, url_for
 from flask import Flask
+from flask.ext.assets import Environment, Bundle
 from networkx.readwrite import json_graph
 
 import db
@@ -13,6 +14,10 @@ from user import User
 
 app = Flask(__name__)
 app.secret_key = os.environ['FLASK_SECRET']
+
+assets = Environment(app)
+assets.load_path = [os.path.join(os.path.dirname(__file__), 'bower_components')]
+assets.register('js', Bundle('d3/d3.min.js', 'jquery/dist/jquery.min.js'))
 
 
 @app.before_request

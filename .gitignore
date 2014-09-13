@@ -14,3 +14,6 @@ share
 
 # bower
 bower_components
+
+# webassets
+static/webassets-external
