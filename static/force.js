@@ -1,5 +1,5 @@
 var width = $( "#force" ).width(),
-    height = $( "#force" ).height();
+    height = $( window ).height();
 
 var force = d3.layout.force()
     .size([width, height]);

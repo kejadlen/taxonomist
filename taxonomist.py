@@ -17,7 +17,10 @@ app.secret_key = os.environ['FLASK_SECRET']
 
 assets = Environment(app)
 assets.load_path = [os.path.join(os.path.dirname(__file__), 'bower_components')]
-assets.register('js', Bundle('d3/d3.min.js', 'jquery/dist/jquery.min.js'))
+assets.register('js', Bundle('jquery/dist/jquery.min.js',
+                             'bootstrap/dist/js/bootstrap.min.js',
+                             'd3/d3.min.js'))
+assets.register('css', Bundle('bootstrap/dist/css/bootstrap.min.css'))
 
 
 @app.before_request
@@ -95,11 +98,11 @@ def update_friends():
 
 @app.route('/friends.json')
 def friends():
-    # data = json_graph.node_link_data(g.user.graph)
     graph = nx.karate_club_graph()
     for node in graph.nodes():
         graph.node[node]['screen_name'] = node
     data = json_graph.node_link_data(graph)
+    data = json_graph.node_link_data(g.user.graph)
     return json.dumps(data)
 
 if __name__ == '__main__':
