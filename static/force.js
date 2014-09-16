@@ -25,6 +25,8 @@ d3.json("friends.json", function(error, data) {
   force
       .nodes(data.nodes)
       .links(data.links)
+      .charge($( "#charge" ).val())
+      .gravity($( "#gravity" ).val())
       .start();
 
   var link = container.append("g").selectAll(".link")
@@ -53,21 +55,26 @@ d3.json("friends.json", function(error, data) {
 
     circle.attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")"; });
     text.attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")"; });
-  });
 
-  d3.select("#startstop").on("click", function() {
-    if (this.value == "Stop") {
-      this.value = "Start";
+    if (force.alpha() < 0.075) {
       force.stop();
-    } else {
-      this.value = "Stop";
-      force.start();
-    }
+    };
+    console.log(force.alpha())
   });
 
-  d3.select("#stop").on("click", function() {
-    force.stop();
-  });
+  // d3.select("#startstop").on("click", function() {
+  //   if (this.value == "Stop") {
+  //     this.value = "Start";
+  //     force.stop();
+  //   } else {
+  //     this.value = "Stop";
+  //     force.start();
+  //   };
+  // });
+
+  // d3.select("#stop").on("click", function() {
+  //   force.stop();
+  // });
 
   d3.select("#charge").on("change", function() {
     force.charge(this.value).start();
