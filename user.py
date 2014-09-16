@@ -5,15 +5,16 @@ import db
 import networkx as nx
 from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.orm import relationship
 
 from cliques import SLPA
 from twitter import Twitter
 
 
 class User(db.Base):
-    __tablename__ = 'users'
-
     STALE = timedelta(weeks=4)
+
+    __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
     twitter_id = Column(BigInteger, nullable=False, unique=True)
@@ -23,6 +24,7 @@ class User(db.Base):
     updated_at = Column(DateTime, onupdate=datetime.now)
     oauth_token = Column(String(255))
     oauth_token_secret = Column(String(255))
+    lists = relationship('List')
 
     def __init__(self, twitter_id, screen_name=None):
         self.twitter_id = twitter_id

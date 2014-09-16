@@ -62,14 +62,24 @@ class Twitter:
         response = self.http(self.oauth.get,
                              '/1.1/lists/members.json',
                              params=payload)
-        return (response.json().get('users'), response)
+        json = response.json()
+        return (json.get('users'), json.get('next_cursor'), response)
+
+    def lists_members_create_all(self, list_id, user_ids):
+        user_ids = ','.join([str(id) for id in user_ids])
+        payload = {'list_id': list_id, 'user_id': user_ids}
+        response = self.http(self.oauth.post,
+                             '/1.1/lists/members/create_all.json',
+                             params=payload)
+        return response
 
     def lists_ownerships(self, user_id, cursor=-1):
         payload = {'user_id': user_id, 'count': 1000, 'cursor': cursor }
         response = self.http(self.oauth.get,
                              '/1.1/lists/ownerships.json',
                              params=payload)
-        return (response.json().get('lists'), response)
+        json = response.json()
+        return (json.get('lists'), json.get('next_cursor'), response)
 
     def users_lookup(self, user_ids):
         payload = {'user_id': ','.join([str(id) for id in user_ids])}
