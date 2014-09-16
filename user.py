@@ -23,7 +23,6 @@ class User(db.Base):
     updated_at = Column(DateTime, onupdate=datetime.now)
     oauth_token = Column(String(255))
     oauth_token_secret = Column(String(255))
-    raw = Column(HSTORE)
 
     def __init__(self, twitter_id, screen_name=None):
         self.twitter_id = twitter_id
