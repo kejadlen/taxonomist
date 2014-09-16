@@ -41,7 +41,7 @@ class TestUserRefresher(TestCase):
         ids = range(1, 6)
         self.user_refresher.hydrate_friends()
 
-        self.twitter.users_lookup.assert_called_with([2, 3, 4])
+        self.twitter.users_lookup.assert_called_with([3, 2, 4])
         for profile in profiles:
             user = User.query.filter(User.twitter_id == profile['id']).scalar()
             self.assertEqual(user.screen_name, profile['screen_name'])

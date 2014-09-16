@@ -32,6 +32,10 @@ class User(db.Base):
         return '<User %r, %r>' % (self.twitter_id, self.screen_name)
 
     @property
+    def dehydrated_friends(self):
+        return self.friends.filter(User.screen_name.is_(None))
+
+    @property
     def graph(self):
         graph = nx.Graph()
         for friend in [friend for friend in self.friends if friend.friend_ids]:
@@ -71,3 +75,10 @@ class User(db.Base):
         return {friends[label]:[friends[id] for id in clique]
                 for label, clique in cliques.iteritems()
                 if len(clique) > 1}
+
+    def create_friends(self):
+        existing_ids = [friend.twitter_id for friend in self.friends]
+        missing_ids = [id for id in self.friend_ids if id not in existing_ids]
+        for id in missing_ids:
+            db.session.add(User(id))
+        db.session.commit()
