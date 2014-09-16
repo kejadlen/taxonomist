@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import db
 import networkx as nx
 from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
-from sqlalchemy.dialects.postgresql import ARRAY, HSTORE
+from sqlalchemy.dialects.postgresql import ARRAY
 
 from cliques import SLPA
 from twitter import Twitter
