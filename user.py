@@ -6,7 +6,7 @@ import networkx as nx
 from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import ARRAY
 
-from friend_graph import SLPA
+from cliques import SLPA
 from twitter import Twitter
 
 
@@ -66,6 +66,9 @@ class User(db.Base):
     def cliques(self, algorithm=None, **kwargs):
         algorithm = algorithm or SLPA
         cliques = algorithm(self.graph).cliques(**kwargs)
+
         friends = self.friends
         friends = {friend.twitter_id:friend for friend in friends}
-        return [[friends[id] for id in clique] for clique in cliques]
+        return {friends[label]:[friends[id] for id in clique]
+                for label, clique in cliques.iteritems()
+                if len(clique) > 1}
