@@ -8,6 +8,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import relationship
 
 from cliques import SLPA
+from list import List
 from twitter import Twitter
 
 
@@ -24,7 +25,7 @@ class User(db.Base):
     updated_at = Column(DateTime, onupdate=datetime.now)
     oauth_token = Column(String(255))
     oauth_token_secret = Column(String(255))
-    lists = relationship('List')
+    lists = relationship('List', backref='user')
 
     def __init__(self, twitter_id, screen_name=None):
         self.twitter_id = twitter_id

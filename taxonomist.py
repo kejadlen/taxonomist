@@ -37,7 +37,7 @@ def shutdown_session(exception=None):
 
 @app.route('/')
 def index():
-    template = 'index.html' # if g.user else 'signin.html'
+    template = 'index.html' if g.user else 'signin.html'
     return render_template(template)
 
 
@@ -48,7 +48,7 @@ def signin():
     session['oauth_token'] = request_token.get('oauth_token')
     session['oauth_token_secret'] = request_token.get('oauth_token_secret')
 
-    url = 'https://api.twitter.com/oauth/authenticate?oauth_token=%s'
+    url = 'https://api.twitter.com/oauth/authorize?oauth_token=%s'
     return redirect(url % session['oauth_token'])
 
 
@@ -76,10 +76,10 @@ def callback():
     user = User.query.filter(User.twitter_id == user_id).scalar()
     if not user:
         user = User(user_id, screen_name)
-        user.oauth_token = oauth_token
-        user.oauth_token_secret = oauth_token_secret
         db.session.add(user)
-        db.session.commit()
+    user.oauth_token = oauth_token
+    user.oauth_token_secret = oauth_token_secret
+    db.session.commit()
     session['user_id'] = user.id
 
     return redirect(url_for('index'))

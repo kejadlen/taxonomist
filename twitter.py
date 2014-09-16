@@ -57,6 +57,13 @@ class Twitter:
                              params=payload)
         return (response.json().get('ids'), response)
 
+    def lists_create(self, name, mode='public'):
+        payload = {'name': name, 'mode': mode }
+        response = self.http(self.oauth.post,
+                             '/1.1/lists/create.json',
+                             params=payload)
+        return (response.json()['id'], response)
+
     def lists_members(self, list_id, cursor=-1):
         payload = {'list_id': list_id, 'cursor': cursor }
         response = self.http(self.oauth.get,

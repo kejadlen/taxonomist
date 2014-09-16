@@ -21,7 +21,7 @@ class ListRefresher:
                 if list:
                     list.name = raw['name']
                 else:
-                    db.session.add(List(raw))
+                    db.session.add(List(self.user, raw))
         db.session.commit()
 
     def update_lists(self, lists):
