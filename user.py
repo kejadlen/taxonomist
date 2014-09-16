@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import db
 import networkx as nx
 from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, HSTORE
 
 from cliques import SLPA
 from twitter import Twitter
@@ -23,6 +23,7 @@ class User(db.Base):
     updated_at = Column(DateTime, onupdate=datetime.now)
     oauth_token = Column(String(255))
     oauth_token_secret = Column(String(255))
+    raw = Column(HSTORE)
 
     def __init__(self, twitter_id, screen_name=None):
         self.twitter_id = twitter_id
