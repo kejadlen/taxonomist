@@ -55,8 +55,6 @@ class Twitter:
         response = self.http(self.oauth.get,
                              '/1.1/friends/ids.json',
                              params=payload)
-        # response = self.oauth.get(self.url_for('/1.1/friends/ids.json'),
-        #                           params=payload)
         return (response.json().get('ids'), response)
 
     def users_lookup(self, user_ids):
@@ -64,8 +62,6 @@ class Twitter:
         response = self.http(self.oauth.post,
                              '/1.1/users/lookup.json',
                              data=payload)
-        # response = self.oauth.post(self.url_for('/1.1/users/lookup.json'),
-        #                            data=payload)
         return (response.json(), response)
 
     def http(self, func, endpoint, **kwargs):
