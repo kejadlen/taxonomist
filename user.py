@@ -63,9 +63,8 @@ class User(db.Base):
         else:
             return Twitter(self.oauth_token, self.oauth_token_secret)
 
-    def cliques(self, algorithm=None, **kwargs):
-        algorithm = algorithm or SLPA
-        cliques = algorithm(self.graph).cliques(**kwargs)
+    def cliques(self, **kwargs):
+        cliques = SLPA(self.graph).cliques(**kwargs)
 
         friends = self.friends
         friends = {friend.twitter_id:friend for friend in friends}
