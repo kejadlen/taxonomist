@@ -33,9 +33,10 @@ class TestUserRefresher(TestCase):
         db.session.add_all([User(1, 'Alice'), User(3), User(5, 'Bob')])
         db.session.commit()
 
-        profiles = [{'id': 2, 'screen_name': 'Eve'},
-                    {'id': 3, 'screen_name': 'Mallory'},
-                    {'id': 4, 'screen_name': 'Trent'}]
+        status = {'created_at': 'Sat Aug 25 19:33:11 +0000 2012'}
+        profiles = [{'id': 2, 'screen_name': 'Eve', 'status': status},
+                    {'id': 3, 'screen_name': 'Mallory', 'status': status},
+                    {'id': 4, 'screen_name': 'Trent', 'status': status}]
         self.twitter.users_lookup = Mock(return_value=(profiles, None))
 
         ids = range(1, 6)
@@ -51,7 +52,10 @@ class TestUserRefresher(TestCase):
         db.session.commit()
 
         def side_effect(ids):
-            profiles = [{'id': id, 'screen_name': str(id)} for id in ids]
+            created_at = 'Sat Aug 25 19:33:11 +0000 2012'
+            profiles = [{'id': id,
+                         'screen_name': str(id),
+                         'status': {'created_at': created_at}} for id in ids]
             return (profiles, None)
         self.twitter.users_lookup = Mock(side_effect=side_effect)
 

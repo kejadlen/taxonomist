@@ -1,3 +1,4 @@
+from datetime import datetime
 from itertools import izip_longest
 
 import db
@@ -46,4 +47,7 @@ class UserRefresher:
         for profile in profiles:
             user = User.query.filter(User.twitter_id == profile['id']).scalar()
             user.screen_name = profile['screen_name']
+            user.last_tweet_at = datetime.strptime(
+                profile['status']['created_at'],
+                '%a %b %d %X +0000 %Y')
         db.session.commit()

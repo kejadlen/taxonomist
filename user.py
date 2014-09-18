@@ -21,6 +21,7 @@ class User(db.Base):
     twitter_id = Column(BigInteger, nullable=False, unique=True)
     screen_name = Column(String(32))
     friend_ids = Column(ARRAY(BigInteger))
+    last_tweet_at = Column(DateTime)
     created_at = Column(DateTime, server_default=text('current_timestamp'))
     updated_at = Column(DateTime, onupdate=datetime.now)
     oauth_token = Column(String(255))
