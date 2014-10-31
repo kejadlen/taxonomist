@@ -5,16 +5,16 @@ from mock import call, Mock
 import db
 from test import TestCase
 from user import User
-from user_refresher import UserRefresher
+from friends_refresher import FriendsRefresher
 
 
-class TestUserRefresher(TestCase):
+class TestFriendsRefresher(TestCase):
     def setUp(self):
-        super(TestUserRefresher, self).setUp()
+        super(TestFriendsRefresher, self).setUp()
 
         self.user = User(12345)
         self.twitter = Mock()
-        self.user_refresher = UserRefresher(self.user, self.twitter)
+        self.user_refresher = FriendsRefresher(self.user, self.twitter)
 
         db.session.add(self.user)
         db.session.commit()

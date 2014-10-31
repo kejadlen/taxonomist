@@ -8,7 +8,7 @@ from flask.ext.assets import Environment, Bundle
 from networkx.readwrite import json_graph
 
 import db
-from user_refresher import UserRefresher
+from friends_refresher import FriendsRefresher
 from twitter import Twitter
 from user import User
 

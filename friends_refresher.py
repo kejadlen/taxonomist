@@ -6,7 +6,7 @@ from twitter import Twitter
 from user import User
 
 
-class UserRefresher:
+class FriendsRefresher:
     def __init__(self, user, twitter=None):
         self.user = user
         self.twitter = twitter or user.twitter
