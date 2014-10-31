@@ -19,6 +19,7 @@ class RateLimitedError(Exception):
 
 
 class Twitter:
+    """Adapter for hitting the Twitter API."""
     BASE_URL = 'https://api.twitter.com'
     USERS_LOOKUP_CHUNK_SIZE = 100
 
@@ -51,49 +52,95 @@ class Twitter:
                                    resource_owner_secret=oauth_token_secret)
 
     def friends_ids(self, user_id):
+        """Retrieve the first 5000 friend IDs for the given user."""
         payload = {'user_id': user_id}
         response = self.http(self.oauth.get,
                              '/1.1/friends/ids.json',
                              params=payload)
-        return (response.json().get('ids'), response)
+        return response.json().get('ids')
 
-    def lists_create(self, name, mode='public'):
-        payload = {'name': name, 'mode': mode }
-        response = self.http(self.oauth.post,
-                             '/1.1/lists/create.json',
-                             params=payload)
-        return (response.json()['id'], response)
+    # def lists_create(self, name, mode='public'):
+    #     payload = {'name': name, 'mode': mode }
+    #     response = self.http(self.oauth.post,
+    #                          '/1.1/lists/create.json',
+    #                          params=payload)
+    #     return response.json()['id']
 
-    def lists_members(self, list_id, cursor=-1):
-        payload = {'list_id': list_id, 'cursor': cursor }
+    # def lists_members(self, list_id, cursor=-1):
+    #     payload = {'list_id': list_id, 'cursor': cursor }
+    #     response = self.http(self.oauth.get,
+    #                          '/1.1/lists/members.json',
+    #                          params=payload)
+    #     json = response.json()
+    #     return (json.get('users'), json.get('next_cursor'))
+
+    # def lists_members_create_all(self, list_id, user_ids):
+    #     if len(users_ids) > 100:
+    #         raise ValueError("Can't add more than 100 users at a time.")
+    #     user_ids = ','.join([str(id) for id in user_ids])
+    #     payload = {'list_id': list_id, 'user_id': user_ids}
+    #     response = self.http(self.oauth.post,
+    #                          '/1.1/lists/members/create_all.json',
+    #                          params=payload)
+    #     # return response
+
+    # def lists_ownerships(self, user_id, cursor=-1):
+    #     payload = {'user_id': user_id, 'count': 1000, 'cursor': cursor }
+    #     response = self.http(self.oauth.get,
+    #                          '/1.1/lists/ownerships.json',
+    #                          params=payload)
+    #     json = response.json()
+    #     return (json.get('lists'), json.get('next_cursor'))
+
+    # def statuses_mentions_timeline(self,
+    #                                count=200, max_id=None, trim_user=True,
+    #                                contributer_details=None,
+    #                                include_entities=True):
+    #     payload = {'count': count, 'max_id': max_id, 'trim_user': trim_user,
+    #                'contributer_details': contributer_details,
+    #                'include_entities': include_entities}
+    #     response = self.http(self.oauth.get,
+    #                          '/1.1/statuses/mentions_timeline.json',
+    #                          params=payload)
+    #     return response.json()
+
+    # def statuses_retweeters(self, id, cursor=-1):
+    #     payload = {'id': id, 'cursor': cursor}
+    #     response = self.http(self.oauth.get,
+    #                          '/1.1/statuses/retweeters/ids.json',
+    #                          params=payload)
+    #     json = response.json()
+    #     return (json['ids'], json['next_cursor'])
+
+    # def statuses_retweets_of_me(self,
+    #                             count=100, max_id=None, trim_user=False,
+    #                             include_entities=False,
+    #                             include_user_entities=False):
+    #     payload = {'count': 100, 'max_id': max_id, 'trim_user': trim_user,
+    #                'include_entities': include_entities,
+    #                'include_user_entities': include_user_entities}
+    #     response = self.http(self.oauth.get,
+    #                          '/1.1/statuses/retweets_of_me.json',
+    #                          params=payload)
+    #     return (response.json(), response)
+
+    def statuses_user_timeline(self, user_id, **kwargs):
+        payload = {'count': 200, 'trim_user': True,
+                   'exclude_replies': False, 'contributor_details': False,
+                   'include_rts': True}
+        payload['user_id'] = user_id
+        payload.update(kwargs)
         response = self.http(self.oauth.get,
-                             '/1.1/lists/members.json',
+                             '/1.1/statuses/user_timeline.json',
                              params=payload)
-        json = response.json()
-        return (json.get('users'), json.get('next_cursor'), response)
-
-    def lists_members_create_all(self, list_id, user_ids):
-        user_ids = ','.join([str(id) for id in user_ids])
-        payload = {'list_id': list_id, 'user_id': user_ids}
-        response = self.http(self.oauth.post,
-                             '/1.1/lists/members/create_all.json',
-                             params=payload)
-        return response
-
-    def lists_ownerships(self, user_id, cursor=-1):
-        payload = {'user_id': user_id, 'count': 1000, 'cursor': cursor }
-        response = self.http(self.oauth.get,
-                             '/1.1/lists/ownerships.json',
-                             params=payload)
-        json = response.json()
-        return (json.get('lists'), json.get('next_cursor'), response)
+        return response.json()
 
     def users_lookup(self, user_ids):
         payload = {'user_id': ','.join([str(id) for id in user_ids])}
         response = self.http(self.oauth.post,
                              '/1.1/users/lookup.json',
                              data=payload)
-        return (response.json(), response)
+        return response.json()
 
     def http(self, func, endpoint, **kwargs):
         response = func(self.url_for(endpoint), **kwargs)

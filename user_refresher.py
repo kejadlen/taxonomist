@@ -11,18 +11,14 @@ class UserRefresher:
         self.user = user
         self.twitter = twitter or user.twitter
 
-    def run(self, hydrate=False, refresh_stale=False):
+    def run(self):
         if self.user.is_stale:
             self.refresh_friends()
-
-        if hydrate:
-            self.hydrate_friends()
-
-        if refresh_stale:
-            self.refresh_stale_friends()
+        self.hydrate_friends()
+        self.refresh_stale_friends()
 
     def refresh_friends(self):
-        ids, _ = self.twitter.friends_ids(self.user.twitter_id)
+        ids = self.twitter.friends_ids(self.user.twitter_id)
         self.user.friend_ids = ids
         db.session.commit()
 
@@ -43,7 +39,7 @@ class UserRefresher:
 
     def hydrate_chunk(self, chunk):
         ids = [id for id in chunk if id is not None]
-        profiles, _ = self.twitter.users_lookup(ids)
+        profiles = self.twitter.users_lookup(ids)
         for profile in profiles:
             user = User.query.filter(User.twitter_id == profile['id']).scalar()
             user.screen_name = profile['screen_name']

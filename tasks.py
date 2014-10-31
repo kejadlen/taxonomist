@@ -11,7 +11,7 @@ app = Celery('tasks', backend='redis://localhost', broker='redis://localhost')
 @app.task(bind=True, acks_late=True, max_retries=None)
 def refresh_user(self, user):
     try:
-        UserRefresher(user).run(hydrate=True, refresh_stale=True)
+        UserRefresher(user).run()
     except RateLimitedError as exc:
         delta = exc.rate_limit_reset - datetime.now()
         countdown = delta.total_seconds() + 1

@@ -21,7 +21,7 @@ class TestUserRefresher(TestCase):
 
     def test_refresh_friends(self):
         ids = range(1, 6)
-        self.twitter.friends_ids = Mock(return_value=(ids, None))
+        self.twitter.friends_ids = Mock(return_value=ids)
 
         self.user_refresher.refresh_friends()
 
@@ -37,7 +37,7 @@ class TestUserRefresher(TestCase):
         profiles = [{'id': 2, 'screen_name': 'Eve', 'status': status},
                     {'id': 3, 'screen_name': 'Mallory', 'status': status},
                     {'id': 4, 'screen_name': 'Trent', 'status': status}]
-        self.twitter.users_lookup = Mock(return_value=(profiles, None))
+        self.twitter.users_lookup = Mock(return_value=profiles)
 
         ids = range(1, 6)
         self.user_refresher.hydrate_friends()
@@ -56,7 +56,7 @@ class TestUserRefresher(TestCase):
             profiles = [{'id': id,
                          'screen_name': str(id),
                          'status': {'created_at': created_at}} for id in ids]
-            return (profiles, None)
+            return profiles
         self.twitter.users_lookup = Mock(side_effect=side_effect)
 
         self.user_refresher.hydrate_friends()

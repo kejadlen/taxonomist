@@ -1,12 +1,12 @@
 import os
 from datetime import datetime, timedelta
 
-import db
 import networkx as nx
 from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import relationship
 
+import db
 from cliques import SLPA
 from list import List
 from twitter import Twitter
