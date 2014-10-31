@@ -9,7 +9,7 @@ class TestCase(unittest.TestCase):
     def setUp(self):
         self.original_session = db.session
 
-        self.engine = create_engine('postgresql://localhost/taxonomist_test',
+        self.engine = create_engine('postgresql://localhost/test',
                                     echo=True)
         self.connection = self.engine.connect()
         self.transaction = self.connection.begin()
