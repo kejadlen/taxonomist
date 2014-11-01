@@ -42,8 +42,9 @@ class FriendsRefresher:
         profiles = self.twitter.users_lookup(ids)
         for profile in profiles:
             user = User.query.filter(User.twitter_id == profile['id']).scalar()
-            user.screen_name = profile['screen_name']
-            user.last_tweet_at = datetime.strptime(
-                profile['status']['created_at'],
-                '%a %b %d %X +0000 %Y')
+            user.raw = profile
+            # user.screen_name = profile['screen_name']
+            # user.last_tweet_at = datetime.strptime(
+            #     profile['status']['created_at'],
+            #     '%a %b %d %X +0000 %Y')
         db.session.commit()

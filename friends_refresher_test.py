@@ -14,7 +14,7 @@ class TestFriendsRefresher(TestCase):
 
         self.user = User(12345)
         self.twitter = Mock()
-        self.user_refresher = FriendsRefresher(self.user, self.twitter)
+        self.friends_refresher = FriendsRefresher(self.user, self.twitter)
 
         db.session.add(self.user)
         db.session.commit()
@@ -23,7 +23,7 @@ class TestFriendsRefresher(TestCase):
         ids = range(1, 6)
         self.twitter.friends_ids = Mock(return_value=ids)
 
-        self.user_refresher.refresh_friends()
+        self.friends_refresher.refresh_friends()
 
         user = User.query.get(self.user.id)
         self.assertEqual(user.friend_ids, ids)
@@ -40,7 +40,7 @@ class TestFriendsRefresher(TestCase):
         self.twitter.users_lookup = Mock(return_value=profiles)
 
         ids = range(1, 6)
-        self.user_refresher.hydrate_friends()
+        self.friends_refresher.hydrate_friends()
 
         self.twitter.users_lookup.assert_called_with([3, 2, 4])
         for profile in profiles:
@@ -59,7 +59,7 @@ class TestFriendsRefresher(TestCase):
             return profiles
         self.twitter.users_lookup = Mock(side_effect=side_effect)
 
-        self.user_refresher.hydrate_friends()
+        self.friends_refresher.hydrate_friends()
 
         self.assertEqual(self.twitter.users_lookup.call_args_list,
                          [call(range(1, 101)), call(range(101, 151))])

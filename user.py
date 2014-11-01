@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 
 import networkx as nx
 from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, JSON
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
 
 import db
@@ -18,29 +19,35 @@ class User(db.Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
+
+    # Twitter data
     twitter_id = Column(BigInteger, nullable=False, unique=True)
-    screen_name = Column(String(32))
     friend_ids = Column(ARRAY(BigInteger))
-    last_tweet_at = Column(DateTime)
-    created_at = Column(DateTime, server_default=text('current_timestamp'))
-    updated_at = Column(DateTime, onupdate=datetime.now)
+    raw = Column(JSON(none_as_null=True))
     oauth_token = Column(String(255))
     oauth_token_secret = Column(String(255))
+
+    # Metadata
+    created_at = Column(DateTime, server_default=text('current_timestamp'))
+    updated_at = Column(DateTime, onupdate=datetime.now)
+
+    # Relationships
     lists = relationship('List', backref='user')
 
-    def __init__(self, twitter_id, screen_name=None):
+    def __init__(self, twitter_id, raw=None):
         self.twitter_id = twitter_id
-        self.screen_name = screen_name
+        # self.screen_name = screen_name
+        self.raw = raw
 
     def __repr__(self):
         return '<User %r, %r>' % (self.twitter_id, self.screen_name)
 
     @property
     def dehydrated_friends(self):
-        return self.friends.filter(User.screen_name.is_(None))
+        return self.friends.filter(User.raw.is_(None))
 
     @property
-    def graph(self):
+    def friend_graph(self):
         graph = nx.Graph()
         for friend in [friend for friend in self.friends if friend.friend_ids]:
             graph.add_node(friend.twitter_id, screen_name=friend.screen_name)
@@ -59,6 +66,10 @@ class User(db.Base):
     @property
     def friends(self):
         return User.query.filter(User.twitter_id.in_(self.friend_ids))
+
+    @property
+    def screen_name(self):
+        return self.raw['screen_name']
 
     @property
     def stale_friends(self):
