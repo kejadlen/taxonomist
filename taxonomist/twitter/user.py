@@ -6,6 +6,7 @@ from sqlalchemy.dialects.postgresql import ARRAY, JSON
 
 from taxonomist.twitter import Base
 
+
 class User(Base):
     __tablename__ = 'users'
 
