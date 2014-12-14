@@ -15,7 +15,7 @@ class RateLimitedError(Exception):
         return datetime.fromtimestamp(int(reset))
 
 
-class Client:
+class Client(object):
     """Adapter for hitting the Twitter API."""
     BASE_URL = 'https://api.twitter.com'
     USERS_LOOKUP_CHUNK_SIZE = 100
@@ -45,8 +45,25 @@ class Client:
 
 
 class AuthedClient(Client):
-    def __init__(self, oauth_token, oauth_token_secret):
+    def __init__(self, api_key, api_secret, oauth_token, oauth_token_secret):
+        super(AuthedClient, self).__init__(api_key, api_secret)
+
         self.oauth = OAuth1Session(api_key,
                                    api_secret,
                                    resource_owner_key=oauth_token,
                                    resource_owner_secret=oauth_token_secret)
+
+    def friends_ids(self, user_id):
+            """Retrieve the first 5000 friend IDs for the given user."""
+            payload = {'user_id': user_id}
+            response = self.http(self.oauth.get,
+                                 '/1.1/friends/ids.json',
+                                 params=payload)
+            return response.json().get('ids')
+
+    def http(self, func, endpoint, **kwargs):
+        response = func(self.url_for(endpoint), **kwargs)
+        if response.status_code == requests.codes.too_many_requests:
+            raise RateLimitedError(response)
+        response.raise_for_status()
+        return response
