@@ -2,5 +2,9 @@ Mako==1.0.0
 MarkupSafe==0.23
 SQLAlchemy==0.9.8
 alembic==0.7.1
+oauthlib==0.7.2
+pep8==1.5.7
 psycopg2==2.5.4
+requests==2.5.0
+requests-oauthlib==0.4.2
 wsgiref==0.1.2
