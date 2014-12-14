@@ -2,7 +2,6 @@ from datetime import datetime
 
 from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import ARRAY, JSON
-# from sqlalchemy.ext.mutable import MutableDict
 # from sqlalchemy.orm import relationship
 
 from taxonomist.twitter import Base
