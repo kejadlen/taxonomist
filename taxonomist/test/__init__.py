@@ -12,10 +12,16 @@ class TestCase(unittest.TestCase):
         cls.connection = cls.engine.connect()
         cls.transaction = cls.connection.begin()
 
-        twitter.init_sql(cls.connection)
+        twitter.init(cls.connection)
 
     @classmethod
-    def tearDown(cls):
-        twitter.Session.close()
+    def tearDownClass(cls):
+        twitter.Session.remove()
         cls.transaction.rollback()
         cls.connection.close()
+
+    def setUp(self):
+        self.transaction = self.connection.begin_nested()
+
+    def tearDown(self):
+        self.transaction.rollback()
