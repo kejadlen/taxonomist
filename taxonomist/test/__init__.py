@@ -4,10 +4,11 @@ from sqlalchemy import create_engine
 
 import taxonomist.twitter as twitter
 
+
 class TestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.engine = create_engine('postgresql://localhost/test', echo=True)
+        cls.engine = create_engine('postgresql://localhost/test', echo=False)
         cls.connection = cls.engine.connect()
         cls.transaction = cls.connection.begin()
 
