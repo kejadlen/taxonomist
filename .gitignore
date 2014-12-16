@@ -4,7 +4,10 @@
 # virtualenv
 .Python
 bin
+build
 include
 lib
 man
 share
+
+.envrc
