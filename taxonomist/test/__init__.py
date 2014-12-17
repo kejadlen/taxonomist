@@ -2,7 +2,7 @@ import unittest
 
 from sqlalchemy import create_engine
 
-import taxonomist.twitter as twitter
+import taxonomist.db as db
 
 
 class TestCase(unittest.TestCase):
@@ -12,11 +12,11 @@ class TestCase(unittest.TestCase):
         cls.connection = cls.engine.connect()
         cls.transaction = cls.connection.begin()
 
-        twitter.init(cls.connection)
+        db.init(cls.connection)
 
     @classmethod
     def tearDownClass(cls):
-        twitter.Session.remove()
+        db.Session.remove()
         cls.transaction.rollback()
         cls.connection.close()
 

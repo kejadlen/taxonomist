@@ -2,12 +2,11 @@ from datetime import datetime
 
 from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import ARRAY, JSON
-# from sqlalchemy.orm import relationship
 
-from taxonomist.twitter import Base
+import taxonomist.db as db
 
 
-class User(Base):
+class User(db.Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
