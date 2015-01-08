@@ -1,9 +1,11 @@
 from datetime import datetime
+import os
 
 from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import ARRAY, JSON
 
 import taxonomist.db as db
+import taxonomist.twitter.client as twitter
 
 
 class User(db.Base):
@@ -22,7 +24,16 @@ class User(db.Base):
     created_at = Column(DateTime, server_default=text('current_timestamp'))
     updated_at = Column(DateTime, onupdate=datetime.now)
 
-    def __init__(self, twitter_id, raw=None):
-        self.twitter_id = twitter_id
-        # self.screen_name = screen_name
-        self.raw = raw
+    @property
+    def friends(self):
+        return User.query.filter(User.twitter_id.in_(self.friend_ids))
+
+    @property
+    def twitter(self):
+        if not self.oauth_token or not self.oauth_token_secret:
+            return None
+        else:
+            return twitter.AuthedClient(os.environ['TWITTER_API_KEY'],
+                                        os.environ['TWITTER_API_SECRET'],
+                                        self.oauth_token,
+                                        self.oauth_token_secret)
