@@ -61,6 +61,13 @@ class AuthedClient(Client):
                                  params=payload)
             return response.json().get('ids')
 
+    def users_lookup(self, user_ids):
+        payload = {'user_id': ','.join([str(id) for id in user_ids])}
+        response = self.http(self.oauth.post,
+                             '/1.1/users/lookup.json',
+                             data=payload)
+        return response.json()
+
     def http(self, func, endpoint, **kwargs):
         response = func(self.url_for(endpoint), **kwargs)
         if response.status_code == requests.codes.too_many_requests:
