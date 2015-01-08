@@ -1,8 +1,10 @@
+import os
 import unittest
 
 from sqlalchemy import create_engine
 
 import taxonomist.db as db
+from taxonomist.models.user import User
 
 
 class TestCase(unittest.TestCase):
@@ -22,6 +24,14 @@ class TestCase(unittest.TestCase):
 
     def setUp(self):
         self.transaction = self.connection.begin_nested()
+
+        oauth_token = os.environ['TWITTER_ACCESS_TOKEN']
+        oauth_token_secret = os.environ['TWITTER_ACCESS_TOKEN_SECRET']
+        self.user = User(twitter_id=715073,
+                         oauth_token=oauth_token,
+                         oauth_token_secret=oauth_token_secret)
+        db.Session.add(self.user)
+        db.Session.commit()
 
     def tearDown(self):
         self.transaction.rollback()
