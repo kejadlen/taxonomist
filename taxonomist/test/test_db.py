@@ -1,7 +1,7 @@
-from taxonomist.test import TestCase
+from . import TestCase
 
-from taxonomist.db import Session
-from taxonomist.models.user import User
+from ..db import Session
+from ..models.user import User
 
 
 class TestDB(TestCase):

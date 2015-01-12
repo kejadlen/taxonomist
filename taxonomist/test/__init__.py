@@ -3,8 +3,8 @@ import unittest
 
 from sqlalchemy import create_engine
 
-import taxonomist.db as db
-from taxonomist.models.user import User
+from .. import db
+from ..models.user import User
 
 
 class TestCase(unittest.TestCase):
