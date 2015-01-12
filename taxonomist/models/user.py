@@ -4,8 +4,8 @@ import os
 from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import ARRAY, JSON
 
-import taxonomist.db as db
-import taxonomist.twitter.client as twitter
+import db
+import twitter.client as twitter
 
 
 class User(db.Base):

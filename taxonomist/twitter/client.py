@@ -1,8 +1,10 @@
+from datetime import datetime
+
 import requests
 from requests_oauthlib import OAuth1Session
 
 
-class RateLimitedError(Exception):
+class RateLimitError(Exception):
     def __init__(self, response):
         self.response = response
 
@@ -71,6 +73,6 @@ class AuthedClient(Client):
     def http(self, func, endpoint, **kwargs):
         response = func(self.url_for(endpoint), **kwargs)
         if response.status_code == requests.codes.too_many_requests:
-            raise RateLimitedError(response)
+            raise RateLimitError(response)
         response.raise_for_status()
         return response
