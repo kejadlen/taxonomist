@@ -1,13 +1,13 @@
-import os
-
-from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-engine = create_engine(os.environ['DATABASE'], echo=True)
-session = scoped_session(sessionmaker(autocommit=False,
-                                      autoflush=False,
-                                      bind=engine))
-
+Session = scoped_session(sessionmaker(autocommit=False, autoflush=False))
 Base = declarative_base()
-Base.query = session.query_property()
+
+
+def init(engine):
+    Session.configure(bind=engine)
+    Base.metadata.bind = engine
+    Base.query = Session.query_property()
+
+    Base.metadata.create_all(engine)

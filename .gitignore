@@ -4,16 +4,10 @@
 # virtualenv
 .Python
 bin
+build
 include
 lib
 man
 share
 
-# honcho
-*.env
-
-# bower
-bower_components
-
-# webassets
-static/webassets-external
+.envrc
