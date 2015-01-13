@@ -3,6 +3,7 @@ from time import sleep
 
 from client import RateLimitError
 
+
 def retry_rate_limited(f):
     def retry(*args, **kwargs):
         while True:

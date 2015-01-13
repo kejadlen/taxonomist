@@ -9,7 +9,7 @@ import db
 
 def is_stale(user):
     return user.updated_at is None or \
-            datetime.now() - user.updated_at > timedelta(weeks=1)
+        datetime.now() - user.updated_at > timedelta(weeks=1)
 
 
 class UpdateUser:
@@ -76,7 +76,7 @@ class GraphFetcher(TwitterJob):
 
         ids = self.twitter.friends_ids(user.twitter_id)
         User.query.filter_by(twitter_id=user.twitter_id).\
-                update({'friend_ids': ids})
+            update({'friend_ids': ids})
         db.Session.commit()
 
 
@@ -104,7 +104,7 @@ class FriendHydrator(TwitterJob):
             profiles = self.twitter.users_lookup(ids)
             for profile in profiles:
                 User.query.filter_by(twitter_id=profile['id']).\
-                    update({'raw':profile})
+                    update({'raw': profile})
             db.Session.commit()
             self.users = self.users[chunk_size:]
 
