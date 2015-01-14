@@ -4,8 +4,8 @@ import os
 from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import ARRAY, JSON
 
-from .. import db
-from .. import twitter
+import db
+import twitter
 
 
 class User(db.Base):
