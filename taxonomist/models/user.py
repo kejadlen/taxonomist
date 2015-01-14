@@ -5,7 +5,7 @@ from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import ARRAY, JSON
 
 from .. import db
-from ..twitter import client as twitter
+from .. import twitter
 
 
 class User(db.Base):

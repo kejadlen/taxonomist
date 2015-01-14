@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from ..twitter.client import AuthedClient, Client
+from ..twitter import AuthedClient, Client
 
 
 @unittest.skipUnless('TEST_CLIENT' in os.environ, '')

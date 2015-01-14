@@ -1,20 +1,8 @@
 from datetime import datetime
+from time import sleep
 
 import requests
 from requests_oauthlib import OAuth1Session
-
-
-class RateLimitError(Exception):
-    def __init__(self, response):
-        self.response = response
-
-    def __str__(self):
-        return repr(self.response)
-
-    @property
-    def rate_limit_reset(self):
-        reset = self.response.headers['x-rate-limit-reset']
-        return datetime.fromtimestamp(int(reset))
 
 
 class Client(object):
@@ -76,3 +64,31 @@ class AuthedClient(Client):
             raise RateLimitError(response)
         response.raise_for_status()
         return response
+
+
+def retry_rate_limited(f):
+    def retry(*args, **kwargs):
+        while True:
+            try:
+                f(*args, **kwargs)
+            except RateLimitError as exc:
+                delta = exc.rate_limit_reset - datetime.now()
+                countdown = delta.total_seconds() + 1
+                # TODO: Replace w/logger
+                print "Rate limited, sleeping for %i seconds" % countdown
+                sleep(countdown)
+            return
+    return retry
+
+
+class RateLimitError(Exception):
+    def __init__(self, response):
+        self.response = response
+
+    def __str__(self):
+        return repr(self.response)
+
+    @property
+    def rate_limit_reset(self):
+        reset = self.response.headers['x-rate-limit-reset']
+        return datetime.fromtimestamp(int(reset))

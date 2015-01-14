@@ -5,7 +5,7 @@ from celery import Celery
 app = Celery('taxonomist',
              broker='redis://localhost',
              backend='redis://localhost',
-             include=['taxonomist.tasks'])
+             include=['taxonomist']) # taxonomist.tasks
 
 app.conf.update(CELERY_TASK_SERIALIZER='json',
                 CELERY_RESULT_SERIALIZER='json',
