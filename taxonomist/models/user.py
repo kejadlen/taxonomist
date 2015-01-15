@@ -3,6 +3,7 @@ import os
 
 from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import ARRAY, JSON
+from sqlalchemy.orm import relationship
 
 from .. import db
 from .. import twitter
@@ -23,6 +24,9 @@ class User(db.Base):
     # Metadata
     created_at = Column(DateTime, server_default=text('current_timestamp'))
     updated_at = Column(DateTime, onupdate=datetime.now)
+
+    # Relationships
+    interactions = relationship('Interaction')
 
     @property
     def friends(self):

@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from sqlalchemy import BigInteger, Column, DateTime, ForeignKey, Integer, String, text
+from sqlalchemy import text, BigInteger, Column, \
+    DateTime, ForeignKey, Integer, String
 
 from .. import db
 

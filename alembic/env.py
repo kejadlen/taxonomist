@@ -21,6 +21,7 @@ fileConfig(config.config_file_name)
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
 sys.path.append(os.getcwd())
+import taxonomist.models.interaction
 import taxonomist.models.tweet_mark
 import taxonomist.models.user
 from taxonomist.db import Base
