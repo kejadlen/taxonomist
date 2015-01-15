@@ -7,12 +7,18 @@ from sqlalchemy.orm import relationship
 
 from .. import db
 from .. import twitter
+import interaction
+import tweet_mark
 
 
 class User(db.Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
+
+    # Relationships
+    interactions = relationship('Interaction')
+    tweet_marks = relationship('TweetMark')
 
     # Twitter data
     twitter_id = Column(BigInteger, index=True, nullable=False, unique=True)
@@ -24,9 +30,6 @@ class User(db.Base):
     # Metadata
     created_at = Column(DateTime, server_default=text('current_timestamp'))
     updated_at = Column(DateTime, onupdate=datetime.now)
-
-    # Relationships
-    interactions = relationship('Interaction')
 
     @property
     def friends(self):

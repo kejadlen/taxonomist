@@ -58,6 +58,20 @@ class AuthedClient(Client):
                              data=payload)
         return response.json()
 
+    def statuses_user_timeline(self, user_id, since_id=None, max_id=None):
+        # Sadly, there's no good way of checking the retweet chain, so
+        # we can just ignore RTs for now.
+        payload = {'user_id': user_id,
+                   'since_id': since_id,
+                   'max_id': max_id,
+                   'count': 200,
+                   'trim_user': 'true',
+                   'include_rts': 'false'}
+        response = self.http(self.oauth.get,
+                             '/1.1/statuses/user_timeline.json',
+                             params=payload)
+        return response.json()
+
     def http(self, func, endpoint, **kwargs):
         response = func(self.url_for(endpoint), **kwargs)
         if response.status_code == requests.codes.too_many_requests:

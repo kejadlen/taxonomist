@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
-from Queue import Queue
-from threading import Event, Thread
+from threading import Event
 
-from models.user import User
-from twitter import retry_rate_limited
-import db
+from ..models.user import User
+from ..twitter import retry_rate_limited
+from twitter_task import TwitterTask
+from .. import db
 
 
 def is_stale(user):
@@ -24,7 +24,7 @@ class UpdateUser:
         if is_stale(self.user):
             self.graph_fetcher.put(self.user.twitter_id)
             self.graph_fetcher.join()
-            self.hydrator.put(user)
+            self.hydrator.put(self.user)
 
         existing_ids = [friend.twitter_id for friend in self.user.friends]
         new_users = [User(twitter_id=id) for id in self.user.friend_ids
@@ -39,34 +39,6 @@ class UpdateUser:
 
         self.hydrator.join()
         self.graph_fetcher.join()
-
-
-class TwitterTask(object):
-    def __init__(self, twitter):
-        self.twitter = twitter
-
-        self.queue = Queue()
-        self.thread = Thread(target=self.run)
-        self.thread.daemon = True
-        self.thread.start()
-
-    def run(self):
-        while True:
-            user = self.get()
-            self.process(user)
-            self.queue.task_done()
-
-    def process(self, user):
-        pass
-
-    def get(self):
-        return self.queue.get()
-
-    def put(self, user):
-        self.queue.put(user)
-
-    def join(self):
-        self.queue.join()
 
 
 class GraphFetcher(TwitterTask):
