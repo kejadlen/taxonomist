@@ -41,7 +41,7 @@ class UpdateUser:
         self.graph_fetcher.join()
 
 
-class TwitterJob(object):
+class TwitterTask(object):
     def __init__(self, twitter):
         self.twitter = twitter
 
@@ -69,7 +69,7 @@ class TwitterJob(object):
         self.queue.join()
 
 
-class GraphFetcher(TwitterJob):
+class GraphFetcher(TwitterTask):
     @retry_rate_limited
     def process(self, user):
         if not is_stale(user):
@@ -81,7 +81,7 @@ class GraphFetcher(TwitterJob):
         db.Session.commit()
 
 
-class FriendHydrator(TwitterJob):
+class FriendHydrator(TwitterTask):
     def __init__(self, twitter):
         super(FriendHydrator, self).__init__(twitter)
 
