@@ -29,8 +29,8 @@ class UpdateUser:
         existing_ids = [friend.twitter_id for friend in self.user.friends]
         new_users = [User(twitter_id=id) for id in self.user.friend_ids
                      if id not in existing_ids]
-        db.Session.add_all(new_users)
-        db.Session.commit()
+        db.session.add_all(new_users)
+        db.session.commit()
 
         for user in self.user.friends:
             self.hydrator.put(user)
@@ -50,7 +50,7 @@ class GraphFetcher(TwitterTask):
         ids = self.twitter.friends_ids(user.twitter_id)
         User.query.filter_by(twitter_id=user.twitter_id).\
             update({'friend_ids': ids})
-        db.Session.commit()
+        db.session.commit()
 
 
 class FriendHydrator(TwitterTask):
@@ -78,7 +78,7 @@ class FriendHydrator(TwitterTask):
             for profile in profiles:
                 User.query.filter_by(twitter_id=profile['id']).\
                     update({'raw': profile})
-            db.Session.commit()
+            db.session.commit()
             self.users = self.users[chunk_size:]
 
         if user is None:

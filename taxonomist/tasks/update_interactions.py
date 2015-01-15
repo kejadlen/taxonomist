@@ -44,23 +44,14 @@ class UpdateTimelineInteractions(TwitterTask):
                            for tweet in tweets
                            for mention in tweet['entities']['user_mentions']]
             for id, count in Counter(mention_ids).iteritems():
-                # interaction = next((i for i in interactions
-                #                     if i.interactee_id == id),
-                #                    None)
-                # if interaction is None:
-                #     db.Session.add(Interaction(user_id=user.id,
-                #                                interactee_id=id,
-                #                                count=count))
-                # else:
                 interaction = next((i for i in interactions
                                     if i.interactee_id == id),
                                    Interaction(user_id=user.id,
                                                interactee_id=id,
-                                               count=count))
+                                               count=0))
                 interaction.count += count
-                import pdb; pdb.set_trace()
-                db.Session.add(interaction)
-            db.Session.commit()
+                db.session.add(interaction)
+            db.session.commit()
 
             return
 
