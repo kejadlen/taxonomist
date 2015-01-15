@@ -1,5 +1,6 @@
 from __future__ import with_statement
-import os, sys
+import os
+import sys
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
@@ -20,8 +21,9 @@ fileConfig(config.config_file_name)
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
 sys.path.append(os.getcwd())
-import taxonomist.twitter.user
-from taxonomist.twitter import Base
+import taxonomist.models.tweet_mark
+import taxonomist.models.user
+from taxonomist.db import Base
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

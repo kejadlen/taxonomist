@@ -4,8 +4,8 @@ import os
 from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import ARRAY, JSON
 
-import db
-import twitter
+from .. import db
+from .. import twitter
 
 
 class User(db.Base):
@@ -14,7 +14,7 @@ class User(db.Base):
     id = Column(Integer, primary_key=True)
 
     # Twitter data
-    twitter_id = Column(BigInteger, nullable=False, unique=True)
+    twitter_id = Column(BigInteger, index=True, nullable=False, unique=True)
     friend_ids = Column(ARRAY(BigInteger))
     raw = Column(JSON(none_as_null=True))
     oauth_token = Column(String(255))
