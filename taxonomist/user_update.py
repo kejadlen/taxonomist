@@ -24,6 +24,7 @@ class UpdateUser:
         if is_stale(self.user):
             self.graph_fetcher.put(self.user.twitter_id)
             self.graph_fetcher.join()
+            self.hydrator.put(user)
 
         existing_ids = [friend.twitter_id for friend in self.user.friends]
         new_users = [User(twitter_id=id) for id in self.user.friend_ids
