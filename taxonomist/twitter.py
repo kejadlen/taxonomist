@@ -83,15 +83,16 @@ class AuthedClient(Client):
 def retry_rate_limited(f):
     def retry(*args, **kwargs):
         while True:
+            result = None
             try:
-                f(*args, **kwargs)
+                result = f(*args, **kwargs)
             except RateLimitError as exc:
                 delta = exc.rate_limit_reset - datetime.now()
                 countdown = delta.total_seconds() + 1
                 # TODO: Replace w/logger
                 print "Rate limited, sleeping for %i seconds" % countdown
                 sleep(countdown)
-            return
+            return result
     return retry
 
 
