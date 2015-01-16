@@ -43,6 +43,19 @@ class AuthedClient(Client):
                                    resource_owner_key=oauth_token,
                                    resource_owner_secret=oauth_token_secret)
 
+    def favorites_list(self, user_id, since_id=None, max_id=None):
+        # Sadly, there's no good way of checking the retweet chain, so
+        # we can just ignore RTs for now.
+        payload = {'user_id': user_id,
+                   'since_id': since_id,
+                   'max_id': max_id,
+                   'count': 200,
+                   'include_entities': 'false'}
+        response = self.http(self.oauth.get,
+                             '/1.1/favorites/list.json',
+                             params=payload)
+        return response.json()
+
     def friends_ids(self, user_id):
             """Retrieve the first 5000 friend IDs for the given user."""
             payload = {'user_id': user_id}

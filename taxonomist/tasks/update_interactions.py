@@ -1,5 +1,6 @@
 from collections import Counter
-from threading import Thread
+from threading import Event, Thread
+import logging
 
 from .. import db
 from ..models.interaction import Interaction
@@ -11,75 +12,101 @@ from twitter_task import TwitterTask
 class UpdateInteractions:
     def __init__(self, user):
         self.user = user
+        self.twitter = user.twitter
 
-        twitter = self.user.twitter
-        self.timeline = UpdateTimelineInteractions(twitter)
-        self.direct_messages = UpdateDirectMessageInteractions(twitter)
-        self.favorites = UpdateFavoriteInteractions(twitter)
+        endpoint = self.endpoint.__name__
+        self.tweet_mark = next((tm for tm in user.tweet_marks
+                                if tm.endpoint == endpoint),
+                               TweetMark(user_id=user.id, endpoint=endpoint))
+
+        self.interactions = {interaction.interactee_id: interaction
+                             for interaction in user.interactions}
+
+        self.event = Event()
+        self.event.clear()
+
+        self.logger = logging.getLogger('taxonomist')
+
+    def start(self):
+        self.thread = Thread(target=self.run)
+        self.thread.daemon = True
+        self.thread.start()
 
     def run(self):
-        self.timeline.put(self.user)
-        self.direct_messages.put(self.user)
-        self.favorites.put(self.user)
+        data = self.fetch(self.user, since_id=self.tweet_mark.tweet_id)
 
-        self.timeline.join()
-        self.direct_messages.join()
-        self.favorites.join()
+        counts = Counter([id
+                          for datum in data
+                          for id in self.interactee_ids(datum)])
 
+        for id, count in counts.iteritems():
+            interaction = self.interactions.get(id)
+            if not interaction:
+                interaction = Interaction(user_id=self.user.id,
+                                          interactee_id=id,
+                                          count=0)
+                self.interactions[id] = interaction
+            interaction.count += count
 
-class UpdateTimelineInteractions(TwitterTask):
-    ENDPOINT = 'statuses/user_timeline'
+        if data:
+            self.tweet_mark.tweet_id = data[0]['id']
+            db.session.add(self.tweet_mark)
+
+        db.session.add_all(self.interactions.values())
+
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+            raise
+
+        self.event.set()
+
+    def join(self):
+        self.event.wait()
 
     @retry_rate_limited
-    def process(self, user):
-        interactions = {interaction.interactee_id: interaction
-                        for interaction in user.interactions}
+    def fetch(self, user, since_id=None):
+        max_id = None
 
-        tweet_mark = next((tm for tm in user.tweet_marks
-                           if tm.endpoint == self.ENDPOINT),
-                          TweetMark(user_id=user.id, endpoint=self.ENDPOINT))
-        params = {'since_id': tweet_mark.tweet_id, 'max_id': None}
-        max_tweet_id = tweet_mark.tweet_id
-
+        tweets = []
         while True:
-            self.logger.debug(params)
-            tweets = self.twitter.statuses_user_timeline(user.twitter_id,
-                                                         **params)
-
-            if not tweets:
+            self.logger.debug("since_id: %s, max_id: %s", since_id, max_id)
+            response = self.endpoint(user.twitter_id,
+                                     since_id=since_id,
+                                     max_id=max_id)
+            if not response:
                 break
 
-            max_tweet_id = max_tweet_id or tweets[0]['id']
+            tweets += response
+            max_id = response[-1]['id'] - 1
 
-            mention_ids = [mention['id']
-                           for tweet in tweets
-                           for mention in tweet['entities']['user_mentions']]
-            for id, count in Counter(mention_ids).iteritems():
-                interaction = interactions.get(id)
-                if not interaction:
-                    interaction = Interaction(user_id=user.id,
-                                              interactee_id=id,
-                                              count=0)
-                    interactions[id] = interaction
-                interaction.count += count
-            params['max_id'] = tweets[-1]['id'] - 1
+        return tweets
 
-        for i in interactions.values():
-            self.logger.debug("%d: %d" % (i.interactee_id, i.count))
 
-        tweet_mark.tweet_id = max_tweet_id
-        self.logger.debug(tweet_mark.tweet_id)
+class UpdateTimelineInteractions(UpdateInteractions):
+    @property
+    def endpoint(self):
+        return self.twitter.statuses_user_timeline
 
-        db.session.add_all(interactions.values())
-        db.session.add(tweet_mark)
-        db.session.commit()
+    def interactee_ids(self, tweet):
+        return [user['id'] for user in tweet['entities']['user_mentions']]
 
 
 class UpdateDirectMessageInteractions(TwitterTask):
-    def process(self, user):
-        pass
+    @property
+    def endpoint(self):
+        return self.twitter.favorites_list
+
+    def interactee_ids(self, tweet):
+        return [tweet['user']['id']]
 
 
 class UpdateFavoriteInteractions(TwitterTask):
-    def process(self, user):
-        pass
+    pass
+    # @property
+    # def endpoint(self):
+    #     return self.twitter.statuses_user_timeline
+
+    # def interactee_ids(self, tweet):
+    #     return [user['id'] for user in tweet['entities']['user_mentions']]
