@@ -20,7 +20,8 @@ class UpdateInteractions:
                                TweetMark(user_id=user.id, endpoint=endpoint))
 
         self.interactions = {interaction.interactee_id: interaction
-                             for interaction in user.interactions}
+                             for interaction in user.interactions
+                             if isinstance(interaction, self.INTERACTION_TYPE)}
 
         self.event = Event()
         self.event.clear()
@@ -42,9 +43,9 @@ class UpdateInteractions:
         for id, count in counts.iteritems():
             interaction = self.interactions.get(id)
             if not interaction:
-                interaction = Interaction(user_id=self.user.id,
-                                          interactee_id=id,
-                                          count=0)
+                interaction = self.INTERACTION_TYPE(user_id=self.user.id,
+                                                    interactee_id=id,
+                                                    count=0)
                 self.interactions[id] = interaction
             interaction.count += count
 
@@ -72,6 +73,7 @@ class UpdateInteractions:
         tweets = []
         while True:
             self.logger.debug("since_id: %s, max_id: %s", since_id, max_id)
+
             response = self.endpoint(user.twitter_id,
                                      since_id=since_id,
                                      max_id=max_id)
@@ -85,6 +87,8 @@ class UpdateInteractions:
 
 
 class UpdateMentionInteractions(UpdateInteractions):
+    INTERACTION_TYPE = interaction.Mention
+
     @property
     def endpoint(self):
         return self.twitter.statuses_user_timeline
@@ -93,7 +97,9 @@ class UpdateMentionInteractions(UpdateInteractions):
         return [user['id'] for user in tweet['entities']['user_mentions']]
 
 
-class UpdateDMInteractions(TwitterTask):
+class UpdateFavoriteInteractions(UpdateInteractions):
+    INTERACTION_TYPE = interaction.Favorite
+
     @property
     def endpoint(self):
         return self.twitter.favorites_list
@@ -102,11 +108,15 @@ class UpdateDMInteractions(TwitterTask):
         return [tweet['user']['id']]
 
 
-class UpdateFavoriteInteractions(TwitterTask):
-    pass
-    # @property
-    # def endpoint(self):
-    #     return self.twitter.statuses_user_timeline
+class UpdateDMInteractions(UpdateInteractions):
+    INTERACTION_TYPE = interaction.DM
 
-    # def interactee_ids(self, tweet):
-    #     return [user['id'] for user in tweet['entities']['user_mentions']]
+    @property
+    def endpoint(self):
+        return self.direct_messages_sent
+
+    def direct_messages_sent(self, _, since_id=None, max_id=None):
+        return self.twitter.direct_messages_sent(since_id=since_id, max_id=max_id)
+
+    def interactee_ids(self, dm):
+        return [dm['recipient_id']]

@@ -43,9 +43,17 @@ class AuthedClient(Client):
                                    resource_owner_key=oauth_token,
                                    resource_owner_secret=oauth_token_secret)
 
+    def direct_messages_sent(self, since_id=None, max_id=None):
+        payload = {'since_id': since_id,
+                   'max_id': max_id,
+                   'count': 200,
+                   'include_entities': 'false'}
+        response = self.http(self.oauth.get,
+                             '/1.1/direct_messages/sent.json',
+                             params=payload)
+        return response.json()
+
     def favorites_list(self, user_id, since_id=None, max_id=None):
-        # Sadly, there's no good way of checking the retweet chain, so
-        # we can just ignore RTs for now.
         payload = {'user_id': user_id,
                    'since_id': since_id,
                    'max_id': max_id,
