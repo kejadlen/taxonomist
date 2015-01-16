@@ -36,6 +36,10 @@ class User(db.Base):
         return User.query.filter(User.twitter_id.in_(self.friend_ids))
 
     @property
+    def screen_name(self):
+        return self.raw['screen_name']
+
+    @property
     def twitter(self):
         if not self.oauth_token or not self.oauth_token_secret:
             return None
