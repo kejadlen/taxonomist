@@ -32,28 +32,47 @@ class UpdateTimelineInteractions(TwitterTask):
 
     @retry_rate_limited
     def process(self, user):
-        interactions = user.interactions
+        interactions = {interaction.interactee_id: interaction
+                        for interaction in user.interactions}
+
         tweet_mark = next((tm for tm in user.tweet_marks
                            if tm.endpoint == self.ENDPOINT),
-                          TweetMark(endpoint=self.ENDPOINT))
+                          TweetMark(user_id=user.id, endpoint=self.ENDPOINT))
+        params = {'since_id': tweet_mark.tweet_id, 'max_id': None}
+        max_tweet_id = tweet_mark.tweet_id
 
         while True:
+            self.logger.debug(params)
             tweets = self.twitter.statuses_user_timeline(user.twitter_id,
-                                                         **tweet_mark.params)
+                                                         **params)
+
+            if not tweets:
+                break
+
+            max_tweet_id = max_tweet_id or tweets[0]['id']
+
             mention_ids = [mention['id']
                            for tweet in tweets
                            for mention in tweet['entities']['user_mentions']]
             for id, count in Counter(mention_ids).iteritems():
-                interaction = next((i for i in interactions
-                                    if i.interactee_id == id),
-                                   Interaction(user_id=user.id,
-                                               interactee_id=id,
-                                               count=0))
+                interaction = interactions.get(id)
+                if not interaction:
+                    interaction = Interaction(user_id=user.id,
+                                              interactee_id=id,
+                                              count=0)
+                    interactions[id] = interaction
                 interaction.count += count
-                db.session.add(interaction)
-            db.session.commit()
+            params['max_id'] = tweets[-1]['id'] - 1
 
-            return
+        for i in interactions.values():
+            self.logger.debug("%d: %d" % (i.interactee_id, i.count))
+
+        tweet_mark.tweet_id = max_tweet_id
+        self.logger.debug(tweet_mark.tweet_id)
+
+        db.session.add_all(interactions.values())
+        db.session.add(tweet_mark)
+        db.session.commit()
 
 
 class UpdateDirectMessageInteractions(TwitterTask):

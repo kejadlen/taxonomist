@@ -1,5 +1,6 @@
 from Queue import Queue
 from threading import Thread
+import logging
 
 
 class TwitterTask(object):
@@ -10,6 +11,8 @@ class TwitterTask(object):
         self.thread = Thread(target=self.run)
         self.thread.daemon = True
         self.thread.start()
+
+        self.logger = logging.getLogger('taxonomist')
 
     def run(self):
         while True:
