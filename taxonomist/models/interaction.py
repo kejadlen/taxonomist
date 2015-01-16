@@ -7,6 +7,9 @@ from .. import db
 
 class Interaction(db.Base):
     __tablename__ = 'interactions'
+    __table_args__ = (
+        sa.UniqueConstraint('user_id', 'type', 'interactee_id'),
+    )
 
     id = sa.Column(sa.Integer, primary_key=True)
 
