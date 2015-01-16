@@ -6,7 +6,6 @@ from .. import db
 from ..models import interaction as interaction
 from ..models.tweet_mark import TweetMark
 from ..twitter import retry_rate_limited
-from twitter_task import TwitterTask
 
 
 class UpdateInteractions:
