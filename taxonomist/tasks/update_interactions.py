@@ -3,7 +3,7 @@ from threading import Event, Thread
 import logging
 
 from .. import db
-from ..models.interaction import Interaction
+from ..models import interaction as interaction
 from ..models.tweet_mark import TweetMark
 from ..twitter import retry_rate_limited
 from twitter_task import TwitterTask
@@ -84,7 +84,7 @@ class UpdateInteractions:
         return tweets
 
 
-class UpdateTimelineInteractions(UpdateInteractions):
+class UpdateMentionInteractions(UpdateInteractions):
     @property
     def endpoint(self):
         return self.twitter.statuses_user_timeline
@@ -93,7 +93,7 @@ class UpdateTimelineInteractions(UpdateInteractions):
         return [user['id'] for user in tweet['entities']['user_mentions']]
 
 
-class UpdateDirectMessageInteractions(TwitterTask):
+class UpdateDMInteractions(TwitterTask):
     @property
     def endpoint(self):
         return self.twitter.favorites_list

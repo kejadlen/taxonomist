@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import text, BigInteger, Column, DateTime, ForeignKey, Integer
+import sqlalchemy as sa
 
 from .. import db
 
@@ -8,13 +8,27 @@ from .. import db
 class Interaction(db.Base):
     __tablename__ = 'interactions'
 
-    id = Column(Integer, primary_key=True)
+    id = sa.Column(sa.Integer, primary_key=True)
 
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_id = sa.Column(sa.Integer, sa.ForeignKey('users.id'))
 
-    interactee_id = Column(BigInteger, nullable=False)
-    count = Column(Integer, default=0)
+    interactee_id = sa.Column(sa.BigInteger, nullable=False)
+    count = sa.Column(sa.Integer, default=0)
+    type = sa.Column(sa.String(32))
 
     # Metadata
-    created_at = Column(DateTime, server_default=text('current_timestamp'))
-    updated_at = Column(DateTime, onupdate=datetime.now)
+    created_at = sa.Column(sa.DateTime,
+                           server_default=sa.text('current_timestamp'))
+    updated_at = sa.Column(sa.DateTime, onupdate=datetime.now)
+
+    __mapper_args__ = {'polymorphic_on':type,
+                       'polymorphic_identity':'interaction'}
+
+class Mention(Interaction):
+    __mapper_args__ = {'polymorphic_identity':'mention'}
+
+class Favorite(Interaction):
+    __mapper_args__ = {'polymorphic_identity':'favorite'}
+
+class DM(Interaction):
+    __mapper_args__ = {'polymorphic_identity':'dm'}
