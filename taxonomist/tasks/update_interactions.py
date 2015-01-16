@@ -115,7 +115,8 @@ class UpdateDMInteractions(UpdateInteractions):
         return self.direct_messages_sent
 
     def direct_messages_sent(self, _, since_id=None, max_id=None):
-        return self.twitter.direct_messages_sent(since_id=since_id, max_id=max_id)
+        return self.twitter.direct_messages_sent(since_id=since_id,
+                                                 max_id=max_id)
 
     def interactee_ids(self, dm):
         return [dm['recipient_id']]

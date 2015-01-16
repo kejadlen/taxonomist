@@ -24,17 +24,19 @@ class Interaction(db.Base):
                            server_default=sa.text('current_timestamp'))
     updated_at = sa.Column(sa.DateTime, onupdate=datetime.now)
 
-    __mapper_args__ = {'polymorphic_on':type,
-                       'polymorphic_identity':'interaction'}
+    __mapper_args__ = {'polymorphic_on': type,
+                       'polymorphic_identity': 'interaction'}
 
     __attrs__ = ['id', 'user_id', 'interactee_id', 'count']
 
 
 class Mention(Interaction):
-    __mapper_args__ = {'polymorphic_identity':'mention'}
+    __mapper_args__ = {'polymorphic_identity': 'mention'}
+
 
 class Favorite(Interaction):
-    __mapper_args__ = {'polymorphic_identity':'favorite'}
+    __mapper_args__ = {'polymorphic_identity': 'favorite'}
+
 
 class DM(Interaction):
-    __mapper_args__ = {'polymorphic_identity':'dm'}
+    __mapper_args__ = {'polymorphic_identity': 'dm'}

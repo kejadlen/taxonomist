@@ -6,6 +6,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 Base = declarative_base()
 
+
 def __repr__(self):
     attrs = self.__attrs__
     attrs = ['{}={}'.format(attr, getattr(self, attr)) for attr in attrs]
