@@ -6,6 +6,14 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 Base = declarative_base()
 
+def __repr__(self):
+    attrs = self.__attrs__
+    attrs = ['{}={}'.format(attr, getattr(self, attr)) for attr in attrs]
+    attrs = ', '.join(attrs)
+    return '{}({})'.format(self.__class__.__name__, attrs)
+
+Base.__repr__ = __repr__
+
 
 def init(engine=None):
     global Session, session

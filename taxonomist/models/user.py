@@ -31,6 +31,8 @@ class User(db.Base):
     created_at = Column(DateTime, server_default=text('current_timestamp'))
     updated_at = Column(DateTime, onupdate=datetime.now)
 
+    __attrs__ = ['id', 'twitter_id']
+
     @property
     def friends(self):
         return User.query.filter(User.twitter_id.in_(self.friend_ids))

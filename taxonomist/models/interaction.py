@@ -24,6 +24,9 @@ class Interaction(db.Base):
     __mapper_args__ = {'polymorphic_on':type,
                        'polymorphic_identity':'interaction'}
 
+    __attrs__ = ['id', 'user_id', 'interactee_id', 'count']
+
+
 class Mention(Interaction):
     __mapper_args__ = {'polymorphic_identity':'mention'}
 

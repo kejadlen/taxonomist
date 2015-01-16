@@ -18,3 +18,5 @@ class TweetMark(db.Base):
     # Metadata
     created_at = Column(DateTime, server_default=text('current_timestamp'))
     updated_at = Column(DateTime, onupdate=datetime.now)
+
+    __attrs__ = ['id', 'user_id', 'endpoint', 'tweet_id']
