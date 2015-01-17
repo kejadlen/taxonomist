@@ -17,7 +17,7 @@ class UpdateUser:
     def is_stale(cls, type, user):
         key = type.__name__
 
-        if not user.fetched_ats.has_key(key):
+        if not key in user.fetched_ats:
             return True
 
         fetched_at = datetime.strptime(user.fetched_ats[key],

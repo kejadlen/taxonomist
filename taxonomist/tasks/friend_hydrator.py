@@ -24,7 +24,6 @@ class FriendHydrator:
 
                 db.session.commit()
 
-
     @retry_rate_limited
     def fetch(self, ids):
         return self.twitter.users_lookup(ids)

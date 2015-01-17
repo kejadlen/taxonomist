@@ -34,4 +34,3 @@ def downgrade():
     op.drop_column('users', 'fetched_ats')
 
     op.execute('drop extension if exists hstore')
-
