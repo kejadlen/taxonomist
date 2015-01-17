@@ -45,6 +45,7 @@ class Mention(Interaction):
     def interactee_ids(cls, tweet):
         return [user['id'] for user in tweet['entities']['user_mentions']]
 
+
 class Favorite(Interaction):
     __mapper_args__ = {'polymorphic_identity': 'favorite'}
 
@@ -58,6 +59,7 @@ class Favorite(Interaction):
     @classmethod
     def interactee_ids(cls, tweet):
         return [tweet['user']['id']]
+
 
 class DM(Interaction):
     __mapper_args__ = {'polymorphic_identity': 'dm'}

@@ -16,7 +16,7 @@ class UpdateUser:
     @classmethod
     def is_stale(cls, user):
         return user.updated_at is None or \
-                datetime.now() - user.updated_at > cls.STALE
+            datetime.now() - user.updated_at > cls.STALE
 
     def __init__(self, user):
         self.user = user
