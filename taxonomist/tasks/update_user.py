@@ -14,9 +14,15 @@ class UpdateUser:
 
     # TODO Add jitter
     @classmethod
-    def is_stale(cls, user):
-        return user.updated_at is None or \
-            datetime.now() - user.updated_at > cls.STALE
+    def is_stale(cls, type, user):
+        key = type.__name__
+
+        if not user.fetched_ats.has_key(key):
+            return True
+
+        fetched_at = datetime.strptime(user.fetched_ats[key],
+                                       '%Y-%m-%dT%H:%M:%S.%f')
+        return datetime.now() - fetched_at > cls.STALE
 
     def __init__(self, user):
         self.user = user
@@ -27,14 +33,16 @@ class UpdateUser:
         self.interaction_updater = UpdateInteractions(self.twitter)
 
     def run(self):
-        if self.is_stale(self.user):
+        if self.is_stale(GraphFetcher, self.user):
             GraphFetcher(self.twitter).run(self.user)
+
+        if self.is_stale(FriendHydrator, self.user):
             FriendHydrator(self.twitter).run(self.user)
 
         self.create_users()
 
         stale_friends = [friend for friend in self.user.friends
-                         if self.is_stale(friend)]
+                         if self.is_stale(FriendHydrator, friend)]
 
         threads = []
         threads.append(self.async(self.graph_fetcher.run, *stale_friends))
@@ -46,6 +54,8 @@ class UpdateUser:
 
         for thread in threads:
             thread.join()
+
+        db.session.commit()
 
     def create_users(self):
         '''Since we need two levels of friendships for analysis, friends of the

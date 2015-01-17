@@ -1,3 +1,4 @@
+from datetime import datetime
 from itertools import izip_longest
 
 from .. import db
@@ -11,12 +12,18 @@ class FriendHydrator:
     def run(self, *users):
         for chunk in izip_longest(*([iter(users)] *
                                     self.twitter.USERS_LOOKUP_CHUNK_SIZE)):
-            lookup = {user.twitter_id: user for user in self.users}
+            lookup = {user.twitter_id: user for user in chunk if user}
             profiles = self.fetch(lookup.keys())
             for profile in profiles:
-                lookup[profile['id']].raw = profile
+                user = lookup[profile['id']]
 
-        db.session.commit()
+                user.raw = profile
+
+                fetched_at = datetime.now().isoformat()
+                user.fetched_ats[self.__class__.__name__] = fetched_at
+
+                db.session.commit()
+
 
     @retry_rate_limited
     def fetch(self, ids):

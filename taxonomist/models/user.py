@@ -1,7 +1,8 @@
 from datetime import datetime
 import os
 
-from sqlalchemy.dialects.postgresql import ARRAY, JSON
+from sqlalchemy.dialects.postgresql import ARRAY, HSTORE, JSON
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
 import sqlalchemy as sa
 
@@ -29,7 +30,7 @@ class User(db.Base):
     oauth_token_secret = sa.Column(sa.String(255))
 
     # Metadata
-    last_fetch_at = sa.Column(sa.DateTime)
+    fetched_ats = sa.Column(MutableDict.as_mutable(HSTORE), default={})
     created_at = sa.Column(sa.DateTime,
                            server_default=sa.text('current_timestamp'))
     updated_at = sa.Column(sa.DateTime, onupdate=datetime.now)

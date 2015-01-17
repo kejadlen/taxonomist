@@ -1,8 +1,9 @@
 from datetime import datetime
 from time import sleep
+import logging
 
-import requests
 from requests_oauthlib import OAuth1Session
+import requests
 
 
 class Client(object):
@@ -103,6 +104,7 @@ class AuthedClient(Client):
 
 def retry_rate_limited(f):
     def retry(*args, **kwargs):
+        logger = logging.getLogger('taxonomist')
         while True:
             result = None
             try:
@@ -110,8 +112,7 @@ def retry_rate_limited(f):
             except RateLimitError as exc:
                 delta = exc.rate_limit_reset - datetime.now()
                 countdown = delta.total_seconds() + 1
-                # TODO: Replace w/logger
-                print "Rate limited, sleeping for %i seconds" % countdown
+                logger.warn("Rate limited, sleeping for %s seconds", countdown)
                 sleep(countdown)
             return result
     return retry
