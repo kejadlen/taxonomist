@@ -1,14 +1,12 @@
-from collections import Counter
 from datetime import datetime, timedelta
-from itertools import izip_longest
 from threading import Thread
-import logging
 
 from .. import db
 from ..models import interaction as interaction
-from ..models.tweet_mark import TweetMark
 from ..models.user import User
-from ..twitter import retry_rate_limited
+from graph_fetcher import GraphFetcher
+from friend_hydrator import FriendHydrator
+from update_interactions import UpdateInteractions
 
 
 class UpdateUser:
@@ -64,95 +62,3 @@ class UpdateUser:
         thread.daemon = True
         thread.start()
         return thread
-
-
-class GraphFetcher:
-    def __init__(self, twitter):
-        self.twitter = twitter
-
-    def run(self, *users):
-        for user in users:
-            ids = self.fetch(user.twitter_id)
-            user.friend_ids = ids
-        db.session.commit()
-
-    @retry_rate_limited
-    def fetch(self, id):
-        return self.twitter.friends_ids(id)
-
-
-class FriendHydrator:
-    def __init__(self, twitter):
-        self.twitter = twitter
-
-    def run(self, *users):
-        for chunk in izip_longest(*([iter(users)] *
-                                    self.twitter.USERS_LOOKUP_CHUNK_SIZE)):
-            lookup = {user.twitter_id: user for user in self.users}
-            profiles = self.fetch(lookup.keys())
-            for profile in profiles:
-                lookup[profile['id']].raw = profile
-
-        db.session.commit()
-
-    @retry_rate_limited
-    def fetch(self, ids):
-        return self.twitter.users_lookup(ids)
-
-
-class UpdateInteractions:
-    def __init__(self, twitter):
-        self.twitter = twitter
-
-        self.logger = logging.getLogger('taxonomist')
-
-    def run(self, type, user):
-        tweet_mark = next((tm for tm in user.tweet_marks
-                           if tm.type == type.__name__),
-                          TweetMark(user_id=user.id, type=type.__name__))
-        interactions = {interaction.interactee_id: interaction
-                        for interaction in user.interactions
-                        if isinstance(interaction, type)}
-
-        data = self.fetch(type, user, since_id=tweet_mark.tweet_id)
-
-        for id, count in Counter([id for datum in data
-                                  for id in type.interactee_ids(datum)]
-                                ).iteritems():
-            interaction = interactions.get(id)
-            if not interaction:
-                interactions[id] = interaction = type(user_id=user.id,
-                                                      interactee_id=id,
-                                                      count=0)
-            interaction.count += count
-
-        if data:
-            tweet_mark.tweet_id = data[0]['id']
-            db.session.add(tweet_mark)
-
-        db.session.add_all(interactions.values())
-
-        try:
-            db.session.commit()
-        except:
-            db.session.rollback()
-            raise
-
-    def fetch(self, type, user, since_id=None):
-        max_id = None
-
-        data = []
-        while True:
-            self.logger.debug("since_id: %s, max_id: %s", since_id, max_id)
-
-            response = type.fetch(self.twitter,
-                                  user=user,
-                                  since_id=since_id,
-                                  max_id=max_id)
-            if not response:
-                break
-
-            data += response
-            max_id = response[-1]['id'] - 1
-
-        return data
