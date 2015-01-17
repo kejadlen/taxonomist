@@ -17,15 +17,12 @@ Base.__repr__ = __repr__
 
 
 def init(engine=None):
-    global Session, session
+    global session
 
     engine = engine or create_engine(os.environ['DATABASE'], echo=False)
-    session_factory = sessionmaker(autocommit=False,
-                                   autoflush=False,
-                                   bind=engine)
+    session = scoped_session(sessionmaker(autocommit=False,
+                                          autoflush=False,
+                                          bind=engine))
 
-    Session = scoped_session(session_factory)
-    session = Session()
-
-    Base.query = Session.query_property()
+    Base.query = session.query_property()
     Base.metadata.create_all(engine)

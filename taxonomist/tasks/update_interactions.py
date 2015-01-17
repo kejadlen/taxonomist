@@ -21,9 +21,10 @@ class UpdateInteractions:
 
         data = self.fetch(type, user, since_id=tweet_mark.tweet_id)
 
-        for id, count in Counter([id for datum in data
-                                  for id in type.interactee_ids(datum)]
-                                ).iteritems():
+        counts = Counter([id
+                          for datum in data
+                          for id in type.interactee_ids(datum)])
+        for id, count in counts.iteritems():
             interaction = interactions.get(id)
             if not interaction:
                 interactions[id] = interaction = type(user_id=user.id,
@@ -33,9 +34,6 @@ class UpdateInteractions:
 
         if data:
             tweet_mark.tweet_id = data[0]['id']
-            db.session.add(tweet_mark)
-
-        db.session.add_all(interactions.values())
 
         try:
             db.session.commit()
