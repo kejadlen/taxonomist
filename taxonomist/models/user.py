@@ -1,9 +1,9 @@
 from datetime import datetime
 import os
 
-from sqlalchemy import text, BigInteger, Column, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import ARRAY, JSON
 from sqlalchemy.orm import relationship
+import sqlalchemy as sa
 
 from .. import db
 from .. import twitter
@@ -14,22 +14,25 @@ import tweet_mark
 class User(db.Base):
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True)
+    id = sa.Column(sa.Integer, primary_key=True)
 
     # Relationships
     interactions = relationship('Interaction')
     tweet_marks = relationship('TweetMark')
 
     # Twitter data
-    twitter_id = Column(BigInteger, index=True, nullable=False, unique=True)
-    friend_ids = Column(ARRAY(BigInteger))
-    raw = Column(JSON(none_as_null=True))
-    oauth_token = Column(String(255))
-    oauth_token_secret = Column(String(255))
+    twitter_id = sa.Column(sa.BigInteger,
+                           index=True, nullable=False, unique=True)
+    friend_ids = sa.Column(ARRAY(sa.BigInteger))
+    raw = sa.Column(JSON(none_as_null=True))
+    oauth_token = sa.Column(sa.String(255))
+    oauth_token_secret = sa.Column(sa.String(255))
 
     # Metadata
-    created_at = Column(DateTime, server_default=text('current_timestamp'))
-    updated_at = Column(DateTime, onupdate=datetime.now)
+    last_fetch_at = sa.Column(sa.DateTime)
+    created_at = sa.Column(sa.DateTime,
+                           server_default=sa.text('current_timestamp'))
+    updated_at = sa.Column(sa.DateTime, onupdate=datetime.now)
 
     __attrs__ = ['id', 'twitter_id']
 
