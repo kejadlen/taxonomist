@@ -1,88 +1,158 @@
+from collections import Counter
 from datetime import datetime, timedelta
-from threading import Event
+from itertools import izip_longest
+from threading import Thread
+import logging
 
+from .. import db
+from ..models import interaction as interaction
+from ..models.tweet_mark import TweetMark
 from ..models.user import User
 from ..twitter import retry_rate_limited
-from twitter_task import TwitterTask
-from .. import db
-
-
-def is_stale(user):
-    return user.updated_at is None or \
-        datetime.now() - user.updated_at > timedelta(weeks=1)
 
 
 class UpdateUser:
+    STALE = timedelta(weeks=1)
+
+    # TODO Add jitter
+    @classmethod
+    def is_stale(cls, user):
+        return user.updated_at is None or \
+                datetime.now() - user.updated_at > cls.STALE
+
     def __init__(self, user):
         self.user = user
         self.twitter = self.user.twitter
 
         self.graph_fetcher = GraphFetcher(self.twitter)
         self.hydrator = FriendHydrator(self.twitter)
+        self.interaction_updater = UpdateInteractions(self.twitter)
 
     def run(self):
-        if is_stale(self.user):
-            self.graph_fetcher.put(self.user.twitter_id)
-            self.graph_fetcher.join()
-            self.hydrator.put(self.user)
+        if self.is_stale(self.user):
+            GraphFetcher(self.twitter).run(self.user)
+            FriendHydrator(self.twitter).run(self.user)
 
+        self.create_users()
+
+        stale_friends = [friend for friend in self.user.friends
+                         if self.is_stale(friend)]
+
+        threads = []
+        threads.append(self.async(self.graph_fetcher.run, *stale_friends))
+        threads.append(self.async(self.hydrator.run, *stale_friends))
+        for i in [interaction.Mention, interaction.Favorite, interaction.DM]:
+            threads.append(self.async(self.interaction_updater.run,
+                                      i,
+                                      self.user))
+
+        for thread in threads:
+            thread.join()
+
+    def create_users(self):
+        '''Since we need two levels of friendships for analysis, friends of the
+        target user need to exist in the DB to store their friend_ids.
+        '''
         existing_ids = [friend.twitter_id for friend in self.user.friends]
         new_users = [User(twitter_id=id) for id in self.user.friend_ids
                      if id not in existing_ids]
         db.session.add_all(new_users)
         db.session.commit()
 
-        for user in self.user.friends:
-            self.hydrator.put(user)
-            self.graph_fetcher.put(user)
-        self.hydrator.put(None)
-
-        self.hydrator.join()
-        self.graph_fetcher.join()
+    def async(self, task, *args):
+        thread = Thread(target=task, args=args)
+        thread.daemon = True
+        thread.start()
+        return thread
 
 
-class GraphFetcher(TwitterTask):
-    @retry_rate_limited
-    def process(self, user):
-        if not is_stale(user):
-            return
+class GraphFetcher:
+    def __init__(self, twitter):
+        self.twitter = twitter
 
-        ids = self.twitter.friends_ids(user.twitter_id)
-        User.query.filter_by(twitter_id=user.twitter_id).\
-            update({'friend_ids': ids})
+    def run(self, *users):
+        for user in users:
+            ids = self.fetch(user.twitter_id)
+            user.friend_ids = ids
         db.session.commit()
 
+    @retry_rate_limited
+    def fetch(self, id):
+        return self.twitter.friends_ids(id)
 
-class FriendHydrator(TwitterTask):
+
+class FriendHydrator:
     def __init__(self, twitter):
-        super(FriendHydrator, self).__init__(twitter)
+        self.twitter = twitter
 
-        self.users = []
-        self.event = Event()
-        self.event.clear()
+    def run(self, *users):
+        for chunk in izip_longest(*([iter(users)] *
+                                    self.twitter.USERS_LOOKUP_CHUNK_SIZE)):
+            lookup = {user.twitter_id: user for user in self.users}
+            profiles = self.fetch(lookup.keys())
+            for profile in profiles:
+                lookup[profile['id']].raw = profile
+
+        db.session.commit()
 
     @retry_rate_limited
-    def process(self, user):
-        if user is None:
-            chunk_size = 1
-        else:
-            chunk_size = self.twitter.USERS_LOOKUP_CHUNK_SIZE
-            if is_stale(user):
-                self.users.append(user)
+    def fetch(self, ids):
+        return self.twitter.users_lookup(ids)
 
-        if len(self.users) >= chunk_size:
-            ids = [user.twitter_id
-                   for user in self.users[:chunk_size]
-                   if user is not None]
-            profiles = self.twitter.users_lookup(ids)
-            for profile in profiles:
-                User.query.filter_by(twitter_id=profile['id']).\
-                    update({'raw': profile})
+
+class UpdateInteractions:
+    def __init__(self, twitter):
+        self.twitter = twitter
+
+        self.logger = logging.getLogger('taxonomist')
+
+    def run(self, type, user):
+        tweet_mark = next((tm for tm in user.tweet_marks
+                           if tm.type == type.__name__),
+                          TweetMark(user_id=user.id, type=type.__name__))
+        interactions = {interaction.interactee_id: interaction
+                        for interaction in user.interactions
+                        if isinstance(interaction, type)}
+
+        data = self.fetch(type, user, since_id=tweet_mark.tweet_id)
+
+        for id, count in Counter([id for datum in data
+                                  for id in type.interactee_ids(datum)]
+                                ).iteritems():
+            interaction = interactions.get(id)
+            if not interaction:
+                interactions[id] = interaction = type(user_id=user.id,
+                                                      interactee_id=id,
+                                                      count=0)
+            interaction.count += count
+
+        if data:
+            tweet_mark.tweet_id = data[0]['id']
+            db.session.add(tweet_mark)
+
+        db.session.add_all(interactions.values())
+
+        try:
             db.session.commit()
-            self.users = self.users[chunk_size:]
+        except:
+            db.session.rollback()
+            raise
 
-        if user is None:
-            self.event.set()
+    def fetch(self, type, user, since_id=None):
+        max_id = None
 
-    def join(self):
-        self.event.wait()
+        data = []
+        while True:
+            self.logger.debug("since_id: %s, max_id: %s", since_id, max_id)
+
+            response = type.fetch(self.twitter,
+                                  user=user,
+                                  since_id=since_id,
+                                  max_id=max_id)
+            if not response:
+                break
+
+            data += response
+            max_id = response[-1]['id'] - 1
+
+        return data

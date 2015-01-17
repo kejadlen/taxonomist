@@ -3,6 +3,7 @@ from datetime import datetime
 import sqlalchemy as sa
 
 from .. import db
+from ..twitter import retry_rate_limited
 
 
 class Interaction(db.Base):
@@ -33,10 +34,39 @@ class Interaction(db.Base):
 class Mention(Interaction):
     __mapper_args__ = {'polymorphic_identity': 'mention'}
 
+    @classmethod
+    @retry_rate_limited
+    def fetch(cls, twitter, user, since_id=None, max_id=None):
+        return twitter.statuses_user_timeline(user.twitter_id,
+                                              since_id=since_id,
+                                              max_id=max_id)
+
+    @classmethod
+    def interactee_ids(cls, tweet):
+        return [user['id'] for user in tweet['entities']['user_mentions']]
 
 class Favorite(Interaction):
     __mapper_args__ = {'polymorphic_identity': 'favorite'}
 
+    @classmethod
+    @retry_rate_limited
+    def fetch(cls, twitter, user, since_id=None, max_id=None):
+        return twitter.favorites_list(user.twitter_id,
+                                      since_id=since_id,
+                                      max_id=max_id)
+
+    @classmethod
+    def interactee_ids(cls, tweet):
+        return [tweet['user']['id']]
 
 class DM(Interaction):
     __mapper_args__ = {'polymorphic_identity': 'dm'}
+
+    @classmethod
+    @retry_rate_limited
+    def fetch(cls, twitter, user=None, since_id=None, max_id=None):
+        return twitter.direct_messages_sent(since_id=since_id, max_id=max_id)
+
+    @classmethod
+    def interactee_ids(cls, dm):
+        return [dm['recipient_id']]
