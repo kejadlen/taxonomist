@@ -34,23 +34,22 @@ class UpdateUser:
 
     def run(self):
         if self.is_stale(GraphFetcher, self.user):
-            GraphFetcher(self.twitter).run(self.user)
+            GraphFetcher(self.twitter).run(self.user.id)
 
         if self.is_stale(FriendHydrator, self.user):
-            FriendHydrator(self.twitter).run(self.user)
+            FriendHydrator(self.twitter).run(self.user.id)
 
         self.create_users()
 
-        stale_friends = [friend for friend in self.user.friends
-                         if self.is_stale(FriendHydrator, friend)]
+        stale_friend_ids = [friend.id for friend in self.user.friends
+                            if self.is_stale(FriendHydrator, friend)]
 
         threads = []
-        threads.append(self.async(self.graph_fetcher.run, *stale_friends))
-        threads.append(self.async(self.hydrator.run, *stale_friends))
+        threads.append(self.async(self.graph_fetcher.run, *stale_friend_ids))
+        threads.append(self.async(self.hydrator.run, *stale_friend_ids))
         for i in [interaction.Mention, interaction.Favorite, interaction.DM]:
             threads.append(self.async(self.interaction_updater.run,
-                                      i,
-                                      self.user))
+                                      i, self.user.id))
 
         for thread in threads:
             thread.join()

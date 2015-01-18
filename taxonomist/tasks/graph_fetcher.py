@@ -8,7 +8,8 @@ class GraphFetcher:
     def __init__(self, twitter):
         self.twitter = twitter
 
-    def run(self, *users):
+    def run(self, *user_ids):
+        users = User.query.filter(User.id.in_(user_ids))
         for user in users:
             print "GraphFetcher: {}".format(user)
             ids = self.fetch(user.twitter_id)

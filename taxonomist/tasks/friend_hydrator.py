@@ -9,7 +9,8 @@ class FriendHydrator:
     def __init__(self, twitter):
         self.twitter = twitter
 
-    def run(self, *users):
+    def run(self, *user_ids):
+        users = User.query.filter(User.id.in_(user_ids))
         for chunk in izip_longest(*([iter(users)] *
                                     self.twitter.USERS_LOOKUP_CHUNK_SIZE)):
             lookup = {user.twitter_id: user for user in chunk if user}

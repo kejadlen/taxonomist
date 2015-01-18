@@ -3,6 +3,7 @@ import logging
 
 from .. import db
 from ..models.tweet_mark import TweetMark
+from ..models.user import User
 
 
 class UpdateInteractions:
@@ -11,7 +12,9 @@ class UpdateInteractions:
 
         self.logger = logging.getLogger('taxonomist')
 
-    def run(self, type, user):
+    def run(self, type, user_id):
+        user = User.query.get(user_id)
+
         tweet_mark = next((tm for tm in user.tweet_marks
                            if tm.type == type.__name__),
                           TweetMark(user_id=user.id, type=type.__name__))
