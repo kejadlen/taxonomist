@@ -1,18 +1,17 @@
 from collections import Counter
 import logging
 
+from . import Task
 from .. import db
 from ..models.tweet_mark import TweetMark
 from ..models.user import User
 
 
-class UpdateInteractions:
-    def __init__(self, twitter):
-        self.twitter = twitter
-
-        self.logger = logging.getLogger('taxonomist')
-
+class UpdateInteractions(Task):
     def run(self, type, user_id):
+        self.logger.info('%s(%s, %d)',
+                         self.__class__.__name__, type.__name__, user_id)
+
         user = User.query.get(user_id)
 
         tweet_mark = next((tm for tm in user.tweet_marks
@@ -58,7 +57,7 @@ class UpdateInteractions:
             if not response:
                 break
 
-            data += response
+            data.extend(response)
             max_id = response[-1]['id'] - 1
 
         return data

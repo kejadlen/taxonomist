@@ -1,16 +1,19 @@
 from datetime import datetime
 from itertools import izip_longest
 
+from . import Task
 from .. import db
 from ..models.user import User
 from ..twitter import retry_rate_limited
 
 
-class HydrateUsers:
-    def __init__(self, twitter):
-        self.twitter = twitter
-
+class HydrateUsers(Task):
     def run(self, *user_ids):
+        self.logger.info('%s(%d)', self.__class__.__name__, len(user_ids))
+
+        if not user_ids:
+            return
+
         users = User.query.filter(User.id.in_(user_ids))
         for chunk in izip_longest(*([iter(users)] *
                                     self.twitter.USERS_LOOKUP_CHUNK_SIZE)):
