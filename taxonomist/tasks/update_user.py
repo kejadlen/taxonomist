@@ -15,7 +15,7 @@ class UpdateUser:
     # TODO Add jitter
     @classmethod
     def is_stale(cls, type, user):
-        key = type.__name__
+        key = type.__class__.__name__
 
         if not key in user.fetched_ats:
             return True
@@ -37,10 +37,10 @@ class UpdateUser:
 
         threads = []
 
-        stale_friend_ids = [friend.id for friend in self.user.friends
-                            if self.is_stale(HydrateUsers, friend)]
-        threads.append(self.async(self.fetch_friends.run, *stale_friend_ids))
-        threads.append(self.async(self.hydrate_users.run, *stale_friend_ids))
+        for task in [self.hydrate_users, self.fetch_friends]:
+            stale_friend_ids = [friend.id for friend in self.user.friends
+                             if self.is_stale(task, friend)]
+            threads.append(self.async(task.run, *stale_friend_ids))
 
         for i in [interaction.Mention, interaction.Favorite, interaction.DM]:
             threads.append(self.async(self.interaction_updater.run,
@@ -50,9 +50,17 @@ class UpdateUser:
             thread.join()
 
     def update_self(self):
-        for task in [FetchFriends, HydrateUsers]:
+        threads = []
+
+        for task in [self.hydrate_users, self.fetch_friends]:
             if self.is_stale(task, self.user):
-                task(self.twitter).run(self.user.id)
+                threads.append(self.async(task.run, self.user.id))
+
+        for thread in threads:
+            thread.join()
+
+        # Refresh since the work above happens in separate threads.
+        db.session.refresh(self.user)
 
         self.create_users()
 

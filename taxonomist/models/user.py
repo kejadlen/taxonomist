@@ -19,6 +19,7 @@ class User(db.Base):
 
     # Relationships
     interactions = relationship('Interaction')
+    lists = relationship('List')
     tweet_marks = relationship('TweetMark')
 
     # Twitter data

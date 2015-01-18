@@ -45,53 +45,60 @@ class AuthedClient(Client):
                                    resource_owner_secret=oauth_token_secret)
 
     def direct_messages_sent(self, since_id=None, max_id=None):
-        payload = {'since_id': since_id,
-                   'max_id': max_id,
-                   'count': 200,
-                   'include_entities': 'false'}
+        params = {'since_id': since_id,
+                  'max_id': max_id,
+                  'count': 200,
+                  'include_entities': 'false'}
         response = self.http(self.oauth.get,
                              '/1.1/direct_messages/sent.json',
-                             params=payload)
+                             params=params)
         return response.json()
 
     def favorites_list(self, user_id, since_id=None, max_id=None):
-        payload = {'user_id': user_id,
-                   'since_id': since_id,
-                   'max_id': max_id,
-                   'count': 200,
-                   'include_entities': 'false'}
+        params = {'user_id': user_id,
+                  'since_id': since_id,
+                  'max_id': max_id,
+                  'count': 200,
+                  'include_entities': 'false'}
         response = self.http(self.oauth.get,
                              '/1.1/favorites/list.json',
-                             params=payload)
+                             params=params)
         return response.json()
 
     def friends_ids(self, user_id):
-            """Retrieve the first 5000 friend IDs for the given user."""
-            payload = {'user_id': user_id}
-            response = self.http(self.oauth.get,
-                                 '/1.1/friends/ids.json',
-                                 params=payload)
-            return response.json().get('ids')
+        """Retrieve the first 5000 friend IDs for the given user."""
+        params = {'user_id': user_id}
+        response = self.http(self.oauth.get,
+                             '/1.1/friends/ids.json',
+                             params=params)
+        return response.json().get('ids')
+
+    def lists_ownerships(self, user_id, cursor=None):
+        params = {'user_id': user_id, 'count': 1000, 'cursor': cursor}
+        response = self.http(self.oauth.get,
+                             '/1.1/lists/ownerships.json',
+                             params=params)
+        return response.json()
 
     def users_lookup(self, user_ids):
-        payload = {'user_id': ','.join([str(id) for id in user_ids])}
+        params = {'user_id': ','.join([str(id) for id in user_ids])}
         response = self.http(self.oauth.post,
                              '/1.1/users/lookup.json',
-                             data=payload)
+                             data=params)
         return response.json()
 
     def statuses_user_timeline(self, user_id, since_id=None, max_id=None):
         # Sadly, there's no good way of checking the retweet chain, so
         # we can just ignore RTs for now.
-        payload = {'user_id': user_id,
-                   'since_id': since_id,
-                   'max_id': max_id,
-                   'count': 200,
-                   'trim_user': 'true',
-                   'include_rts': 'false'}
+        params = {'user_id': user_id,
+                  'since_id': since_id,
+                  'max_id': max_id,
+                  'count': 200,
+                  'trim_user': 'true',
+                  'include_rts': 'false'}
         response = self.http(self.oauth.get,
                              '/1.1/statuses/user_timeline.json',
-                             params=payload)
+                             params=params)
         return response.json()
 
     def http(self, func, endpoint, **kwargs):
