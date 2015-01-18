@@ -112,7 +112,8 @@ def retry_rate_limited(f):
             except RateLimitError as exc:
                 delta = exc.rate_limit_reset - datetime.now()
                 countdown = delta.total_seconds() + 1
-                logger.warn("Rate limited, sleeping for %s seconds", countdown)
+                fmt = "Rate limited trying to hit %s, sleeping for %s seconds"
+                logger.warn(fmt, exc.response.url, countdown)
                 sleep(countdown)
             return result
     return retry
