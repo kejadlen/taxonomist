@@ -2,10 +2,11 @@ from datetime import datetime
 from itertools import izip_longest
 
 from .. import db
+from ..models.user import User
 from ..twitter import retry_rate_limited
 
 
-class FriendHydrator:
+class HydrateUsers:
     def __init__(self, twitter):
         self.twitter = twitter
 

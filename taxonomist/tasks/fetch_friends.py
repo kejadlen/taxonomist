@@ -1,17 +1,18 @@
 from datetime import datetime
 
 from .. import db
+from ..models.user import User
 from ..twitter import retry_rate_limited
 
 
-class GraphFetcher:
+class FetchFriends:
     def __init__(self, twitter):
         self.twitter = twitter
 
     def run(self, *user_ids):
         users = User.query.filter(User.id.in_(user_ids))
         for user in users:
-            print "GraphFetcher: {}".format(user)
+            print "{}: {}".format(self.__class__.__name__, user)
             ids = self.fetch(user.twitter_id)
             user.friend_ids = ids
 
