@@ -80,6 +80,17 @@ class AuthedClient(Client):
                              params=params)
         return response.json()
 
+    def lists_members(self, list_id, cursor=None):
+        params = {'list_id': list_id,
+                  'count': 5000,
+                  'cursor': cursor,
+                  'include_entities': False,
+                  'skip_status': True}
+        response = self.http(self.oauth.get,
+                             '/1.1/lists/members.json',
+                             params=params)
+        return response.json()
+
     def users_lookup(self, user_ids):
         params = {'user_id': ','.join([str(id) for id in user_ids])}
         response = self.http(self.oauth.post,

@@ -1,4 +1,3 @@
-from datetime import datetime, timedelta
 from threading import Thread
 
 from .. import db
@@ -7,29 +6,17 @@ from ..models.user import User
 from fetch_friends import FetchFriends
 from hydrate_users import HydrateUsers
 from update_interactions import UpdateInteractions
+from update_lists import UpdateLists
 
 
 class UpdateUser:
-    STALE = timedelta(weeks=1)
-
-    # TODO Add jitter
-    @classmethod
-    def is_stale(cls, type, user):
-        key = type.__class__.__name__
-
-        if not key in user.fetched_ats:
-            return True
-
-        fetched_at = datetime.strptime(user.fetched_ats[key],
-                                       '%Y-%m-%dT%H:%M:%S.%f')
-        return datetime.now() - fetched_at > cls.STALE
-
     def __init__(self, user):
         self.user = user
         self.twitter = self.user.twitter
 
         self.fetch_friends = FetchFriends(self.twitter)
         self.hydrate_users = HydrateUsers(self.twitter)
+        self.update_lists = UpdateLists(self.twitter)
         self.interaction_updater = UpdateInteractions(self.twitter)
 
     def run(self):
@@ -37,10 +24,8 @@ class UpdateUser:
 
         threads = []
 
-        for task in [self.hydrate_users, self.fetch_friends]:
-            stale_friend_ids = [friend.id for friend in self.user.friends
-                             if self.is_stale(task, friend)]
-            threads.append(self.async(task.run, *stale_friend_ids))
+        threads.append(self.async(self.fetch_friends.run, self.user.id))
+        threads.append(self.async(self.hydrate_users.run, self.user.id))
 
         for i in [interaction.Mention, interaction.Favorite, interaction.DM]:
             threads.append(self.async(self.interaction_updater.run,
@@ -51,15 +36,14 @@ class UpdateUser:
 
     def update_self(self):
         threads = []
-
-        for task in [self.hydrate_users, self.fetch_friends]:
-            if self.is_stale(task, self.user):
-                threads.append(self.async(task.run, self.user.id))
-
+        threads.append(self.async(self.fetch_friends.run, self.user.id))
+        threads.append(self.async(self.hydrate_users.run, self.user.id))
+        threads.append(self.async(self.update_lists.run, self.user.id))
         for thread in threads:
             thread.join()
 
-        # Refresh since the work above happens in separate threads.
+        # Not sure if this refresh is needed? The above happens in separate
+        # threads, so I don't know if this session knows about it.
         db.session.refresh(self.user)
 
         self.create_users()

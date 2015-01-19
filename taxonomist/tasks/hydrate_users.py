@@ -8,14 +8,13 @@ from ..twitter import retry_rate_limited
 
 
 class HydrateUsers(Task):
-    def run(self, *user_ids):
-        self.logger.info('%s(%d)', self.__class__.__name__, len(user_ids))
+    def run(self, user_id):
+        user = User.query.get(user_id)
+        self.logger.info('%s(%s)', self.__class__.__name__, user)
 
-        if not user_ids:
-            return
-
-        users = User.query.filter(User.id.in_(user_ids))
-        for chunk in izip_longest(*([iter(users)] *
+        stale_users = [friend for friend in user.friends
+                       if self.is_stale(friend)]
+        for chunk in izip_longest(*([iter(stale_users)] *
                                     self.twitter.USERS_LOOKUP_CHUNK_SIZE)):
             lookup = {user.twitter_id: user for user in chunk if user}
             profiles = self.fetch(lookup.keys())

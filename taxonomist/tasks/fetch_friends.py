@@ -7,14 +7,15 @@ from ..twitter import retry_rate_limited
 
 
 class FetchFriends(Task):
-    def run(self, *user_ids):
-        self.logger.info('%s(%d)', self.__class__.__name__, len(user_ids))
+    def run(self, user_id):
+        user = User.query.get(user_id)
+        self.logger.info('%s(%s)', self.__class__.__name__, user)
 
-        if not user_ids:
-            return
+        stale_users = [friend for friend in user.friends
+                       if self.is_stale(friend)]
+        for user in stale_users:
+            self.logger.info('%s(%s)', self.__class__.__name__, user)
 
-        users = User.query.filter(User.id.in_(user_ids))
-        for user in users:
             # We only do a single fetch to get the first 5000 friends, since I
             # don't want to analyze accounts that just auto-follow a ton of
             # people on Twitter.

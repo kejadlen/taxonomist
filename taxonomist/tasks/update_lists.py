@@ -14,28 +14,49 @@ class UpdateLists(Task):
 
         user = User.query.get(user_id)
 
-        lists = self.fetch_and_create_lists(user)
-        for l in lists:
-            self.fetch_members(l)
+        self.update_lists(user)
+        for l in user.lists:
+            self.update_members(l)
 
-    def fetch_and_create_lists(self, user):
-        raw = self.fetch_cursored(self.twitter.lists_ownerships,
-                                  user_id=user.twitter_id)
+    def update_lists(self, user):
+        lookup = {l.list_id: l for l in user.lists}
+        for raw in self.fetch_cursored(self.twitter.lists_ownerships,
+                                       'lists', user_id=user.twitter_id):
+            l = lookup.get(raw['id'])
+            if not l:
+                l = List(list_id=raw['id'])
+                user.lists.append(l)
+            l.raw = raw
+        db.session.commit()
 
-        lists = List.query.filter(List.list_id.in_([l['id'] for l in raw]))
-        existing_ids = [l.list_id for l in lists]
-        for raw_list in [l for l in raw if not l['id'] in existing_ids]:
-            l = List(user_id=user.id, list_id=raw_list['id'], raw=raw_list)
-            db.session.add(l)
-            lists.append(l)
+    def update_members(self, l):
+        members = self.fetch_cursored(self.twitter.lists_members,
+                                      'users', list_id=l.list_id)
+        member_ids = [member['id'] for member in members]
 
-        return lists
+        # Update list
+        l.member_ids = member_ids
+        l.fetched_at = datetime.now().isoformat()
+        db.session.commit()
 
-    def fetch_members(self, l):
-        pass
+        if not member_ids:
+            return
+
+        # Update users
+        users = User.query.filter(User.twitter_id.in_(member_ids))
+        lookup = {user.twitter_id: user
+                  for user in users}
+        for member in members:
+            user = lookup.get(member['id'])
+            if not user:
+                user = User(twitter_id=member['id'])
+                db.session.add(user)
+            user.raw = member
+
+        db.session.commit()
 
     @retry_rate_limited
-    def fetch_cursored(self, endpoint, **params):
+    def fetch_cursored(self, endpoint, key, **params):
         cursor = -1
         data = []
 
@@ -44,7 +65,7 @@ class UpdateLists(Task):
                               endpoint.__name__, cursor)
 
             response = endpoint(**params)
-            data.extend(response['lists'])
+            data.extend(response[key])
             cursor = response['next_cursor']
 
             if not cursor:
