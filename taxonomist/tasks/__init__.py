@@ -10,7 +10,7 @@ class Task:
     def is_stale(cls, user):
         key = cls.__name__
 
-        if not key in user.fetched_ats:
+        if key not in user.fetched_ats:
             return True
 
         fetched_at = datetime.strptime(user.fetched_ats[key],

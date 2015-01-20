@@ -4,6 +4,7 @@ import unittest
 from sqlalchemy import create_engine
 
 from .. import db
+from ..models.list import List
 from ..models.user import User
 
 

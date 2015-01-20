@@ -26,7 +26,7 @@ class UpdateInteractions(Task):
         counts = Counter([id
                           for datum in data
                           for id in type.interactee_ids(datum)])
-        for id, count in counts.iteritems():
+        for id, count in counts.items():
             interaction = interactions.get(id)
             if not interaction:
                 interactions[id] = interaction = type(user_id=user.id,

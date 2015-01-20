@@ -6,10 +6,10 @@ from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
 import sqlalchemy as sa
 
+from . import interaction
+from . import tweet_mark
 from .. import db
 from .. import twitter
-import interaction
-import tweet_mark
 
 
 class User(db.Base):

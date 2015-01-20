@@ -1,5 +1,5 @@
 from datetime import datetime
-from itertools import izip_longest
+from itertools import zip_longest
 
 from . import Task
 from .. import db
@@ -14,8 +14,8 @@ class HydrateUsers(Task):
 
         stale_users = [friend for friend in user.friends
                        if self.is_stale(friend)]
-        for chunk in izip_longest(*([iter(stale_users)] *
-                                    self.twitter.USERS_LOOKUP_CHUNK_SIZE)):
+        for chunk in zip_longest(*([iter(stale_users)] *
+                                   self.twitter.USERS_LOOKUP_CHUNK_SIZE)):
             lookup = {user.twitter_id: user for user in chunk if user}
             profiles = self.fetch(lookup.keys())
             for profile in profiles:

@@ -3,10 +3,10 @@ from threading import Thread
 from .. import db
 from ..models import interaction as interaction
 from ..models.user import User
-from fetch_friends import FetchFriends
-from hydrate_users import HydrateUsers
-from update_interactions import UpdateInteractions
-from update_lists import UpdateLists
+from .fetch_friends import FetchFriends
+from .hydrate_users import HydrateUsers
+from .update_interactions import UpdateInteractions
+from .update_lists import UpdateLists
 
 
 class UpdateUser:
