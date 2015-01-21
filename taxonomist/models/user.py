@@ -1,6 +1,7 @@
 from datetime import datetime
 import os
 
+import networkx as nx
 from sqlalchemy.dialects.postgresql import ARRAY, HSTORE, JSON
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
@@ -40,7 +41,9 @@ class User(db.Base):
 
     @property
     def friends(self):
-        return User.query.filter(User.twitter_id.in_(self.friend_ids))
+        # TODO Make friend_ids default to an empty list
+        friend_ids = self.friend_ids or []
+        return User.query.filter(User.twitter_id.in_(friend_ids))
 
     @property
     def screen_name(self):
@@ -55,3 +58,18 @@ class User(db.Base):
                                         os.environ['TWITTER_API_SECRET'],
                                         self.oauth_token,
                                         self.oauth_token_secret)
+
+    @property
+    def graph(self):
+        graph = nx.Graph()
+        nodes = [friend for friend in self.friends
+                 if friend.friend_ids and friend != self]
+        for node in nodes:
+            edges = [(node.twitter_id, friend_id)
+                     for friend_id in node.friend_ids
+                     if friend_id in self.friend_ids and
+                     friend_id != self.twitter_id]
+            if edges:
+                graph.add_node(node.twitter_id, screen_name=node.screen_name)
+                graph.add_edges_from(edges)
+        return graph
