@@ -123,17 +123,18 @@ class AuthedClient(Client):
 def retry_rate_limited(f):
     def retry(*args, **kwargs):
         logger = logging.getLogger('taxonomist')
+        result = None
         while True:
-            result = None
             try:
                 result = f(*args, **kwargs)
+                break
             except RateLimitError as exc:
                 delta = exc.rate_limit_reset - datetime.now()
                 countdown = delta.total_seconds() + 1
                 fmt = "Rate limited trying to hit %s, sleeping for %s seconds"
                 logger.warn(fmt, exc.response.url, countdown)
                 sleep(countdown)
-            return result
+        return result
     return retry
 
 
