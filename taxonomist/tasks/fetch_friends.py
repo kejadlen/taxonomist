@@ -1,5 +1,7 @@
 from datetime import datetime
 
+import requests
+
 from . import Task
 from .. import db
 from ..models.user import User
@@ -7,14 +9,20 @@ from ..twitter import retry_rate_limited
 
 
 class FetchFriends(Task):
-    def run(self, user_id):
-        user = User.query.get(user_id)
-        self.logger.info('%s(%s)', self.__class__.__name__, user)
+    def run(self, *twitter_ids, force=False, depth=1):
+        self.logger.info('%s(%s)', self.__class__.__name__, len(twitter_ids))
 
-        stale_users = [friend for friend in user.friends
-                       if self.is_stale(friend)]
+        if not twitter_ids:
+            return
+
+        self.create_users(twitter_ids)
+        users = User.query.filter(User.twitter_id.in_(twitter_ids))
+        stale_users = [user for user in users
+                       if not force and self.is_stale(user)]
+
         for user in stale_users:
-            self.logger.info('%s(%s)', self.__class__.__name__, user)
+            self.logger.info('%s(%s)',
+                             self.__class__.__name__, user)
 
             # We only do a single fetch to get the first 5000 friends, since I
             # don't want to analyze accounts that just auto-follow a ton of
@@ -27,6 +35,18 @@ class FetchFriends(Task):
 
             db.session.commit()
 
+        depth -= 1
+        if depth > 0:
+            for user in users:
+                self.run(*user.friend_ids)
+
     @retry_rate_limited
     def fetch(self, id):
-        return self.twitter.friends_ids(id)
+        try:
+            return self.twitter.friends_ids(id)
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == requests.codes.unauthorized:
+                self.logger.warn('Skipping fetching friends for %d (401)', id)
+                return []
+            else:
+                raise

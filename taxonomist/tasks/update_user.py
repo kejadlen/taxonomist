@@ -24,8 +24,10 @@ class UpdateUser:
 
         threads = []
 
-        threads.append(self.async(self.fetch_friends.run, self.user.id))
-        threads.append(self.async(self.hydrate_users.run, self.user.id))
+        threads.append(self.async(self.fetch_friends.run,
+                                  *self.user.friend_ids, depth=2))
+        threads.append(self.async(self.hydrate_users.run,
+                                  *self.user.friend_ids))
 
         for i in [interaction.Mention, interaction.Favorite, interaction.DM]:
             threads.append(self.async(self.interaction_updater.run,
@@ -36,8 +38,10 @@ class UpdateUser:
 
     def update_self(self):
         threads = []
-        threads.append(self.async(self.fetch_friends.run, self.user.id))
-        threads.append(self.async(self.hydrate_users.run, self.user.id))
+        threads.append(self.async(self.fetch_friends.run,
+                                  self.user.twitter_id, force=True))
+        threads.append(self.async(self.hydrate_users.run,
+                                  self.user.twitter_id, force=True))
         threads.append(self.async(self.update_lists.run, self.user.id))
         for thread in threads:
             thread.join()
@@ -46,20 +50,8 @@ class UpdateUser:
         # threads, so I don't know if this session knows about it.
         db.session.refresh(self.user)
 
-        self.create_users()
-
-    def create_users(self):
-        '''Since we need two levels of friendships for analysis, friends of the
-        target user need to exist in the DB to store their friend_ids.
-        '''
-        existing_ids = [friend.twitter_id for friend in self.user.friends]
-        new_users = [User(twitter_id=id) for id in self.user.friend_ids
-                     if id not in existing_ids]
-        db.session.add_all(new_users)
-        db.session.commit()
-
-    def async(self, task, *args):
-        thread = Thread(target=task, args=args)
+    def async(self, task, *args, **kwargs):
+        thread = Thread(target=task, args=args, kwargs=kwargs)
         thread.daemon = True
         thread.start()
         return thread
