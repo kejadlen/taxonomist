@@ -26,7 +26,7 @@ class User(db.Base):
     # Twitter data
     twitter_id = sa.Column(sa.BigInteger,
                            index=True, nullable=False, unique=True)
-    friend_ids = sa.Column(ARRAY(sa.BigInteger))
+    friend_ids = sa.Column(ARRAY(sa.BigInteger), nullable=False)
     raw = sa.Column(JSON(none_as_null=True))
     oauth_token = sa.Column(sa.String(255))
     oauth_token_secret = sa.Column(sa.String(255))
