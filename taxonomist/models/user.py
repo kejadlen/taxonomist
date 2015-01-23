@@ -11,6 +11,7 @@ from . import interaction
 from . import tweet_mark
 from .. import db
 from .. import twitter
+from ..slpa import SLPA
 
 
 class User(db.Base):
@@ -40,10 +41,35 @@ class User(db.Base):
     __attrs__ = ['id', 'twitter_id']
 
     @property
+    def friend_graph(self):
+        graph = nx.Graph()
+
+        for friend in self.friends:
+            for stranger in friend.friends:
+                graph.add_edge(friend.twitter_id, stranger.twitter_id)
+
+                # For future investigation: does adding more nodes increase
+                # accuracy of clique detection?
+                # for strangest_id in stranger.friend_ids:
+                #     graph.add_edge(stranger.twitter_id, strangest_id)
+
+        graph.remove_node(self.twitter_id)
+
+        for node in graph.nodes():
+            if graph.degree(node) < 2 and node not in self.friend_ids:
+                graph.remove_node(node)
+
+        return graph
+
+    @property
     def friends(self):
-        # TODO Make friend_ids default to an empty list
-        friend_ids = self.friend_ids or []
-        return User.query.filter(User.twitter_id.in_(friend_ids))
+        return User.query.filter(User.twitter_id.in_(self.friend_ids))
+
+    @property
+    def last_tweet_at(self):
+        status = self.raw['status']
+        return status and datetime.strptime(status['created_at'],
+                                            '%a %b %d %H:%M:%S %z %Y')
 
     @property
     def screen_name(self):
@@ -59,17 +85,14 @@ class User(db.Base):
                                         self.oauth_token,
                                         self.oauth_token_secret)
 
-    @property
-    def graph(self):
-        graph = nx.Graph()
-        nodes = [friend for friend in self.friends
-                 if friend.friend_ids and friend != self]
-        for node in nodes:
-            edges = [(node.twitter_id, friend_id)
-                     for friend_id in node.friend_ids
-                     if friend_id in self.friend_ids and
-                     friend_id != self.twitter_id]
-            if edges:
-                graph.add_node(node.twitter_id, screen_name=node.screen_name)
-                graph.add_edges_from(edges)
-        return graph
+    def cliques(self, r=0.5):
+        slpa = SLPA(self.friend_graph)
+
+        cliques = slpa.cliques(r=r)
+        cliques = cliques.values()
+        cliques = [[twitter_id for twitter_id in clique
+                    if twitter_id in self.friend_ids]
+                   for clique in cliques]
+        # cliques = [clique for clique in cliques if len(clique) > 1]
+
+        return cliques

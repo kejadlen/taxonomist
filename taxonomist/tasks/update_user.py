@@ -25,7 +25,7 @@ class UpdateUser:
         threads = []
 
         threads.append(self.async(self.fetch_friends.run,
-                                  *self.user.friend_ids, depth=2))
+                                  *self.user.friend_ids))
         threads.append(self.async(self.hydrate_users.run,
                                   *self.user.friend_ids))
 

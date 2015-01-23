@@ -10,9 +10,9 @@ class SLPA:
         self.graph = graph
         self.memory = {}
 
-    def cliques(self, t=None, r=0.5):
-        if t or not self.memory:
-            self.explore(t)
+    def cliques(self, r=0.5):
+        if not self.memory:
+            self.explore()
 
         # Stage 3: post-processing
         cliques = defaultdict(list)
@@ -27,11 +27,13 @@ class SLPA:
         return cliques
 
     def explore(self, t=None):
-        t = t or 20
+        # "In general, SLPA produces relatively stable outputs, independent of
+        # network size or structure, when T is greater than 20."
+        t = t or 25
 
         # Stage 1: initialization
         nodes = self.graph.nodes()
-        self.memory = {node:[node] for node in nodes}
+        self.memory = {node: [node] for node in nodes}
 
         # Stage 2: evolution
         for _ in range(t):
