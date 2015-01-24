@@ -26,6 +26,7 @@ class TestCase(unittest.TestCase):
         oauth_token = os.environ['TWITTER_ACCESS_TOKEN']
         oauth_token_secret = os.environ['TWITTER_ACCESS_TOKEN_SECRET']
         self.user = User(twitter_id=715073,
+                         friend_ids=[],
                          oauth_token=oauth_token,
                          oauth_token_secret=oauth_token_secret)
         db.session.add(self.user)
