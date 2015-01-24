@@ -1,0 +1,6 @@
+<div id="navbar-user" class="navbar-right navbar-collapse collapse">
+  {% if g.user %}
+  {% else %}
+  <a class="btn btn-default navbar-btn" href="/signin" >Sign in with Twitter</a>
+  {% endif %}
+</div>
