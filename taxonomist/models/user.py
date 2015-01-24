@@ -8,10 +8,11 @@ from sqlalchemy.orm import relationship
 import sqlalchemy as sa
 
 from . import interaction
-from . import tweet_mark
 from .. import db
 from .. import twitter
 from ..slpa import SLPA
+from .list import List
+from .tweet_mark import TweetMark
 
 
 class User(db.Base):
