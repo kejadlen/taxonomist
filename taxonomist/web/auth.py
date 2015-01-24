@@ -1,6 +1,12 @@
 from flask import redirect, request, session, url_for
 import os
 
+from .. import db
+from ..models.user import User
+from ..twitter import Client
+
+from . import app
+
 
 @app.route('/signin')
 def signin():
@@ -13,6 +19,12 @@ def signin():
 
     url = 'https://api.twitter.com/oauth/authorize?oauth_token=%s'
     return redirect(url % session['oauth_token'])
+
+
+@app.route('/signout')
+def signout():
+    session.pop('user_id', None)
+    return redirect(url_for('index'))
 
 
 @app.route('/callback')

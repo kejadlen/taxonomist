@@ -3,9 +3,11 @@ import os
 
 from .. import db
 from ..models.user import User
-from ..twitter import Client
 
 app = Flask(__name__, static_url_path='')
+
+from . import auth
+
 app.secret_key = os.environ["FLASK_SECRET"]
 
 
