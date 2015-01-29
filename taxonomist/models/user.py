@@ -46,24 +46,24 @@ class User(db.Base):
         graph = nx.Graph()
 
         for friend in self.friends:
-            for stranger in friend.friends:
-                graph.add_edge(friend.twitter_id, stranger.twitter_id)
+            graph.add_node(friend.twitter_id, screen_name=friend.screen_name)
 
-                # For future investigation: does adding more nodes increase
-                # accuracy of clique detection?
-                # for strangest_id in stranger.friend_ids:
-                #     graph.add_edge(stranger.twitter_id, strangest_id)
+            for stranger_id in friend.friend_ids:
+                graph.add_edge(friend.twitter_id, stranger_id)
 
         graph.remove_node(self.twitter_id)
 
         for node in graph.nodes():
-            if graph.degree(node) < 2 and node not in self.friend_ids:
+            if graph.degree(node) < 2:
                 graph.remove_node(node)
 
         return graph
 
     @property
     def friends(self):
+        if not self.friend_ids:
+            return []
+
         return User.query.filter(User.twitter_id.in_(self.friend_ids))
 
     @property
@@ -94,6 +94,5 @@ class User(db.Base):
         cliques = [[twitter_id for twitter_id in clique
                     if twitter_id in self.friend_ids]
                    for clique in cliques]
-        # cliques = [clique for clique in cliques if len(clique) > 1]
 
         return cliques
