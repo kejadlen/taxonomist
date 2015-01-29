@@ -1,4 +1,7 @@
 from flask import Flask, g, render_template, session
+from networkx.readwrite import json_graph
+import json
+import networkx as nx
 import os
 
 from .. import db
@@ -28,3 +31,15 @@ def shutdown_session(exception=None):
 @app.route("/")
 def index():
     return render_template("index.html")
+
+
+@app.route("/friend_graph.json")
+def friends():
+    if g.user:
+        data = json_graph.node_link_data(g.user.friend_graph)
+    else:
+        graph = nx.karate_club_graph()
+        for node in graph.nodes():
+            graph.node[node]["id"] = node
+        data = json_graph.node_link_data(graph)
+    return json.dumps(data)
