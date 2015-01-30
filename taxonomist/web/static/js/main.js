@@ -14,14 +14,18 @@ d3.json("friend_graph.json", function(error, graph) {
   force
       .nodes(graph.nodes)
       .links(graph.links)
+      .linkDistance(50)
+      .friction(0.8)
+      .charge(-100)
+      .gravity(0.2)
       .start();
 
   var link = svg.selectAll(".link")
       .data(graph.links)
     .enter().append("line")
       .attr("class", "link")
-      .style("stroke-width", function(d) { return Math.sqrt(d.value); })
-      .style("visibility", "hidden");
+      // .style("stroke-width", function(d) { return Math.sqrt(d.value); })
+      // .style("visibility", "hidden");
 
   var node = svg.selectAll(".node")
       .data(graph.nodes)

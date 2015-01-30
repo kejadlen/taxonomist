@@ -48,13 +48,15 @@ class User(db.Base):
         for friend in self.friends:
             graph.add_node(friend.twitter_id, screen_name=friend.screen_name)
 
-            for stranger_id in friend.friend_ids:
+            for stranger_id in [id for id in friend.friend_ids
+                                if id in self.friend_ids]:
                 graph.add_edge(friend.twitter_id, stranger_id)
 
-        graph.remove_node(self.twitter_id)
+        if self.twitter_id in self.friend_ids:
+            graph.remove_node(self.twitter_id)
 
         for node in graph.nodes():
-            if node not in self.friend_ids or graph.degree(node) < 2:
+            if graph.degree(node) < 2:
                 graph.remove_node(node)
 
         return graph
