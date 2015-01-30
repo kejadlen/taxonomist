@@ -54,7 +54,7 @@ class User(db.Base):
         graph.remove_node(self.twitter_id)
 
         for node in graph.nodes():
-            if graph.degree(node) < 2:
+            if node not in self.friend_ids or graph.degree(node) < 2:
                 graph.remove_node(node)
 
         return graph
