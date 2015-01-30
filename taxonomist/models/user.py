@@ -73,6 +73,10 @@ class User(db.Base):
                                             '%a %b %d %H:%M:%S %z %Y')
 
     @property
+    def name(self):
+        return self.raw['name']
+
+    @property
     def screen_name(self):
         return self.raw['screen_name']
 
