@@ -9,7 +9,7 @@ from ..twitter import retry_rate_limited
 
 
 class FetchFriends(Task):
-    def run(self, *twitter_ids, force=False): #, depth=1):
+    def run(self, *twitter_ids, force=False):
         self.logger.info('%s(%s)', self.__class__.__name__, len(twitter_ids))
 
         if not twitter_ids:
@@ -34,11 +34,6 @@ class FetchFriends(Task):
             user.fetched_ats[self.__class__.__name__] = fetched_at
 
             db.session.commit()
-
-        # depth -= 1
-        # if depth > 0:
-        #     for user in users:
-        #         self.run(*user.friend_ids)
 
     @retry_rate_limited
     def fetch(self, id):

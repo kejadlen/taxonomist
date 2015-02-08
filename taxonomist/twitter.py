@@ -36,6 +36,11 @@ class Client(object):
 
 
 class AuthedClient(Client):
+    @classmethod
+    def from_client(cls, client, oauth_token, oauth_token_secret):
+        return cls(client.api_key, client.api_secret,
+                   oauth_token, oauth_token_secret)
+
     def __init__(self, api_key, api_secret, oauth_token, oauth_token_secret):
         super(AuthedClient, self).__init__(api_key, api_secret)
 
