@@ -34,6 +34,18 @@ def index():
 
 
 @app.route("/friend_graph.json")
+def friend_graph():
+    if g.user:
+        data = json_graph.node_link_data(g.user.friend_graph)
+    else:
+        graph = nx.karate_club_graph()
+        for node in graph.nodes():
+            graph.node[node]["id"] = node
+        data = json_graph.node_link_data(graph)
+    return json.dumps(data)
+
+
+@app.route("/friends.json")
 def friends():
     if g.user:
         data = json_graph.node_link_data(g.user.friend_graph)

@@ -46,7 +46,10 @@ class User(db.Base):
         graph = nx.Graph()
 
         for friend in self.friends:
-            graph.add_node(friend.twitter_id, screen_name=friend.screen_name)
+            graph.add_node(friend.twitter_id,
+                           last_tweet_at=friend.last_tweet_at,
+                           name=friend.name,
+                           screen_name=friend.screen_name)
 
             for stranger_id in [id for id in friend.friend_ids
                                 if id in self.friend_ids]:
@@ -70,9 +73,14 @@ class User(db.Base):
 
     @property
     def last_tweet_at(self):
-        status = self.raw['status']
-        return status and datetime.strptime(status['created_at'],
-                                            '%a %b %d %H:%M:%S %z %Y')
+        status = self.raw.get('status')
+        return status and status['created_at']
+        # return status and datetime.strptime(status['created_at'],
+                                            # '%a %b %d %H:%M:%S %z %Y')
+
+    @property
+    def name(self):
+        return self.raw['name']
 
     @property
     def screen_name(self):

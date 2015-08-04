@@ -90,3 +90,7 @@ d3.json("friend_graph.json", function(error, graph) {
 
   force.on("tick", tick);
 });
+
+d3.timer(function() {
+  force.stop();
+}, 10*1000);
