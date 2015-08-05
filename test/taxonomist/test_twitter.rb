@@ -23,7 +23,7 @@ module Taxonomist
                                     access_token: access_token,
                                     access_token_secret: access_token_secret)
       user = twitter.users_show(user_id: 2244994945)
-      assert_equal "TwitterDev", user.screen_name
+      assert_equal "TwitterDev", user["screen_name"]
     end
   end
 end
