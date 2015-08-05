@@ -20,9 +20,9 @@ module Taxonomist
 
         @client = Faraday.new("https://api.twitter.com/1.1") do |conn|
           conn.request :oauth, consumer_key: api_key,
-            consumer_secret: api_secret,
-            token: access_token,
-            token_secret: access_token_secret
+                               consumer_secret: api_secret,
+                               token: access_token,
+                               token_secret: access_token_secret
           conn.request :json
 
           conn.response :json, :content_type => /\bjson$/
