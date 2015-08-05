@@ -9,8 +9,8 @@ $LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
 require "taxonomist"
 
 module Taxonomist
-  class TestAuthedTwitter < Minitest::Test
-    def test_twitter
+  class TestTwitterAuthed < Minitest::Test
+    def test_twitter_authed
       return unless ENV['TEST_TWITTER']
 
       api_key = ENV["TWITTER_API_KEY"]
