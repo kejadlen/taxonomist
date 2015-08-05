@@ -38,7 +38,7 @@ module Taxonomist
       end
     end
 
-    def users_show(user_id: user_id)
+    def users_show(user_id:)
       User.new(client.get("users/show.json", user_id: user_id).body)
     end
   end
