@@ -11,12 +11,6 @@ module Taxonomist
 
     attr_reader :client
 
-    class User
-      include Virtus.model
-
-      attribute :screen_name, String
-    end
-
     class Authed < Twitter
       attribute :access_token, String
       attribute :access_token_secret, String
@@ -40,6 +34,12 @@ module Taxonomist
       def users_show(user_id:)
         User.new(client.get("users/show.json", user_id: user_id).body)
       end
+    end
+
+    class User
+      include Virtus.model
+
+      attribute :screen_name, String
     end
   end
 end
