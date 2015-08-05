@@ -11,12 +11,12 @@ require "taxonomist"
 module Taxonomist
   class TestTwitterAuthed < Minitest::Test
     def test_twitter_authed
-      return unless ENV['TEST_TWITTER']
+      return unless ENV.has_key?("TEST_TWITTER")
 
-      api_key = ENV["TWITTER_API_KEY"]
-      api_secret = ENV["TWITTER_API_SECRET"]
-      access_token = ENV["TWITTER_ACCESS_TOKEN"]
-      access_token_secret = ENV["TWITTER_ACCESS_TOKEN_SECRET"]
+      api_key = ENV.fetch("TWITTER_API_KEY")
+      api_secret = ENV.fetch("TWITTER_API_SECRET")
+      access_token = ENV.fetch("TWITTER_ACCESS_TOKEN")
+      access_token_secret = ENV.fetch("TWITTER_ACCESS_TOKEN_SECRET")
 
       twitter = Twitter::Authed.new(api_key: api_key,
                                     api_secret: api_secret,
