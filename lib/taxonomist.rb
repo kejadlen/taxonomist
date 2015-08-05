@@ -16,30 +16,30 @@ module Taxonomist
 
       attribute :screen_name, String
     end
-  end
 
-  class AuthedTwitter < Twitter
-    attribute :access_token, String
-    attribute :access_token_secret, String
+    class Authed < Twitter
+      attribute :access_token, String
+      attribute :access_token_secret, String
 
-    def initialize(*)
-      super
+      def initialize(*)
+        super
 
-      @client = Faraday.new("https://api.twitter.com/1.1") do |conn|
-        conn.request :oauth, consumer_key: api_key,
-                             consumer_secret: api_secret,
-                             token: access_token,
-                             token_secret: access_token_secret
-        conn.request :json
+        @client = Faraday.new("https://api.twitter.com/1.1") do |conn|
+          conn.request :oauth, consumer_key: api_key,
+            consumer_secret: api_secret,
+            token: access_token,
+            token_secret: access_token_secret
+          conn.request :json
 
-        conn.response :json, :content_type => /\bjson$/
+          conn.response :json, :content_type => /\bjson$/
 
-        conn.adapter Faraday.default_adapter
+          conn.adapter Faraday.default_adapter
+        end
       end
-    end
 
-    def users_show(user_id:)
-      User.new(client.get("users/show.json", user_id: user_id).body)
+      def users_show(user_id:)
+        User.new(client.get("users/show.json", user_id: user_id).body)
+      end
     end
   end
 end

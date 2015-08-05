@@ -18,10 +18,10 @@ module Taxonomist
       access_token = ENV["TWITTER_ACCESS_TOKEN"]
       access_token_secret = ENV["TWITTER_ACCESS_TOKEN_SECRET"]
 
-      twitter = AuthedTwitter.new(api_key: api_key,
-                                  api_secret: api_secret,
-                                  access_token: access_token,
-                                  access_token_secret: access_token_secret)
+      twitter = Twitter::Authed.new(api_key: api_key,
+                                    api_secret: api_secret,
+                                    access_token: access_token,
+                                    access_token_secret: access_token_secret)
       user = twitter.users_show(user_id: 2244994945)
       assert_equal "TwitterDev", user.screen_name
     end
