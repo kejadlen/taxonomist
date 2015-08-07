@@ -1,7 +1,5 @@
 Sequel.migration do
   change do
-    extension :pg_json
-
     create_table(:users) do
       primary_key :id
 

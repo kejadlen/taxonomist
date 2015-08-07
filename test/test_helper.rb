@@ -1,13 +1,19 @@
+
 require "minitest"
 require "pry"
 require "sequel"
 
 require "dotenv"
-Dotenv.load(".test.envrc")
+Dotenv.overload(".test.envrc")
 
 $LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
 
 require "taxonomist/db"
+
+if ENV.has_key?("DEBUG")
+  require "logger"
+  Taxonomist::DB.loggers << Logger.new($stdout)
+end
 
 module Taxonomist
   class Test < Minitest::Test
@@ -20,3 +26,6 @@ module Taxonomist
 end
 
 include Taxonomist
+
+Sequel.extension :migration
+Sequel::Migrator.run(DB, "db/migrations")
