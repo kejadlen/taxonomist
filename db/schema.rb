@@ -10,6 +10,8 @@ Sequel.migration do
       column :raw, "json"
       column :created_at, "timestamp without time zone"
       column :updated_at, "timestamp without time zone"
+      column :access_token, "text"
+      column :access_token_secret, "text"
 
       index [:twitter_id]
       index [:twitter_id], :name=>:users_twitter_id_key, :unique=>true
