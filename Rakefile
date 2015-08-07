@@ -14,7 +14,7 @@ namespace :db do
     end
 
     db.extension :schema_dumper
-    File.write("db/migrations/schema.rb",
-               db.dump_schema_migration(same_db: true))
+    File.write("db/schema.rb",
+               db.dump_schema_migration(same_db: true).gsub(/^\s+$/, ''))
   end
 end

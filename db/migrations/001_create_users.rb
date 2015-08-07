@@ -5,7 +5,7 @@ Sequel.migration do
     create_table(:users) do
       primary_key :id
 
-      Bignum :twitter_id
+      Bignum :twitter_id, null: false, unique: true
       json :raw
 
       DateTime :created_at
