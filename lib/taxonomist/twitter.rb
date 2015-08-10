@@ -34,6 +34,26 @@ module Taxonomist
       def users_show(user_id:)
         client.get("users/show.json", user_id: user_id).body
       end
+
+      def friends_ids(user_id:)
+        resp = client.get("friends/ids.json", user_id: user_id)
+        cursored(resp.body["ids"], resp)
+      end
+
+      private
+
+      def cursored(obj, resp)
+        obj.extend(Cursored)
+        obj.attributes = resp.body
+        obj
+      end
+
+      module Cursored
+        include Virtus.module
+
+        attribute :next_cursor, Integer
+        attribute :previous_cursor, Integer
+      end
     end
   end
 end
