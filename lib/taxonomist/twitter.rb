@@ -31,13 +31,18 @@ module Taxonomist
         end
       end
 
-      def users_show(user_id:)
-        client.get("users/show.json", user_id: user_id).body
-      end
-
       def friends_ids(user_id:)
         resp = client.get("friends/ids.json", user_id: user_id)
         cursored(resp.body["ids"], resp)
+      end
+
+      def users_lookup(user_ids:)
+        user_ids = user_ids.join(?,)
+        client.get("users/lookup.json", user_id: user_ids).body
+      end
+
+      def users_show(user_id:)
+        client.get("users/show.json", user_id: user_id).body
       end
 
       private

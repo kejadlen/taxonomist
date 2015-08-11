@@ -32,6 +32,12 @@ class TestTwitterAuthed < Test
     assert_kind_of Twitter::Authed::Cursored, ids
   end
 
+  def test_users_lookup
+    users = @twitter.users_lookup(user_ids: [715073, 2244994945])
+    assert_equal %w[TwitterDev kejadlen],
+                 users.map {|user| user["screen_name"] }.sort
+  end
+
   def test_cursored
     obj = Object.new
     obj.extend(Twitter::Authed::Cursored)
