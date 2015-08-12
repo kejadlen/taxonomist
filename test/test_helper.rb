@@ -1,5 +1,4 @@
-
-require "minitest"
+require "minitest/autorun"
 require "pry"
 require "sequel"
 
