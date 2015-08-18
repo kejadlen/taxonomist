@@ -4,6 +4,12 @@ require "virtus"
 
 module Taxonomist
   class Twitter
+    class RateLimitedError < StandardError
+      include Virtus.model
+
+      attribute :reset_at, DateTime
+    end
+
     include Virtus.model
 
     attribute :api_key, String
@@ -32,24 +38,31 @@ module Taxonomist
       end
 
       def friends_ids(user_id:)
-        resp = client.get("friends/ids.json", user_id: user_id)
+        resp = get("friends/ids.json", user_id: user_id)
         cursored(resp.body["ids"], resp)
       end
 
       def users_lookup(user_ids:)
         user_ids = user_ids.join(?,)
-        client.get("users/lookup.json", user_id: user_ids).body
+        get("users/lookup.json", user_id: user_ids).body
       end
 
       def users_show(user_id:)
-        client.get("users/show.json", user_id: user_id).body
+        get("users/show.json", user_id: user_id).body
       end
 
       private
 
+      def get(endpoint, **kwargs)
+        resp = client.get(endpoint, **kwargs)
+        raise RateLimitedError.new(reset_at: resp.headers['x-rate-limit-reset'].to_i) if resp.status == 429
+        resp
+      end
+
       def cursored(obj, resp)
         obj.extend(Cursored)
-        obj.attributes = resp.body
+        obj.next_cursor = resp.body["next_cursor"]
+        obj.previous_cursor = resp.body["previous_cursor"]
         obj
       end
 

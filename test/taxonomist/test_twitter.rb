@@ -16,9 +16,9 @@ class TestTwitterAuthed < Test
     access_token_secret = ENV.fetch("TWITTER_ACCESS_TOKEN_SECRET")
 
     @twitter = Twitter::Authed.new(api_key: api_key,
-                                  api_secret: api_secret,
-                                  access_token: access_token,
-                                  access_token_secret: access_token_secret)
+                                   api_secret: api_secret,
+                                   access_token: access_token,
+                                   access_token_secret: access_token_secret)
   end
 
   def test_authed
