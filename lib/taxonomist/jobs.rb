@@ -1,14 +1,16 @@
+require "que"
+
 require_relative "db"
 require_relative "twitter"
 
+Que.connection = DB
+
 module Taxonomist
   module Jobs
-    class Job
-      attr_accessor :twitter, :twitter_adapter, :user
+    @twitter_adapter = Twitter::Authed
 
-      def initialize
-        @twitter_adapter = Twitter::Authed
-      end
+    class Job < Que::Job
+      attr_accessor :twitter, :user
 
       def setup!(user_id:)
         self.user = Models::User[user_id]
@@ -17,10 +19,22 @@ module Taxonomist
         api_secret = ENV.fetch('TWITTER_API_SECRET')
         access_token = self.user.access_token
         access_token_secret = self.user.access_token_secret
-        self.twitter = twitter_adapter.new(api_key: api_key,
+        self.twitter = TWITTER_ADAPTER.new(api_key: api_key,
                                            api_secret: api_secret,
                                            access_token: access_token,
                                            access_token_secret: access_token_secret)
+      end
+    end
+
+    class UpdateUser < Job
+      def run(user_id:)
+        setup!(user_id: user_id)
+
+        ids = self.twitter.friends_ids(user_id: user.twitter_id)
+        self.user.friend_ids = Sequel.pg_array(ids)
+        self.user.save
+
+        destroy
       end
     end
 
@@ -33,16 +47,8 @@ module Taxonomist
           Models::User.create(twitter_id: friend["id"],
                               raw: Sequel.pg_json(friend))
         end
-      end
-    end
 
-    class UpdateUser < Job
-      def run(user_id:)
-        setup!(user_id: user_id)
-
-        ids = self.twitter.friends_ids(user_id: user.twitter_id)
-        self.user.friend_ids = Sequel.pg_array(ids)
-        self.user.save
+        destroy
       end
     end
   end

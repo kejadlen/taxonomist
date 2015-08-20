@@ -1,5 +1,18 @@
 Sequel.migration do
   change do
+    create_table(:que_jobs) do
+      column :priority, "smallint", :default=>100, :null=>false
+      column :run_at, "timestamp with time zone", :default=>Sequel::CURRENT_TIMESTAMP, :null=>false
+      column :job_id, "bigint", :default=>Sequel::LiteralString.new("nextval('que_jobs_job_id_seq'::regclass)"), :null=>false
+      column :job_class, "text", :null=>false
+      column :args, "json", :default=>Sequel::LiteralString.new("'[]'::json"), :null=>false
+      column :error_count, "integer", :default=>0, :null=>false
+      column :last_error, "text"
+      column :queue, "text", :default=>"", :null=>false
+
+      primary_key [:priority, :run_at, :job_id, :queue]
+    end
+
     create_table(:schema_info) do
       column :version, "integer", :default=>0, :null=>false
     end

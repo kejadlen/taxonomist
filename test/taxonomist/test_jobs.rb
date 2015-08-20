@@ -23,14 +23,18 @@ class TestUpdateUser < Test
     end
   end
 
+  module ::Taxonomist::Jobs
+    original_verbose, $VERBOSE = $VERBOSE, nil
+    TWITTER_ADAPTER = FakeTwitter
+    $VERBOSE = original_verbose
+  end
+
   def setup
     @user = Models::User.create(twitter_id: 123)
   end
 
   def test_update_user
-    job = Jobs::UpdateUser.new
-    job.twitter_adapter = FakeTwitter
-    job.run(user_id: @user.id)
+    Jobs::UpdateUser.enqueue(user_id: @user.id)
 
     @user.refresh
 
@@ -38,9 +42,7 @@ class TestUpdateUser < Test
   end
 
   def test_hydrate_users
-    job = Jobs::HydrateUsers.new
-    job.twitter_adapter = FakeTwitter
-    job.run(user_id: @user.id, user_ids: FRIENDS.map(&:id))
+    Jobs::HydrateUsers.enqueue(user_id: @user.id, user_ids: FRIENDS.map(&:id))
 
     FRIENDS.each do |friend|
       assert_equal Models::User[twitter_id: friend.id].raw["screen_name"],

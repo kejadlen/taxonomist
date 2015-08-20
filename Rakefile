@@ -1,3 +1,15 @@
+require "logger"
+
+require "que/rake_tasks"
+
+task :environment do
+  require "sequel"
+  db = Sequel.connect(ENV.fetch("DATABASE_URL"))
+
+  require "que"
+  Que.connection = db
+end
+
 desc "Run Pry"
 task :pry do
   require_relative "lib/taxonomist"
@@ -16,16 +28,16 @@ task :pry do
                                 access_token: access_token,
                                 access_token_secret: access_token_secret)
 
+  user = Models::User[25]
+
   require "pry"
   binding.pry
 end
 
 namespace :db do
   desc "Run migrations"
-  task :migrate, [:version] do |t, args|
-    require "sequel"
+  task :migrate, [:version] => 'que:migrate' do |t, args|
     Sequel.extension :migration
-    db = Sequel.connect(ENV.fetch("DATABASE_URL"))
 
     if args[:version]
       puts "Migrating to version #{args[:version]}"
