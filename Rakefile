@@ -8,6 +8,9 @@ task :environment do
 
   require "que"
   Que.connection = db
+  Que.logger = Logger.new(STDOUT)
+
+  require_relative "lib/taxonomist"
 end
 
 desc "Run Pry"
@@ -29,6 +32,7 @@ task :pry do
                                 access_token_secret: access_token_secret)
 
   user = Models::User[25]
+  class QueJob < Sequel::Model; end
 
   require "pry"
   binding.pry
