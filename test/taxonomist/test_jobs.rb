@@ -2,12 +2,14 @@ require_relative "../test_helper"
 
 require "taxonomist/jobs"
 
-class TestUpdateUser < Test
+class TestJob < Test
   Friend = Struct.new(:id, :screen_name)
 
   FRIENDS = [[ 45, "foo" ], [ 67, "bar"], [ 89, "baz" ]].map do |friend|
     Friend.new(*friend)
   end
+
+  INFO = { 'screen_name' => 'John Doe' }
 
   class FakeTwitter < Twitter::Authed
     def friends_ids(*)
@@ -21,6 +23,10 @@ class TestUpdateUser < Test
         end
       end
     end
+
+    def users_show(*)
+      INFO
+    end
   end
 
   class Jobs::Job
@@ -29,26 +35,26 @@ class TestUpdateUser < Test
     end
   end
 
-  # module ::Taxonomist::Jobs
-  #   original_verbose, $VERBOSE = $VERBOSE, nil
-  #   TWITTER_ADAPTER = FakeTwitter
-  #   $VERBOSE = original_verbose
-  # end
-
   def setup
     @user = Models::User.create(twitter_id: 123)
   end
+end
 
+class TestUpdateUser < TestJob
   def test_update_user
     Jobs::UpdateUser.enqueue(@user.id)
 
     @user.refresh
 
+    assert_equal INFO, @user.raw
     assert_equal FRIENDS.map(&:id), @user.friend_ids
   end
+end
 
-  def test_hydrate_users
-    Jobs::HydrateUsers.enqueue(@user.id, FRIENDS.map(&:id))
+class TestHydrateFriends < TestJob
+  def test_hydrate_friends
+    @user.update(friend_ids: FRIENDS.map(&:id))
+    Jobs::HydrateFriends.enqueue(@user.id)
 
     FRIENDS.each do |friend|
       assert_equal Models::User[twitter_id: friend.id].raw["screen_name"],

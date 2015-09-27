@@ -10,7 +10,7 @@ module Taxonomist
     class Job < Que::Job
       attr_accessor :twitter, :user
 
-      def setup!(user_id)
+      def run(user_id, *args)
         self.user = Models::User[user_id]
 
         api_key = ENV.fetch('TWITTER_API_KEY')
@@ -30,12 +30,15 @@ module Taxonomist
 
     class UpdateUser < Job
       def run(user_id)
-        setup!(user_id)
+        super
 
+        info = self.twitter.users_show(user_id: user.twitter_id)
         ids = self.twitter.friends_ids(user_id: user.twitter_id)
 
         DB.transaction do
-          self.user.update(friend_ids: Sequel.pg_array(ids))
+          self.user.update(raw: info, friend_ids: Sequel.pg_array(ids))
+          Jobs::HydrateFriends.enqueue(user_id)
+          Jobs::UpdateFriendGraph.enqueue(user_id)
           destroy
         end
       rescue Twitter::RateLimitedError => e
@@ -43,11 +46,11 @@ module Taxonomist
       end
     end
 
-    class HydrateUsers < Job
-      def run(user_id, user_ids)
-        setup!(user_id)
+    class HydrateFriends < Job
+      def run(user_id)
+        super
 
-        friends = self.twitter.users_lookup(user_ids: user_ids)
+        friends = self.twitter.users_lookup(user_ids: self.user.friend_ids)
 
         DB.transaction do
           friends.each do |friend|
@@ -56,6 +59,12 @@ module Taxonomist
           end
           destroy
         end
+      end
+    end
+
+    class UpdateFriendGraph < Job
+      def run(user_id)
+        super
       end
     end
   end
