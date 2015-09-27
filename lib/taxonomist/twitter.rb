@@ -31,6 +31,7 @@ module Taxonomist
                                token_secret: access_token_secret
           conn.request :json
 
+          conn.response :raise_error
           conn.response :json, :content_type => /\bjson$/
 
           conn.adapter Faraday.default_adapter
@@ -54,9 +55,14 @@ module Taxonomist
       private
 
       def get(endpoint, **kwargs)
-        resp = client.get(endpoint, **kwargs)
-        raise RateLimitedError.new(reset_at: resp.headers['x-rate-limit-reset'].to_i) if resp.status == 429
-        resp
+        client.get(endpoint, **kwargs)
+      rescue Faraday::ClientError => e
+        response = e.response
+        if response.status == 429
+          reset_at = response.headers['x-rate-limit-reset'].to_i
+          raise RateLimitedError.new(reset_at: reset_at)
+        end
+        raise
       end
 
       def cursored(obj, resp)

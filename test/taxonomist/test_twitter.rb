@@ -2,7 +2,7 @@ require_relative "../test_helper"
 
 require "taxonomist/twitter"
 
-class TestTwitterAuthed < Test
+class TestTwitter < Test
   def self.runnable_methods
     return [] unless ENV.has_key?("TEST_TWITTER")
 
@@ -45,5 +45,21 @@ class TestTwitterAuthed < Test
 
     assert_equal 12345, obj.next_cursor
     assert_equal 67890, obj.previous_cursor
+  end
+
+  def test_rate_limited
+    client = Class.new do
+      def self.get(*)
+        response_headers = { 'rate-limit-reset'=> '56789' }
+        response = Faraday::Response.new(status: 429,
+                                         response_headers: response_headers)
+        raise Faraday::ClientError.new(nil, response)
+      end
+    end
+    @twitter.instance_variable_set(:@client, client)
+
+    assert_raises(Twitter::RateLimitedError) do
+      @twitter.users_show(user_id: 12345)
+    end
   end
 end
