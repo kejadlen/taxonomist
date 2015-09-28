@@ -1,4 +1,5 @@
 require "minitest/autorun"
+require "letters"
 require "pry"
 require "que"
 require "sequel"

@@ -13,6 +13,7 @@ group :development do
   gem "guard"
   gem "guard-minitest"
   gem "foreman"
+  gem "letters"
   gem "minitest"
   gem "pry"
   gem "pry-byebug"
