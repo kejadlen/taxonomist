@@ -32,12 +32,13 @@ module Taxonomist
       def run(user_id)
         super
 
-        info = self.twitter.users_show(user_id: user.twitter_id)
-        ids = self.twitter.friends_ids(user_id: user.twitter_id)
+        user_info = self.twitter.users_show(user_id: user.twitter_id)
+        friend_ids = self.twitter.friends_ids(user_id: user.twitter_id)
 
         DB.transaction do
-          self.user.update(raw: info, friend_ids: Sequel.pg_array(ids))
-          Jobs::HydrateFriends.enqueue(user_id)
+          self.user.update(raw: user_info,
+                           friend_ids: Sequel.pg_array(friend_ids))
+          Jobs::HydrateFriends.enqueue(user_id, friend_ids)
           Jobs::UpdateFriendGraph.enqueue(user_id)
           destroy
         end
@@ -47,18 +48,37 @@ module Taxonomist
     end
 
     class HydrateFriends < Job
-      def run(user_id)
+      def run(user_id, friend_ids)
         super
 
-        friends = self.twitter.users_lookup(user_ids: self.user.friend_ids)
+        friend_ids.each_slice(self.users_per_request) do |ids|
+          friends = self.twitter.users_lookup(user_ids: ids)
+                                .each.with_object({}) do |friend, hash|
+                                  hash[friend["id"]] = friend
+                                end
 
-        DB.transaction do
-          friends.each do |friend|
-            Models::User.create(twitter_id: friend["id"],
-                                raw: Sequel.pg_json(friend))
+          existing_ids = Models::User.where(twitter_id: friends.keys)
+                                     .select_map(:twitter_id)
+          existing_ids.each do |id|
+            Models::User.where(twitter_id: id)
+                        .update(raw: Sequel.pg_json(friends[id]))
           end
-          destroy
+
+          nonexistent_friends = friends.reject {|id,_| existing_ids.include?(id) }
+          nonexistent_friends.each do |id, friend|
+            Models::User.create(twitter_id: id, raw: Sequel.pg_json(friend))
+          end
         end
+
+        destroy
+      rescue Twitter::RateLimitedError => e
+        self.class.enqueue(user_id: user_id,
+                           friend_ids: friend_ids,
+                           run_at: e.reset_at)
+      end
+
+      def users_per_request
+        100
       end
     end
 

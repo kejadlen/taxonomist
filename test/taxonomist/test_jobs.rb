@@ -16,12 +16,14 @@ class TestJob < Test
       FRIENDS.map(&:id)
     end
 
-    def users_lookup(*)
-      FRIENDS.map(&:to_h).map do |friend|
-        friend.each.with_object({}) do |(k,v),h|
-          h[k.to_s] = v
-        end
-      end
+    def users_lookup(user_ids:)
+      FRIENDS.select {|friend| user_ids.include?(friend.id) }
+             .map(&:to_h)
+             .map do |friend|
+               friend.each.with_object({}) do |(k,v),h|
+                 h[k.to_s] = v
+               end
+             end
     end
 
     def users_show(*)
@@ -52,9 +54,48 @@ class TestUpdateUser < TestJob
 end
 
 class TestHydrateFriends < TestJob
-  def test_hydrate_friends
-    @user.update(friend_ids: FRIENDS.map(&:id))
-    Jobs::HydrateFriends.enqueue(@user.id)
+  class LimitedHydrateFriends < Jobs::HydrateFriends
+    def users_per_request
+      2
+    end
+  end
+
+  def test_nonexistent_friends
+    Jobs::HydrateFriends.enqueue(@user.id, FRIENDS.map(&:id))
+
+    FRIENDS.each do |friend|
+      assert_equal Models::User[twitter_id: friend.id].raw["screen_name"],
+                   friend.screen_name
+    end
+  end
+
+  def test_existing_friends
+    FRIENDS.each do |friend|
+      Models::User.create(twitter_id: friend.id)
+    end
+
+    Jobs::HydrateFriends.enqueue(@user.id, FRIENDS.map(&:id))
+
+    FRIENDS.each do |friend|
+      assert_equal Models::User[twitter_id: friend.id].raw["screen_name"],
+                   friend.screen_name
+    end
+  end
+
+  def test_existing_and_nonexistent_friends
+    friend = FRIENDS.first
+    Models::User.create(twitter_id: friend.id)
+
+    Jobs::HydrateFriends.enqueue(@user.id, FRIENDS.map(&:id))
+
+    FRIENDS.each do |friend|
+      assert_equal Models::User[twitter_id: friend.id].raw["screen_name"],
+                   friend.screen_name
+    end
+  end
+
+  def test_users_per_request
+    LimitedHydrateFriends.enqueue(@user.id, FRIENDS.map(&:id))
 
     FRIENDS.each do |friend|
       assert_equal Models::User[twitter_id: friend.id].raw["screen_name"],
