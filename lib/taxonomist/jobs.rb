@@ -8,6 +8,8 @@ module Taxonomist
 
   module Jobs
     class Job < Que::Job
+      TWITTER_ADAPTER = Twitter::Authed
+
       attr_accessor :twitter, :user
 
       def run(user_id, *args)
@@ -17,14 +19,10 @@ module Taxonomist
         api_secret = ENV.fetch('TWITTER_API_SECRET')
         access_token = self.user.access_token
         access_token_secret = self.user.access_token_secret
-        self.twitter = self.twitter_adapter.new(api_key: api_key,
-                                                api_secret: api_secret,
-                                                access_token: access_token,
-                                                access_token_secret: access_token_secret)
-      end
-
-      def twitter_adapter
-        Twitter::Authed
+        self.twitter = TWITTER_ADAPTER.new(api_key: api_key,
+                                           api_secret: api_secret,
+                                           access_token: access_token,
+                                           access_token_secret: access_token_secret)
       end
     end
 

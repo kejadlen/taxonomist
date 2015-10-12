@@ -21,6 +21,12 @@ end
 
 module Taxonomist
   class Test < Minitest::Test
+    def without_warnings
+      original_verbose, $VERBOSE = $VERBOSE, nil
+      yield
+      $VERBOSE = original_verbose
+    end
+
     def run(*args, &block)
       Sequel::Model.db.transaction(rollback: :always, auto_savepoint: true) do
         super

@@ -1,44 +1,23 @@
 require_relative "../test_helper"
+require_relative "../karate_club"
 
 require "taxonomist/jobs"
 
 class TestJob < Test
-  Friend = Struct.new(:id, :screen_name)
-
-  FRIENDS = [[ 45, "foo" ], [ 67, "bar"], [ 89, "baz" ]].map do |friend|
-    Friend.new(*friend)
-  end
-
-  INFO = { 'screen_name' => 'John Doe' }
-
-  class FakeTwitter < Twitter::Authed
-    def friends_ids(*)
-      FRIENDS.map(&:id)
-    end
-
-    def users_lookup(user_ids:)
-      FRIENDS.select {|friend| user_ids.include?(friend.id) }
-             .map(&:to_h)
-             .map do |friend|
-               friend.each.with_object({}) do |(k,v),h|
-                 h[k.to_s] = v
-               end
-             end
-    end
-
-    def users_show(*)
-      INFO
-    end
-  end
-
-  class Jobs::Job
-    def twitter_adapter
-      FakeTwitter
-    end
-  end
-
   def setup
-    @user = Models::User.create(twitter_id: 123)
+    without_warnings do
+      @original_twitter_adapter = Jobs::Job::TWITTER_ADAPTER
+      Jobs::Job.const_set(:TWITTER_ADAPTER, KarateClub)
+    end
+
+    @user = Models::User.create(twitter_id: 1)
+    @karate_club = KarateClub.new
+  end
+
+  def teardown
+    without_warnings do
+      Jobs::Job.const_set(:TWITTER_ADAPTER, @original_twitter_adapter)
+    end
   end
 end
 
@@ -48,8 +27,11 @@ class TestUpdateUser < TestJob
 
     @user.refresh
 
-    assert_equal INFO, @user.raw
-    assert_equal FRIENDS.map(&:id), @user.friend_ids
+    twitter_id = @user.twitter_id
+    assert_equal({'id' => twitter_id,
+                  'screen_name' => KarateClub::SCREEN_NAMES[twitter_id]},
+                 @user.raw)
+    assert_equal KarateClub::FRIENDS[@user.twitter_id], @user.friend_ids
   end
 end
 
@@ -61,45 +43,48 @@ class TestHydrateFriends < TestJob
   end
 
   def test_nonexistent_friends
-    Jobs::HydrateFriends.enqueue(@user.id, FRIENDS.map(&:id))
+    friends = KarateClub::FRIENDS[@user.twitter_id]
+    Jobs::HydrateFriends.enqueue(@user.id, friends)
 
-    FRIENDS.each do |friend|
-      assert_equal Models::User[twitter_id: friend.id].raw["screen_name"],
-                   friend.screen_name
+    friends.each do |friend|
+      assert_equal Models::User[twitter_id: friend].raw["screen_name"],
+                   KarateClub::SCREEN_NAMES[friend]
     end
   end
 
   def test_existing_friends
-    FRIENDS.each do |friend|
-      Models::User.create(twitter_id: friend.id)
+    friend_ids = KarateClub::FRIENDS[@user.twitter_id]
+    friend_ids.each do |id|
+      Models::User.create(twitter_id: id)
     end
 
-    Jobs::HydrateFriends.enqueue(@user.id, FRIENDS.map(&:id))
+    Jobs::HydrateFriends.enqueue(@user.id, friend_ids)
 
-    FRIENDS.each do |friend|
-      assert_equal Models::User[twitter_id: friend.id].raw["screen_name"],
-                   friend.screen_name
+    friend_ids.each do |id|
+      assert_equal Models::User[twitter_id: id].raw["screen_name"],
+                   KarateClub::SCREEN_NAMES[id]
     end
   end
 
   def test_existing_and_nonexistent_friends
-    friend = FRIENDS.first
-    Models::User.create(twitter_id: friend.id)
+    friend_ids = KarateClub::FRIENDS[@user.twitter_id]
+    Models::User.create(twitter_id: friend_ids.first)
 
-    Jobs::HydrateFriends.enqueue(@user.id, FRIENDS.map(&:id))
+    Jobs::HydrateFriends.enqueue(@user.id, friend_ids)
 
-    FRIENDS.each do |friend|
-      assert_equal Models::User[twitter_id: friend.id].raw["screen_name"],
-                   friend.screen_name
+    friend_ids.each do |id|
+      assert_equal Models::User[twitter_id: id].raw["screen_name"],
+                   KarateClub::SCREEN_NAMES[id]
     end
   end
 
   def test_users_per_request
-    LimitedHydrateFriends.enqueue(@user.id, FRIENDS.map(&:id))
+    friend_ids = KarateClub::FRIENDS[@user.twitter_id]
+    LimitedHydrateFriends.enqueue(@user.id, friend_ids)
 
-    FRIENDS.each do |friend|
-      assert_equal Models::User[twitter_id: friend.id].raw["screen_name"],
-                   friend.screen_name
+    friend_ids.each do |id|
+      assert_equal Models::User[twitter_id: id].raw["screen_name"],
+                   KarateClub::SCREEN_NAMES[id]
     end
   end
 end
