@@ -3,10 +3,12 @@ require_relative "job"
 module Taxonomist
   module Jobs
     class HydrateFriends < Job
+      USERS_PER_REQUEST = 100
+
       def run(user_id, friend_ids)
         super
 
-        friend_ids.each_slice(self.users_per_request) do |ids|
+        friend_ids.each_slice(USERS_PER_REQUEST) do |ids|
           friends = self.twitter.users_lookup(user_ids: ids)
                                 .each.with_object({}) do |friend, hash|
                                   hash[friend["id"]] = friend
@@ -30,10 +32,6 @@ module Taxonomist
         self.class.enqueue(user_id: user_id,
                            friend_ids: friend_ids,
                            run_at: e.reset_at)
-      end
-
-      def users_per_request
-        100
       end
     end
   end
