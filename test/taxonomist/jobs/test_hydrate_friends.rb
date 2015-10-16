@@ -38,22 +38,15 @@ class TestHydrateFriends < TestJob
   end
 
   def test_users_per_request
-    without_warnings do
-      @original_users_per_request = Jobs::HydrateFriends::USERS_PER_REQUEST
-      Jobs::HydrateFriends.const_set(:USERS_PER_REQUEST, 2)
-    end
-
     friend_ids = KarateClub::FRIENDS[@user.twitter_id]
-    Jobs::HydrateFriends.enqueue(@user.id, friend_ids)
+
+    with_const(Jobs::HydrateFriends, :USERS_PER_REQUEST, 2) do
+      Jobs::HydrateFriends.enqueue(@user.id, friend_ids)
+    end
 
     friend_ids.each do |id|
       assert_equal Models::User[twitter_id: id].raw["screen_name"],
-                   KarateClub::SCREEN_NAMES[id]
-    end
-  ensure
-    without_warnings do
-      Jobs::HydrateFriends.const_set(:USERS_PER_REQUEST,
-                                     @original_users_per_request)
+        KarateClub::SCREEN_NAMES[id]
     end
   end
 end
