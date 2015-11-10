@@ -6,8 +6,8 @@ module Taxonomist
       def run(user_id)
         super
 
-        user_info = self.twitter.users_show(user_id: user.twitter_id)
-        friend_ids = self.twitter.friends_ids(user_id: user.twitter_id)
+        user_info = self.twitter.users_show(user_id: self.user.twitter_id)
+        friend_ids = self.twitter.friends_ids(user_id: self.user.twitter_id)
 
         DB.transaction do
           self.user.update(raw: user_info,
