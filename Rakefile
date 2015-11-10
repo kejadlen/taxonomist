@@ -13,8 +13,8 @@ task :environment do
   require_relative "lib/taxonomist"
 end
 
-desc "Run Pry"
-task :pry do
+desc "Open an interactive console"
+task :console do
   require_relative "lib/taxonomist"
   include Taxonomist
 
