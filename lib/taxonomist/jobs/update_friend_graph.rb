@@ -10,7 +10,7 @@ module Taxonomist
           id = user_ids.shift
 
           friend_ids = self.twitter.friends_ids(user_id: id)
-          Models::User[twitter_id: id].update(friend_ids: friend_ids)
+          Models::User[twitter_id: id].update(friend_ids: Sequel.pg_array(friend_ids))
         end
 
         destroy

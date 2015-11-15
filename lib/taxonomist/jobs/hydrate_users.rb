@@ -16,8 +16,7 @@ module Taxonomist
                                   hash[friend["id"]] = friend
                                 end
           ids.each do |id|
-            Models::User.where(twitter_id: id)
-                        .update(raw: Sequel.pg_json(friends[id]))
+            Models::User[twitter_id: id].update(raw: Sequel.pg_json(friends[id]))
           end
         end
 
