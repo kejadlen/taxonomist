@@ -12,7 +12,14 @@ module Taxonomist
         DB.transaction do
           self.user.update(raw: user_info,
                            friend_ids: Sequel.pg_array(friend_ids))
-          Jobs::HydrateFriends.enqueue(user_id, friend_ids)
+
+          existing_ids = Models::User.where(twitter_id: friend_ids)
+                                     .select_map(:twitter_id)
+          (friend_ids - existing_ids).each do |id|
+            Models::User.create(twitter_id: id)
+          end
+
+          Jobs::HydrateFriends.enqueue(user_id)
           Jobs::UpdateFriendGraph.enqueue(user_id)
           destroy
         end

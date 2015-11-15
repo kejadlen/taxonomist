@@ -39,15 +39,6 @@ module Taxonomist
       end
     end
 
-    module Foo; BAR = 1; end
-    def test_replace_const
-      assert_equal 1, Foo::BAR
-      with_const(Foo, :BAR, 2) do
-        assert_equal(2, Foo::BAR)
-      end
-      assert_equal 1, Foo::BAR
-    end
-
     def run(*args, &block)
       Sequel::Model.db.transaction(rollback: :always, auto_savepoint: true) do
         super
