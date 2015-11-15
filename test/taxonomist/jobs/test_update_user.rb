@@ -1,8 +1,10 @@
 require_relative "test_job"
 
 class TestUpdateUser < TestJob
+  MOCKED_JOBS = %i[ HydrateFriends UpdateFriendGraph ]
+
   def test_update_user
-    with_job_mock do
+    with_mocked_jobs(MOCKED_JOBS) do
       Jobs::UpdateUser.enqueue(@user.id)
     end
 
@@ -22,34 +24,11 @@ class TestUpdateUser < TestJob
     Models::User.create(twitter_id: friend_ids.first)
     assert_equal 2, Models::User.count
 
-    with_job_mock do
+    with_mocked_jobs(MOCKED_JOBS) do
       Jobs::UpdateUser.enqueue(@user.id)
     end
 
     friend_ids = KarateClub::FRIENDS[@user.twitter_id]
     assert_equal friend_ids.size, Models::User.where(twitter_id: friend_ids).count
-  end
-
-  def with_job_mock
-    job_mock = Minitest::Mock.new
-
-    original_hydrate_friends = Jobs::HydrateFriends
-    original_update_friend_graph = Jobs::UpdateFriendGraph
-    without_warnings do
-      Jobs.const_set(:HydrateFriends, job_mock)
-      Jobs.const_set(:UpdateFriendGraph, job_mock)
-    end
-
-    job_mock.expect :enqueue, nil, [@user.id]
-    job_mock.expect :enqueue, nil, [@user.id]
-
-    yield
-  ensure
-    without_warnings do
-      Jobs.const_set(:HydrateFriends, original_hydrate_friends)
-      Jobs.const_set(:UpdateFriendGraph, original_update_friend_graph)
-    end
-
-    job_mock.verify
   end
 end

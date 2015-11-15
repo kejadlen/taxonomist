@@ -19,5 +19,27 @@ class TestJob < Test
       Jobs::Job.const_set(:TWITTER_ADAPTER, @original_twitter_adapter)
     end
   end
+
+  def with_mocked_jobs(klasses)
+    job_mock = Minitest::Mock.new
+    originals = klasses.map {|klass| Jobs.const_get(klass) }
+
+    without_warnings do
+      klasses.each do |klass|
+        Jobs.const_set(klass, job_mock)
+        job_mock.expect :enqueue, nil, [@user.id]
+      end
+    end
+
+    yield
+  ensure
+    job_mock.verify
+
+    without_warnings do
+      klasses.zip(originals) do |klass, original|
+        Jobs.const_set(klass, original)
+      end
+    end
+  end
 end
 
