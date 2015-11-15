@@ -1,5 +1,8 @@
 require_relative "job"
 
+require_relative "hydrate_users"
+require_relative "update_friend_graph"
+
 module Taxonomist
   module Jobs
     class UpdateUser < Job
@@ -19,7 +22,7 @@ module Taxonomist
             Models::User.create(twitter_id: id)
           end
 
-          Jobs::HydrateFriends.enqueue(user_id)
+          Jobs::HydrateUsers.enqueue(user_id, friend_ids)
           Jobs::UpdateFriendGraph.enqueue(user_id)
           destroy
         end

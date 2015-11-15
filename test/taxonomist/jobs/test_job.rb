@@ -20,14 +20,14 @@ class TestJob < Test
     end
   end
 
-  def with_mocked_jobs(klasses)
+  def with_mocked_jobs(jobs)
     job_mock = Minitest::Mock.new
-    originals = klasses.map {|klass| Jobs.const_get(klass) }
+    originals = Hash[jobs.map {|klass,_| [klass, Jobs.const_get(klass)] }]
 
     without_warnings do
-      klasses.each do |klass|
+      jobs.each do |klass, args|
         Jobs.const_set(klass, job_mock)
-        job_mock.expect :enqueue, nil, [@user.id]
+        job_mock.expect :enqueue, nil, args
       end
     end
 
@@ -36,7 +36,7 @@ class TestJob < Test
     job_mock.verify
 
     without_warnings do
-      klasses.zip(originals) do |klass, original|
+      originals.each do |klass, original|
         Jobs.const_set(klass, original)
       end
     end

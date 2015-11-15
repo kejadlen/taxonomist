@@ -1,10 +1,15 @@
 require_relative "test_job"
 
+require "taxonomist/jobs/update_user"
+
 class TestUpdateUser < TestJob
-  MOCKED_JOBS = %i[ HydrateFriends UpdateFriendGraph ]
+  def mocked_jobs
+    { HydrateUsers: [@user.id, KarateClub::FRIENDS[@user.twitter_id]],
+      UpdateFriendGraph: [@user.id] }
+  end
 
   def test_update_user
-    with_mocked_jobs(MOCKED_JOBS) do
+    with_mocked_jobs(self.mocked_jobs) do
       Jobs::UpdateUser.enqueue(@user.id)
     end
 
@@ -24,7 +29,7 @@ class TestUpdateUser < TestJob
     Models::User.create(twitter_id: friend_ids.first)
     assert_equal 2, Models::User.count
 
-    with_mocked_jobs(MOCKED_JOBS) do
+    with_mocked_jobs(self.mocked_jobs) do
       Jobs::UpdateUser.enqueue(@user.id)
     end
 

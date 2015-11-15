@@ -2,13 +2,15 @@ require_relative "job"
 
 module Taxonomist
   module Jobs
-    class HydrateFriends < Job
+    class HydrateUsers < Job
       USERS_PER_REQUEST = 100
 
-      def run(user_id)
+      def run(user_id, user_ids)
         super
 
-        @user.friend_ids.each_slice(USERS_PER_REQUEST) do |ids|
+        batches = user_ids.each_slice(USERS_PER_REQUEST).to_a
+        until batches.empty?
+          ids = batches.shift
           friends = self.twitter.users_lookup(user_ids: ids)
                                 .each.with_object({}) do |friend, hash|
                                   hash[friend["id"]] = friend
@@ -21,9 +23,7 @@ module Taxonomist
 
         destroy
       rescue Twitter::RateLimitedError => e
-        self.class.enqueue(user_id: user_id,
-                           friend_ids: friend_ids,
-                           run_at: e.reset_at)
+        self.class.enqueue(user_id, user_ids, run_at: e.reset_at)
       end
     end
   end
