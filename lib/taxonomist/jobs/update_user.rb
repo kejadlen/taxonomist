@@ -23,7 +23,7 @@ module Taxonomist
           end
 
           Jobs::HydrateUsers.enqueue(user_id, friend_ids)
-          Jobs::UpdateFriendGraph.enqueue(user_id)
+          Jobs::UpdateFriendGraph.enqueue(user_id, friend_ids)
           destroy
         end
       rescue Twitter::RateLimitedError => e

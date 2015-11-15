@@ -4,8 +4,8 @@ require "taxonomist/jobs/update_user"
 
 class TestUpdateUser < TestJob
   def mocked_jobs
-    { HydrateUsers: [@user.id, KarateClub::FRIENDS[@user.twitter_id]],
-      UpdateFriendGraph: [@user.id] }
+    args = [@user.id, KarateClub::FRIENDS[@user.twitter_id]]
+    { HydrateUsers: args, UpdateFriendGraph: args }
   end
 
   def test_update_user
