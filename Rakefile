@@ -21,6 +21,9 @@ task :console do
   require "dotenv"
   Dotenv.load(".test.envrc")
 
+  require "logger"
+  DB.loggers << Logger.new($stdout)
+
   api_key = ENV.fetch("TWITTER_API_KEY")
   api_secret = ENV.fetch("TWITTER_API_SECRET")
   access_token = ENV.fetch("TWITTER_ACCESS_TOKEN")
