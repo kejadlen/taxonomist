@@ -103,7 +103,7 @@ DEPENDENCIES
   pg
   pry
   pry-byebug
-  que
+  que (~> 0.11.2)
   sequel
   simple_oauth
   virtus

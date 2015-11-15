@@ -1,18 +1,5 @@
 require "logger"
 
-require "que/rake_tasks"
-
-task :environment do
-  require "sequel"
-  db = Sequel.connect(ENV.fetch("DATABASE_URL"))
-
-  require "que"
-  Que.connection = db
-  Que.logger = Logger.new(STDOUT)
-
-  require_relative "lib/taxonomist"
-end
-
 desc "Open an interactive console"
 task :console do
   require_relative "lib/taxonomist"

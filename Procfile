@@ -1,2 +1,2 @@
 postgres: postgres -D /usr/local/var/postgres
-que: rake que:work
+que: que --log-level info ./config/que.rb
