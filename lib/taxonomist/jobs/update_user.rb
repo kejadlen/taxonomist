@@ -27,7 +27,7 @@ module Taxonomist
           destroy
         end
       rescue Twitter::RateLimitedError => e
-        self.class.enqueue(user_id: user_id, run_at: e.reset_at)
+        self.class.enqueue(user_id, run_at: e.reset_at)
       end
     end
   end
