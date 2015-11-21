@@ -7,7 +7,6 @@ gem "pg"
 gem "que", "~> 0.11.2"
 gem "sequel"
 gem "simple_oauth"
-gem "virtus"
 
 group :development do
   gem "guard"

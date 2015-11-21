@@ -38,15 +38,6 @@ class TestTwitter < Test
                  users.map {|user| user["screen_name"] }.sort
   end
 
-  def test_cursored
-    obj = Object.new
-    obj.extend(Twitter::Authed::Cursored)
-    obj.attributes = { next_cursor: 12345, previous_cursor: 67890 }
-
-    assert_equal 12345, obj.next_cursor
-    assert_equal 67890, obj.previous_cursor
-  end
-
   def test_rate_limited
     client = Class.new do
       def self.get(*)

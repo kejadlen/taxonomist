@@ -1,28 +1,30 @@
 require "faraday"
 require "faraday_middleware"
-require "virtus"
 
 module Taxonomist
   class Twitter
     class RateLimitedError < StandardError
-      include Virtus.model
+      attr_reader :reset_at
 
-      attribute :reset_at, DateTime
+      def initialize(reset_at:)
+        @reset_at = reset_at
+      end
     end
 
-    include Virtus.model
+    attr_reader *%i[ api_key api_secret client ]
 
-    attribute :api_key, String
-    attribute :api_secret, String
-
-    attr_reader :client
+    def initialize(api_key:, api_secret:)
+      @api_key, @api_secret = api_key, api_secret
+    end
 
     class Authed < Twitter
-      attribute :access_token, String
-      attribute :access_token_secret, String
+      attr_reader *%i[ access_token access_token_secret ]
 
-      def initialize(*)
-        super
+      def initialize(api_key:, api_secret:,
+                     access_token:, access_token_secret:)
+        super(api_key: api_key, api_secret: api_secret)
+
+        @access_token, @access_token_secret = access_token, access_token_secret
 
         @client = Faraday.new("https://api.twitter.com/1.1") do |conn|
           conn.request :oauth, consumer_key: api_key,
@@ -58,8 +60,8 @@ module Taxonomist
         client.get(endpoint, **kwargs)
       rescue Faraday::ClientError => e
         response = e.response
-        if response[:status] == 429
-          reset_at = response[:headers]['x-rate-limit-reset'].to_i
+        if response.status == 429
+          reset_at = Time.at(response.headers['x-rate-limit-reset'].to_i)
           raise RateLimitedError.new(reset_at: reset_at)
         end
         raise
@@ -73,10 +75,7 @@ module Taxonomist
       end
 
       module Cursored
-        include Virtus.module
-
-        attribute :next_cursor, Integer
-        attribute :previous_cursor, Integer
+        attr_accessor *%i[ next_cursor previous_cursor ]
       end
     end
   end
