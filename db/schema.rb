@@ -26,6 +26,7 @@ Sequel.migration do
       column :access_token, "text"
       column :access_token_secret, "text"
       column :friend_ids, "bigint[]"
+      column :list_ids, "bigint[]"
 
       index [:twitter_id]
       index [:twitter_id], :name=>:users_twitter_id_key, :unique=>true
