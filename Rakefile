@@ -1,13 +1,11 @@
 require "logger"
 
+$LOAD_PATH.unshift(File.expand_path("../lib", __FILE__))
+require "taxonomist"
+include Taxonomist
+
 desc "Open an interactive console"
 task :console do
-  require_relative "lib/taxonomist"
-  include Taxonomist
-
-  require "dotenv"
-  Dotenv.load(".test.envrc")
-
   require "logger"
   DB.loggers << Logger.new($stdout)
 
@@ -30,19 +28,22 @@ end
 
 namespace :db do
   desc "Run migrations"
-  task :migrate, [:version] => 'que:migrate' do |t, args|
+  task :migrate, [:version] do |t, args|
+    require_relative "config/que"
+    Que.logger = Logger.new(STDOUT)
+    Que.migrate!
+
     Sequel.extension :migration
 
     if args[:version]
       puts "Migrating to version #{args[:version]}"
-      Sequel::Migrator.run(db, "db/migrations", target: args[:version].to_i)
+      Sequel::Migrator.run(DB, "db/migrations", target: args[:version].to_i)
     else
       puts "Migrating to latest"
-      Sequel::Migrator.run(db, "db/migrations")
+      Sequel::Migrator.run(DB, "db/migrations")
     end
 
-    db.extension :schema_dumper
-    File.write("db/schema.rb",
-               db.dump_schema_migration(same_db: true).gsub(/^\s+$/, ''))
+    DB.extension :schema_dumper
+    File.write("db/schema.rb", DB.dump_schema_migration(same_db: true).gsub(/^\s+$/, ''))
   end
 end
