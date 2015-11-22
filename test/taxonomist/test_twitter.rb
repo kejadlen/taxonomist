@@ -38,6 +38,14 @@ class TestTwitter < Test
                  users.map {|user| user["screen_name"] }.sort
   end
 
+  def test_lists_ownerships
+    lists = @twitter.lists_ownerships(user_id: 783214)
+    assert_equal %w[ Ads\ &\ Sales Developers Engineering International
+                     Media Offices\ &\ Culture Official\ Twitter\ Accounts
+                     Support Twitter\ &\ IR ],
+                 lists.map {|list| list["name"] }.sort
+  end
+
   def test_rate_limited
     client = Class.new do
       def self.get(*)
