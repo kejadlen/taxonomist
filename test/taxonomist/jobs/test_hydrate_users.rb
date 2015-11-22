@@ -6,7 +6,7 @@ class TestHydrateUsers < TestJob
   def setup
     super
 
-    friend_ids = KarateClub::FRIENDS[@user.twitter_id]
+    friend_ids = KARATE_CLUB[@user.twitter_id]
     @user.update(friend_ids: friend_ids)
 
     friend_ids.each do |id|
@@ -19,7 +19,7 @@ class TestHydrateUsers < TestJob
 
     @user.friend_ids.each do |id|
       assert_equal Models::User[twitter_id: id].raw["screen_name"],
-                   KarateClub::SCREEN_NAMES[id]
+                   TwitterStub::SCREEN_NAMES[id]
     end
   end
 
@@ -30,7 +30,7 @@ class TestHydrateUsers < TestJob
 
     @user.friend_ids.each do |id|
       assert_equal Models::User[twitter_id: id].raw["screen_name"],
-        KarateClub::SCREEN_NAMES[id]
+        TwitterStub::SCREEN_NAMES[id]
     end
   end
 end

@@ -1,5 +1,5 @@
 require_relative "../../test_helper"
-require_relative "../../karate_club"
+require_relative "../../twitter_stub"
 
 require "taxonomist/jobs"
 
@@ -7,11 +7,10 @@ class TestJob < Test
   def setup
     without_warnings do
       @original_twitter_adapter = Jobs::Job::TWITTER_ADAPTER
-      Jobs::Job.const_set(:TWITTER_ADAPTER, KarateClub)
+      Jobs::Job.const_set(:TWITTER_ADAPTER, TwitterStub)
     end
 
     @user = Models::User.create(twitter_id: 1)
-    @karate_club = KarateClub.new
   end
 
   def teardown
