@@ -2,31 +2,20 @@ require_relative "karate_club"
 
 module Taxonomist
   class TwitterStub
-    SCREEN_NAMES = {
-      1 => 'Alice',
-      2 => 'Bob',
-      3 => 'Charlie',
-    }
-
-    attr_reader :friends
+    class << self
+      attr_accessor :stubs
+    end
 
     def initialize(*)
+      self.class.stubs ||= {}
     end
 
-    def friends_ids(user_id:)
-      KARATE_CLUB[user_id]
+    def method_missing(name, *args)
+      self.class.stubs[name]
     end
 
-    def users_lookup(user_ids:)
-      user_ids.map {|id| raw(id) }
-    end
-
-    def users_show(user_id:)
-      raw(user_id)
-    end
-
-    def raw(id)
-      { 'id' => id, 'screen_name' => SCREEN_NAMES[id] }
+    def respond_to_missing?(name, include_private=false)
+      self.class.stubs.has_key?(name)
     end
   end
 end

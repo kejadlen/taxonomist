@@ -2,38 +2,41 @@ require_relative "test_job"
 
 require "taxonomist/jobs/update_user"
 
-class TestUpdateUser < TestJob
-  def mocked_jobs
-    args = [@user.id, KARATE_CLUB[@user.twitter_id]]
-    { HydrateUsers: args, UpdateFriendGraph: args }
-  end
+module Taxonomist
+  class TestUpdateUser < TestJob
+    def setup
+      super
 
-  def test_update_user
-    with_mocked_jobs(self.mocked_jobs) do
-      Jobs::UpdateUser.enqueue(@user.id)
+      @raw = { "foo" => "bar" }
+      @friend_ids = [2, 3, 5, 8]
+
+      args = [@user.id, @friend_ids]
+      @mocked_jobs = { HydrateUsers: args, UpdateFriendGraph: args }
+
+      TwitterStub.stubs = { users_show: @raw, friends_ids: @friend_ids }
     end
 
-    @user.refresh
+    def test_update_user
+      with_mocked_jobs(@mocked_jobs) do
+        Jobs::UpdateUser.enqueue(@user.id)
+      end
 
-    twitter_id = @user.twitter_id
-    assert_equal({"id" => twitter_id,
-                  "screen_name" => TwitterStub::SCREEN_NAMES[twitter_id]},
-                 @user.raw)
-    assert_equal KARATE_CLUB[@user.twitter_id], @user.friend_ids
-  end
-
-  def test_create_friends
-    assert_equal 1, Models::User.count
-
-    friend_ids = KARATE_CLUB[@user.twitter_id]
-    Models::User.create(twitter_id: friend_ids.first)
-    assert_equal 2, Models::User.count
-
-    with_mocked_jobs(self.mocked_jobs) do
-      Jobs::UpdateUser.enqueue(@user.id)
+      @user.refresh
+      assert_equal @raw, @user.raw
+      assert_equal @friend_ids, @user.friend_ids
     end
 
-    friend_ids = KARATE_CLUB[@user.twitter_id]
-    assert_equal friend_ids.size, Models::User.where(twitter_id: friend_ids).count
+    def test_create_friends
+      assert_equal 1, Models::User.count
+
+      Models::User.create(twitter_id: @friend_ids.first)
+      assert_equal 2, Models::User.count
+
+      with_mocked_jobs(@mocked_jobs) do
+        Jobs::UpdateUser.enqueue(@user.id)
+      end
+
+      assert_equal @friend_ids.size, Models::User.where(twitter_id: @friend_ids).count
+    end
   end
 end
