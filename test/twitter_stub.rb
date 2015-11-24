@@ -11,7 +11,13 @@ module Taxonomist
     end
 
     def method_missing(name, *args)
-      self.class.stubs[name]
+      answer = self.class.stubs[name]
+      case answer
+      when Proc
+        answer.call(*args)
+      else
+        answer
+      end
     end
 
     def respond_to_missing?(name, include_private=false)
