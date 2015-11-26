@@ -65,8 +65,8 @@ module Taxonomist
         client.get(endpoint, **kwargs)
       rescue Faraday::ClientError => e
         response = e.response
-        if response.status == 429
-          reset_at = Time.at(response.headers['x-rate-limit-reset'].to_i)
+        if response[:status] == 429
+          reset_at = Time.at(response[:headers]['x-rate-limit-reset'].to_i)
           raise RateLimitedError.new(reset_at: reset_at)
         end
         raise
