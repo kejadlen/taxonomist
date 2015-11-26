@@ -14,10 +14,11 @@ module Taxonomist
       @mocked_jobs = { HydrateUsers: args, UpdateFriendGraph: args }
 
       @list_ids = [10, 20, 30]
+      lists = @list_ids.map {|id| { "id" => id } }
       TwitterStub.stubs = {
         users_show: @raw,
         friends_ids: @friend_ids,
-        lists_ownerships: @list_ids,
+        lists_ownerships: lists,
       }
     end
 

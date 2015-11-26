@@ -11,7 +11,8 @@ module Taxonomist
 
         user_info = self.twitter.users_show(user_id: self.user.twitter_id)
         friend_ids = self.twitter.friends_ids(user_id: self.user.twitter_id)
-        list_ids = self.twitter.lists_ownerships(user_id: self.user.twitter_id)
+        lists = self.twitter.lists_ownerships(user_id: self.user.twitter_id)
+        list_ids = lists.map {|list| list["id"] }
 
         DB.transaction do
           self.user.update(
