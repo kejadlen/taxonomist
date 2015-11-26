@@ -11,10 +11,14 @@ module Taxonomist
 
         user_info = self.twitter.users_show(user_id: self.user.twitter_id)
         friend_ids = self.twitter.friends_ids(user_id: self.user.twitter_id)
+        list_ids = self.twitter.lists_ownerships(user_id: self.user.twitter_id)
 
         DB.transaction do
-          self.user.update(raw: Sequel.pg_json(user_info),
-                           friend_ids: Sequel.pg_array(friend_ids))
+          self.user.update(
+            raw: Sequel.pg_json(user_info),
+            friend_ids: Sequel.pg_array(friend_ids),
+            list_ids: Sequel.pg_array(list_ids),
+          )
 
           existing_ids = Models::User.where(twitter_id: friend_ids)
                                      .select_map(:twitter_id)

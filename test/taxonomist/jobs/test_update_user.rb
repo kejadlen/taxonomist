@@ -13,7 +13,12 @@ module Taxonomist
       args = [@user.id, @friend_ids]
       @mocked_jobs = { HydrateUsers: args, UpdateFriendGraph: args }
 
-      TwitterStub.stubs = { users_show: @raw, friends_ids: @friend_ids }
+      @list_ids = [10, 20, 30]
+      TwitterStub.stubs = {
+        users_show: @raw,
+        friends_ids: @friend_ids,
+        lists_ownerships: @list_ids,
+      }
     end
 
     def test_update_user
@@ -24,6 +29,7 @@ module Taxonomist
       @user.refresh
       assert_equal @raw, @user.raw
       assert_equal @friend_ids, @user.friend_ids
+      assert_equal @list_ids, @user.list_ids
     end
 
     def test_create_friends
