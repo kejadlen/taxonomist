@@ -29,6 +29,10 @@ module Taxonomist
       @lists.each do |list_id, members|
         member_ids = members.map {|member| member["id"]}
         assert_equal member_ids, Models::List[twitter_id: list_id].member_ids
+
+        members.each do |member|
+          assert_equal member, Models::User[twitter_id: member["id"]].raw
+        end
       end
     end
   end
