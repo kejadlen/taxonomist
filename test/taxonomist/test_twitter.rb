@@ -32,12 +32,6 @@ class TestTwitter < Test
     assert_kind_of Twitter::Authed::Cursored, ids
   end
 
-  def test_users_lookup
-    users = @twitter.users_lookup(user_ids: [715073, 2244994945])
-    assert_equal %w[TwitterDev kejadlen],
-                 users.map {|user| user["screen_name"] }.sort
-  end
-
   def test_lists_ownerships
     lists = @twitter.lists_ownerships(user_id: 783214)
     assert_equal %w[ Ads\ &\ Sales Developers Engineering International
@@ -46,12 +40,24 @@ class TestTwitter < Test
                  lists.map {|list| list["name"] }.sort
   end
 
+  def test_lists_members
+    members = @twitter.lists_members(list_id: 84839422)
+    member_ids = members.map {|member| member["id"]}
+    [3260518932, 3260514654, 3099993704].each do |id|
+      assert_includes member_ids, id
+    end
+  end
+
+  def test_users_lookup
+    users = @twitter.users_lookup(user_ids: [715073, 2244994945])
+    assert_equal %w[TwitterDev kejadlen],
+                 users.map {|user| user["screen_name"] }.sort
+  end
+
   def test_rate_limited
     client = Class.new do
       def self.get(*)
-        response_headers = { 'rate-limit-reset'=> '56789' }
-        response = Faraday::Response.new(status: 429,
-                                         response_headers: response_headers)
+        response = { status: 429, headers: { "rate-limit-reset"=> "56789" } }
         raise Faraday::ClientError.new(nil, response)
       end
     end

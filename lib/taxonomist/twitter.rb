@@ -45,8 +45,13 @@ module Taxonomist
         cursored(resp.body["ids"], resp)
       end
 
+      def lists_members(list_id:)
+        resp = get("lists/members.json", list_id: list_id, count: 5_000)
+        cursored(resp.body["users"], resp)
+      end
+
       def lists_ownerships(user_id:)
-        resp = get("lists/ownerships.json", user_id: user_id)
+        resp = get("lists/ownerships.json", user_id: user_id, count: 1_000)
         cursored(resp.body["lists"], resp)
       end
 
