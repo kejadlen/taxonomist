@@ -2,6 +2,7 @@ require_relative "job"
 
 require_relative "hydrate_users"
 require_relative "update_friend_graph"
+require_relative "update_lists"
 
 module Taxonomist
   module Jobs
@@ -19,7 +20,7 @@ module Taxonomist
           self.update_lists(lists)
           self.create_friends(friend_ids)
 
-          self.enqueue_child_jobs(friend_ids)
+          self.enqueue_child_jobs
           destroy
         end
       rescue Twitter::RateLimitedError => e
@@ -48,9 +49,10 @@ module Taxonomist
         end
       end
 
-      def enqueue_child_jobs(friend_ids)
-        Jobs::HydrateUsers.enqueue(self.user.id, friend_ids)
-        Jobs::UpdateFriendGraph.enqueue(self.user.id, friend_ids)
+      def enqueue_child_jobs
+        Jobs::UpdateLists.enqueue(self.user.id, self.user.list_ids)
+        Jobs::HydrateUsers.enqueue(self.user.id, self.user.friend_ids)
+        Jobs::UpdateFriendGraph.enqueue(self.user.id, self.user.friend_ids)
       end
     end
   end

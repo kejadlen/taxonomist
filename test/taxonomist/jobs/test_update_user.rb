@@ -9,12 +9,15 @@ module Taxonomist
 
       @raw = { "foo" => "bar" }
       @friend_ids = [2, 3, 5, 8]
+      @list_ids = [10, 20, 30]
+      @lists = @list_ids.map {|id| { "id" => id } }
 
-      args = [@user.id, @friend_ids]
-      @mocked_jobs = { HydrateUsers: args, UpdateFriendGraph: args }
+      @mocked_jobs = {
+        UpdateLists: [@user.id, @list_ids],
+        HydrateUsers: [@user.id, @friend_ids],
+        UpdateFriendGraph: [@user.id, @friend_ids],
+      }
 
-      list_ids = [10, 20, 30]
-      @lists = list_ids.map {|id| { "id" => id } }
       TwitterStub.stubs = {
         users_show: @raw,
         friends_ids: @friend_ids,
@@ -30,7 +33,7 @@ module Taxonomist
       @user.refresh
       assert_equal @raw, @user.raw
       assert_equal @friend_ids, @user.friend_ids
-      assert_equal @lists.map {|list| list["id"]}, @user.list_ids
+      assert_equal @list_ids, @user.list_ids
     end
 
     def test_create_friends
