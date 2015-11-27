@@ -15,24 +15,42 @@ module Taxonomist
         list_ids = lists.map {|list| list["id"] }
 
         DB.transaction do
-          self.user.update(
-            raw: Sequel.pg_json(user_info),
-            friend_ids: Sequel.pg_array(friend_ids),
-            list_ids: Sequel.pg_array(list_ids),
-          )
+          self.update_user(user_info, friend_ids, list_ids)
+          self.update_lists(lists)
+          self.create_friends(friend_ids)
 
-          existing_ids = Models::User.where(twitter_id: friend_ids)
-                                     .select_map(:twitter_id)
-          (friend_ids - existing_ids).each do |id|
-            Models::User.create(twitter_id: id)
-          end
-
-          Jobs::HydrateUsers.enqueue(user_id, friend_ids)
-          Jobs::UpdateFriendGraph.enqueue(user_id, friend_ids)
+          self.enqueue_child_jobs(friend_ids)
           destroy
         end
       rescue Twitter::RateLimitedError => e
         self.class.enqueue(user_id, run_at: e.reset_at)
+      end
+
+      def update_user(user_info, friend_ids, list_ids)
+        self.user.update(
+          raw: Sequel.pg_json(user_info),
+          friend_ids: Sequel.pg_array(friend_ids),
+          list_ids: Sequel.pg_array(list_ids),
+        )
+      end
+
+      def update_lists(lists)
+        lists.each do |raw|
+          list = Models::List.find_or_create(twitter_id: raw["id"])
+          list.update(raw: raw)
+        end
+      end
+
+      def create_friends(friend_ids)
+        existing_ids = Models::User.where(twitter_id: friend_ids).select_map(:twitter_id)
+        (friend_ids - existing_ids).each do |id|
+          Models::User.create(twitter_id: id)
+        end
+      end
+
+      def enqueue_child_jobs(friend_ids)
+        Jobs::HydrateUsers.enqueue(self.user.id, friend_ids)
+        Jobs::UpdateFriendGraph.enqueue(self.user.id, friend_ids)
       end
     end
   end

@@ -7,7 +7,7 @@ module Taxonomist
   DB.extension :pg_array, :pg_json
 
   module Models
-    class User < Sequel::Model
-    end
+    class User < Sequel::Model; end
+    class List < Sequel::Model; end
   end
 end
