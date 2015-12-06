@@ -21,6 +21,12 @@ end
 
 module Taxonomist
   class Test < Minitest::Test
+    def run(*args, &block)
+      Sequel::Model.db.transaction(rollback: :always, auto_savepoint: true) do
+        super
+      end
+    end
+
     def without_warnings
       original_verbose, $VERBOSE = $VERBOSE, nil
       yield
@@ -36,12 +42,6 @@ module Taxonomist
     ensure
       without_warnings do
         namespace.const_set(const, original_value)
-      end
-    end
-
-    def run(*args, &block)
-      Sequel::Model.db.transaction(rollback: :always, auto_savepoint: true) do
-        super
       end
     end
   end
