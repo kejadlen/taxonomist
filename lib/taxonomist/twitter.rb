@@ -11,7 +11,7 @@ module Taxonomist
       end
     end
 
-    attr_reader *%i[ api_key api_secret client ]
+    attr_reader *%i[ api_key api_secret conn ]
 
     def initialize(api_key:, api_secret:)
       @api_key, @api_secret = api_key, api_secret
@@ -26,7 +26,7 @@ module Taxonomist
 
         @access_token, @access_token_secret = access_token, access_token_secret
 
-        @client = Faraday.new("https://api.twitter.com/1.1") do |conn|
+        @conn = Faraday.new("https://api.twitter.com/1.1") do |conn|
           conn.request :oauth, consumer_key: api_key,
                                consumer_secret: api_secret,
                                token: access_token,
@@ -67,7 +67,7 @@ module Taxonomist
       private
 
       def get(endpoint, **kwargs)
-        client.get(endpoint, **kwargs)
+        self.conn.get(endpoint, **kwargs)
       rescue Faraday::ClientError => e
         response = e.response
         if response[:status] == 429

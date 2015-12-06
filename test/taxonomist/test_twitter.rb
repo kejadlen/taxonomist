@@ -55,13 +55,13 @@ class TestTwitter < Test
   end
 
   def test_rate_limited
-    client = Class.new do
+    conn = Class.new do
       def self.get(*)
         response = { status: 429, headers: { "rate-limit-reset"=> "56789" } }
         raise Faraday::ClientError.new(nil, response)
       end
     end
-    @twitter.instance_variable_set(:@client, client)
+    @twitter.instance_variable_set(:@conn, conn)
 
     assert_raises(Twitter::RateLimitedError) do
       @twitter.users_show(user_id: 12345)
