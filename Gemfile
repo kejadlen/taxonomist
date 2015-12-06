@@ -5,8 +5,10 @@ gem "faraday"
 gem "faraday_middleware"
 gem "pg"
 gem "que", "~> 0.11.2"
+gem "roda"
 gem "sequel"
 gem "simple_oauth"
+gem "tilt"
 
 group :development do
   gem "guard"
@@ -16,4 +18,5 @@ group :development do
   gem "minitest"
   gem "pry"
   gem "pry-byebug"
+  gem "rerun"
 end
