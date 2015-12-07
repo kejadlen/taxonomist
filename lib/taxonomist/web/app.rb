@@ -4,14 +4,13 @@ Dotenv.load
 require "roda"
 require "tilt/erb"
 
-require_relative "db"
-require_relative "twitter"
+require_relative "../../taxonomist"
 
 module Taxonomist
   class Web < Roda
     use Rack::Session::Cookie, secret: ENV["RODA_SECRET"]
 
-    opts[:root] = File.expand_path("../web", __FILE__)
+    opts[:root] = File.expand_path("..", __FILE__)
 
     plugin :multi_route
     plugin :render, views: "views"
@@ -21,7 +20,7 @@ module Taxonomist
         twitter_oauth = Twitter::OAuth.new(api_key: ENV["TWITTER_API_KEY"],
                                            api_secret: ENV["TWITTER_API_SECRET"])
 
-        callback = "http://#{r.host_with_port}/oauth/callback"
+        callback = "http://#{r.host_with_port}/auth/callback"
         request_token = twitter_oauth.request_token(callback: callback)
 
         r.session[:token] = request_token["oauth_token"]

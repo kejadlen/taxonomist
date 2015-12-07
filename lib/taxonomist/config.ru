@@ -1,3 +1,3 @@
-require_relative "web"
+require_relative "web/app"
 
 run Taxonomist::Web.freeze.app
