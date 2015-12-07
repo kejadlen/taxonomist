@@ -16,7 +16,7 @@ module Taxonomist
     plugin :multi_route
     plugin :render, views: "views"
 
-    route("oauth") do |r|
+    route("auth") do |r|
       r.get "sign_in" do
         twitter_oauth = Twitter::OAuth.new(api_key: ENV["TWITTER_API_KEY"],
                                            api_secret: ENV["TWITTER_API_SECRET"])
