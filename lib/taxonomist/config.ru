@@ -17,7 +17,7 @@ module Taxonomist
 
     route do |r|
       r.root do
-        if r.session[:user_id]
+        if r.session.has_key?(:user_id)
           r.redirect "filter"
         else
           view "index"
@@ -26,6 +26,11 @@ module Taxonomist
 
       r.get "filter" do
         "Hello world!"
+      end
+
+      r.get "sign_out" do
+        r.session.delete(:user_id)
+        r.redirect "/"
       end
 
       r.on "oauth" do
@@ -45,9 +50,8 @@ module Taxonomist
 
         # TODO Verify oauth_token is the same as before?
         r.get "callback" do
-          token = r.session[:token]
-          token_secret = r.session[:token_secret]
-          r.session.clear
+          token = r.session.delete(:token)
+          token_secret = r.session.delete(:token_secret)
 
           twitter_oauth = Twitter::OAuth.new(api_key: ENV["TWITTER_API_KEY"],
                                              api_secret: ENV["TWITTER_API_SECRET"])
@@ -64,11 +68,6 @@ module Taxonomist
 
           r.session[:user_id] = user_id
 
-          r.redirect "/"
-        end
-
-        r.get "sign_out" do
-          r.session.delete(:user_id)
           r.redirect "/"
         end
       end
