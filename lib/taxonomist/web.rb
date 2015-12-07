@@ -17,14 +17,14 @@ module Taxonomist
 
     route do |r|
       r.root do
-        if r.session.has_key?(:user_id)
-          r.redirect "filter"
+        if r.session[:user_id]
+          r.redirect "filters"
         else
           view "index"
         end
       end
 
-      r.get "filter" do
+      r.get "filters" do
         "Hello world!"
       end
 
