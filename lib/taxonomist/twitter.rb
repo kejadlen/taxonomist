@@ -17,6 +17,40 @@ module Taxonomist
       @api_key, @api_secret = api_key, api_secret
     end
 
+    class OAuth < Twitter
+      def request_token(callback:)
+        conn = Faraday.new("https://api.twitter.com/oauth") do |conn|
+          conn.request :oauth, consumer_key: api_key,
+                               consumer_secret: api_secret,
+                               callback: callback
+
+          conn.response :raise_error
+
+          conn.adapter Faraday.default_adapter
+        end
+
+        resp = conn.post("request_token")
+        Faraday::Utils.parse_query(resp.body)
+      end
+
+      def access_token(token:, token_secret:, oauth_verifier:)
+        conn = Faraday.new("https://api.twitter.com/oauth") do |conn|
+          conn.request :url_encoded
+          conn.request :oauth, consumer_key: api_key,
+                               consumer_secret: api_secret,
+                               token: token,
+                               token_secret: token_secret
+
+          conn.response :raise_error
+
+          conn.adapter Faraday.default_adapter
+        end
+
+        resp = conn.post("access_token", oauth_verifier: oauth_verifier)
+        Faraday::Utils.parse_query(resp.body)
+      end
+    end
+
     class Authed < Twitter
       attr_reader *%i[ access_token access_token_secret ]
 
