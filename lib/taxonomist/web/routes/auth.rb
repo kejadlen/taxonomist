@@ -33,13 +33,13 @@ module Taxonomist
         user = Models::User.find_or_create(twitter_id: user_id)
         user.update(access_token: oauth_token, access_token_secret: oauth_token_secret)
 
-        r.session[:user_id] = user_id
+        r.session[:twitter_id] = user_id
 
         r.redirect "/"
       end
 
       r.get "sign_out" do
-        r.session.delete(:user_id)
+        r.session.delete(:twitter_id)
         r.redirect "/"
       end
     end

@@ -22,14 +22,14 @@ module Taxonomist
         r.multi_route
 
         r.root do
-          if r.session[:user_id]
-            r.redirect "filters"
+          if r.session[:twitter_id]
+            r.redirect "app"
           else
             view "index"
           end
         end
 
-        r.get "filters" do
+        r.get "app" do
           "Hello world!"
         end
       end
