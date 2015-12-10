@@ -37,9 +37,7 @@ module Taxonomist
 
     # Stage 3: post-processing
     def communities
-      communities = Hash.new {|h,k| h[k] = [] }
-
-      self.graph.keys.each do |node|
+      self.graph.keys.each.with_object(Hash.new {|h,k| h[k] = [] }) do |node, communities|
         labels = self.memory[node]
         labels = labels.group_by(&:itself)
                        .map {|label,labels| [label, labels.count]}
@@ -48,8 +46,6 @@ module Taxonomist
           communities[label] << node
         end
       end
-
-      communities
     end
   end
 end
