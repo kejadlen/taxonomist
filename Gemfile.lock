@@ -61,6 +61,7 @@ GEM
       pry (~> 0.10)
     que (0.11.2)
     rack (1.6.4)
+    rake (10.5.0)
     rb-fsevent (0.9.6)
     rb-inotify (0.9.5)
       ffi (>= 0.5.0)
@@ -95,6 +96,7 @@ DEPENDENCIES
   pry
   pry-byebug
   que (~> 0.11.2)
+  rake
   rerun
   roda
   sequel
@@ -102,4 +104,4 @@ DEPENDENCIES
   tilt
 
 BUNDLED WITH
-   1.10.6
+   1.11.2

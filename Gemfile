@@ -18,5 +18,6 @@ group :development do
   gem "minitest"
   gem "pry"
   gem "pry-byebug"
+  gem "rake"
   gem "rerun"
 end
