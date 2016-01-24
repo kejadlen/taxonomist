@@ -47,3 +47,12 @@ namespace :db do
     File.write("db/schema.rb", DB.dump_schema_migration(same_db: true).gsub(/^\s+$/, ''))
   end
 end
+
+require "rake/testtask"
+Rake::TestTask.new do |t|
+  t.libs << "test"
+  t.test_files = FileList["test/**/test_*.rb"]
+  t.verbose = true
+end
+
+task default: :test
