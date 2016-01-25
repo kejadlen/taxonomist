@@ -1,14 +1,41 @@
 require 'logger'
+require 'rake/clean'
+require 'rake/testtask'
 
 $LOAD_PATH.unshift(File.expand_path('../lib', __FILE__))
 require 'taxonomist'
+
 include Taxonomist
+
+task default: %i[ test elm ]
+
+desc "Build Elm JS"
+task elm: FileList["lib/taxonomist/web/elm/*.elm"] do
+  cd "lib/taxonomist/web/elm" do
+    sh "elm-make Taxonomist.elm --output ../public/js/elm-taxonomist.js"
+  end
+end
+CLOBBER.include("lib/taxonomist/web/public/Taxonomist.elm")
+
+# web = "lib/taxonomist/web"
+# FileList[File.join(web, "elm/Taxonomist.elm")].each do |elm|
+#   rel = elm.pathmap("public/js/elm-%{.*,*}n.js", &:downcase)
+#   pub = File.join(web, rel)
+#   CLOBBER.include(pub)
+#   file pub => elm do
+#     cd elm.pathmap("%d") do
+#       sh "elm-make #{elm.pathmap("%f")} --output #{File.join("..", rel)}"
+#     end
+#   end
+
+#   desc "Build Elm JS"
+#   task elm: pub
+# end
 
 desc 'Open an interactive console'
 task :console, :user_id do |t, args|
   user_id = args[:user_id]
 
-  require 'logger'
   DB.loggers << Logger.new($stdout)
 
   class QueJob < Sequel::Model; end
@@ -56,5 +83,3 @@ Rake::TestTask.new do |t|
   t.warning = false
   # t.verbose = true
 end
-
-task default: :test

@@ -14,6 +14,7 @@ module Taxonomist
       opts[:root] = File.expand_path("..", __FILE__)
 
       plugin :render, views: "views"
+      plugin :static, %w[ /js ]
 
       plugin :multi_route
       require_relative "routes/auth"
@@ -22,15 +23,7 @@ module Taxonomist
         r.multi_route
 
         r.root do
-          if r.session[:twitter_id]
-            r.redirect "app"
-          else
-            view "index"
-          end
-        end
-
-        r.get "app" do
-          "Hello world!"
+          view r.session[:twitter_id] ? "app" : "sign_in"
         end
       end
     end
