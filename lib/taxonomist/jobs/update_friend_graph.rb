@@ -3,9 +3,7 @@ require_relative "job"
 module Taxonomist
   module Jobs
     class UpdateFriendGraph < Job
-      def run(user_id, user_ids)
-        super
-
+      def run_rate_limited(user_ids)
         until user_ids.empty?
           id = user_ids.first
 
@@ -16,8 +14,6 @@ module Taxonomist
         end
 
         destroy
-      rescue Twitter::RateLimitedError => e
-        self.class.enqueue(user_id, user_ids, run_at: e.reset_at)
       end
     end
   end

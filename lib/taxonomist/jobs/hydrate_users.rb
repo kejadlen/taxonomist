@@ -5,9 +5,7 @@ module Taxonomist
     class HydrateUsers < Job
       USERS_PER_REQUEST = 100
 
-      def run(user_id, user_ids)
-        super
-
+      def run_rate_limited(user_ids)
         batches = user_ids.each_slice(USERS_PER_REQUEST).to_a
         until batches.empty?
           ids = batches.first
@@ -24,8 +22,6 @@ module Taxonomist
         end
 
         destroy
-      rescue Twitter::RateLimitedError => e
-        self.class.enqueue(user_id, user_ids, run_at: e.reset_at)
       end
     end
   end

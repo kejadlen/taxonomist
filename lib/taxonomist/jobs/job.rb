@@ -12,7 +12,12 @@ module Taxonomist
 
       attr_accessor :twitter, :user
 
-      def run(user_id, *args)
+      def run_rate_limited(*args)
+        raise NotImplementedError
+      end
+
+      def run(*args)
+        user_id = args.first
         self.user = Models::User[user_id]
 
         api_key = ENV.fetch('TWITTER_API_KEY')
@@ -23,6 +28,10 @@ module Taxonomist
                                            api_secret: api_secret,
                                            access_token: access_token,
                                            access_token_secret: access_token_secret)
+
+        self.run_rate_limited(*args[1..-1])
+      rescue Twitter::RateLimitedError => e
+        self.class.enqueue(*args, run_at: e.reset_at)
       end
     end
   end

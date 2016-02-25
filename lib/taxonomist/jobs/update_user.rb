@@ -7,9 +7,7 @@ require_relative "update_lists"
 module Taxonomist
   module Jobs
     class UpdateUser < Job
-      def run(user_id)
-        super
-
+      def run_rate_limited
         user_info = self.twitter.users_show(user_id: self.user.twitter_id)
         friend_ids = self.twitter.friends_ids(user_id: self.user.twitter_id)
         lists = self.twitter.lists_ownerships(user_id: self.user.twitter_id)
@@ -23,8 +21,6 @@ module Taxonomist
           self.enqueue_child_jobs
           destroy
         end
-      rescue Twitter::RateLimitedError => e
-        self.class.enqueue(user_id, run_at: e.reset_at)
       end
 
       def update_user(user_info, friend_ids, list_ids)
