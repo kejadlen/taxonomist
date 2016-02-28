@@ -5,9 +5,13 @@ require "taxonomist"
 include Taxonomist
 
 desc "Open an interactive console"
-task :console do
+task :console, :user_id do |t, args|
+  user_id = args[:user_id]
+
   require "logger"
   DB.loggers << Logger.new($stdout)
+
+  class QueJob < Sequel::Model; end
 
   api_key = ENV.fetch("TWITTER_API_KEY")
   api_secret = ENV.fetch("TWITTER_API_SECRET")
@@ -19,8 +23,7 @@ task :console do
                                 access_token: access_token,
                                 access_token_secret: access_token_secret)
 
-  user = Models::User[25]
-  class QueJob < Sequel::Model; end
+  user = Models::User[user_id] if user_id
 
   require "pry"
   binding.pry
