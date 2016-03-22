@@ -1,4 +1,5 @@
 require_relative '../test_helper'
+require_relative '../twitter_stub'
 
 require 'taxonomist/list'
 
