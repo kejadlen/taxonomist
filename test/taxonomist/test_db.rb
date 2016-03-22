@@ -1,5 +1,5 @@
 require_relative "../test_helper"
-require_relative "../karate_club"
+# require_relative "../karate_club"
 
 module Taxonomist
   class TestUser < Test
