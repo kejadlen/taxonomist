@@ -14,6 +14,8 @@ class TestJob < Test
   end
 
   def teardown
+    TwitterStub.stubs.clear
+
     without_warnings do
       Jobs::Job.const_set(:TWITTER_ADAPTER, @original_twitter_adapter)
     end
