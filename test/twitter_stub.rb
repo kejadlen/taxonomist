@@ -4,6 +4,10 @@ module Taxonomist
   class TwitterStub
     class << self
       attr_accessor :stubs
+      def stubs
+        return @stubs if defined?(@stubs)
+        @stubs = {}
+      end
     end
 
     attr_reader :stubs
