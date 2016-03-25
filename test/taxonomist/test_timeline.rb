@@ -2,8 +2,17 @@ require_relative '../test_helper'
 require_relative '../twitter_stub'
 
 require 'taxonomist/timeline'
+require 'taxonomist/twitter'
 
 class TestTimeline < Test
+  def test_timeline
+    timeline_stub = TimelineStub.new
+    user_id = nil
+    timeline = Timeline.new(timeline_stub, :statuses_user_timeline, user_id)
+
+    assert_equal timeline_stub.ids, timeline.to_a.map {|t| t['id'] }
+  end
+
   class TimelineStub
     attr_reader :ids
 
@@ -20,12 +29,5 @@ class TestTimeline < Test
          .take(200)
          .map {|id| { 'id' => id } }
     end
-  end
-
-  def test_timeline
-    timeline_stub = TimelineStub.new
-    timeline = Timeline.new(timeline_stub, :statuses_user_timeline, nil)
-
-    assert_equal timeline_stub.ids, timeline.to_a.map {|t| t['id'] }
   end
 end
