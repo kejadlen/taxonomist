@@ -89,6 +89,14 @@ module Taxonomist
         cursored(resp.body["lists"], resp)
       end
 
+      def statuses_user_timeline(user_id:, since_id: nil, max_id: nil)
+        params = { user_id: user_id, count: 200, trim_user: true }
+        params[:since_id] = since_id if since_id
+        params[:max_id] = max_id if max_id
+        resp = get('statuses/user_timeline.json', params)
+        resp.body
+      end
+
       def users_lookup(user_ids:)
         user_ids = user_ids.join(?,)
         get("users/lookup.json", user_id: user_ids).body
