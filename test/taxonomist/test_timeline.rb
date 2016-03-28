@@ -10,13 +10,15 @@ class TestTimeline < Test
       ids << ids.last + rand(5) + 1
     }.reverse
 
-    twitter_stub = TwitterStub.new do |user_id:, since_id: nil, max_id: nil|
-      since_id ||= ids.last - 1
-      max_id ||= ids.first
-      ids.select {|id| (since_id+1..max_id).cover?(id) }
-         .take(200)
-         .map {|id| { 'id' => id } }
-    end
+    twitter_stub = TwitterStub.new(
+      statuses_user_timeline: ->(user_id:, since_id: nil, max_id: nil) {
+        since_id ||= ids.last - 1
+        max_id ||= ids.first
+        ids.select {|id| (since_id+1..max_id).cover?(id) }
+          .take(200)
+          .map {|id| { 'id' => id } }
+      }
+    )
 
     user_id = nil
     timeline = Timeline.new(twitter_stub, :statuses_user_timeline, user_id)
@@ -28,9 +30,11 @@ class TestTimeline < Test
 
   def test_rate_limited
     reset_at = Time.now + 42
-    twitter_stub = TwitterStub.new do |**options|
-      raise Twitter::RateLimitedError.new(reset_at: reset_at)
-    end
+    twitter_stub = TwitterStub.new(
+      statuses_user_timeline: ->(*) {
+        raise Twitter::RateLimitedError.new(reset_at: reset_at)
+      }
+    )
 
     user_id = nil
     timeline = Timeline.new(twitter_stub, :statuses_user_timeline, user_id)
@@ -38,15 +42,5 @@ class TestTimeline < Test
 
     assert_equal [], timeline.statuses
     assert_equal reset_at, timeline.rate_limited.reset_at
-  end
-
-  class TwitterStub
-    def initialize(&block)
-      @block = block
-    end
-
-    def statuses_user_timeline(user_id:, since_id: nil, max_id: nil)
-      @block.call(user_id: user_id, since_id: since_id, max_id: max_id)
-    end
   end
 end
