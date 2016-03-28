@@ -8,8 +8,6 @@ module Taxonomist
     Que.connection = DB
 
     class Job < Que::Job
-      TWITTER_ADAPTER = Twitter::Authed
-
       attr_accessor :twitter, :user
 
       def run_rate_limited(*args)
@@ -24,7 +22,7 @@ module Taxonomist
         api_secret = ENV.fetch('TWITTER_API_SECRET')
         access_token = self.user.access_token
         access_token_secret = self.user.access_token_secret
-        self.twitter = TWITTER_ADAPTER.new(api_key: api_key,
+        self.twitter = Twitter::Authed.new(api_key: api_key,
                                            api_secret: api_secret,
                                            access_token: access_token,
                                            access_token_secret: access_token_secret)

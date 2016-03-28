@@ -1,13 +1,13 @@
-require_relative "../../test_helper"
-require_relative "../../twitter_stub"
+require_relative '../../test_helper'
+require_relative '../../twitter_stub'
 
-require "taxonomist/jobs"
+require 'taxonomist/jobs'
 
 class TestJob < Test
   def setup
     without_warnings do
-      @original_twitter_adapter = Jobs::Job::TWITTER_ADAPTER
-      Jobs::Job.const_set(:TWITTER_ADAPTER, TwitterStub)
+      @original_twitter = Twitter::Authed
+      Twitter.const_set(:Authed, TwitterStub)
     end
 
     @user = Models::User.create(twitter_id: 1)
@@ -17,7 +17,7 @@ class TestJob < Test
     TwitterStub.stubs.clear
 
     without_warnings do
-      Jobs::Job.const_set(:TWITTER_ADAPTER, @original_twitter_adapter)
+      Twitter.const_set(:Authed, @original_twitter)
     end
   end
 
