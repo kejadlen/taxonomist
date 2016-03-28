@@ -39,6 +39,8 @@ Sequel.migration do
       column :access_token_secret, "text"
       column :friend_ids, "bigint[]"
       column :list_ids, "bigint[]"
+      column :interactions, "json", :default=>Sequel::LiteralString.new("'{}'::json"), :null=>false
+      column :tweet_marks, "json", :default=>Sequel::LiteralString.new("'{}'::json"), :null=>false
 
       index [:twitter_id]
       index [:twitter_id], :name=>:users_twitter_id_key, :unique=>true
