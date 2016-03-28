@@ -8,6 +8,10 @@ module Taxonomist
 
   module Models
     class User < Sequel::Model
+      def screen_name
+        raw['screen_name']
+      end
+
       # def graph
       #   graph = self.class.where(twitter_id: self.friend_ids.to_a - [self.twitter_id])
       #                     .select_hash(:twitter_id, :friend_ids)

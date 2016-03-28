@@ -1,6 +1,6 @@
 require_relative 'job'
 
-require_relative '../twitter'
+require_relative '../timeline'
 
 module Taxonomist
   module Jobs
