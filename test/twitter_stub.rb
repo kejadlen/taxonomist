@@ -16,11 +16,11 @@ module Taxonomist
       @stubs = (self.class.stubs || {}).merge(stubs)
     end
 
-    def method_missing(name, *args)
+    def method_missing(name, *args, **options)
       answer = self.stubs[name]
       case answer
       when Proc
-        answer.call(*args)
+        answer.call(*args, **options)
       else
         answer
       end
