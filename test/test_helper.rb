@@ -1,21 +1,22 @@
-require "minitest/autorun"
-require "letters"
-require "pry"
-require "que"
-require "sequel"
+require 'minitest/autorun'
+require 'letters'
+require 'pry'
+require 'que'
+require 'sequel'
 
-require "dotenv"
-Dotenv.overload(".test.envrc")
+require 'dotenv'
+Dotenv.overload('.test.envrc')
 
-$LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
+$LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 
-require "taxonomist/db"
+require 'taxonomist/db'
+require 'taxonomist/twitter'
 Que.connection = Taxonomist::DB
 Que.migrate!
 Que.mode = :sync
 
-if ENV.has_key?("DEBUG")
-  require "logger"
+if ENV.has_key?('DEBUG')
+  require 'logger'
   Taxonomist::DB.loggers << Logger.new($stdout)
 end
 
@@ -50,4 +51,4 @@ end
 include Taxonomist
 
 Sequel.extension :migration
-Sequel::Migrator.run(DB, "db/migrations")
+Sequel::Migrator.run(DB, 'db/migrations')

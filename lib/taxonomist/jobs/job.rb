@@ -10,11 +10,11 @@ module Taxonomist
     class Job < Que::Job
       attr_accessor :twitter, :user
 
-      def run_rate_limited(*args)
+      def run_rate_limited(*args, **options)
         raise NotImplementedError
       end
 
-      def run(*args)
+      def run(*args, **options)
         user_id = args.first
         self.user = Models::User[user_id]
 
@@ -27,9 +27,12 @@ module Taxonomist
                                            access_token: access_token,
                                            access_token_secret: access_token_secret)
 
-        self.run_rate_limited(*args[1..-1])
+        DB.transaction do
+          self.run_rate_limited(*args[1..-1])
+          destroy
+        end
       rescue Twitter::RateLimitedError => e
-        self.class.enqueue(*args, run_at: e.reset_at)
+        self.class.enqueue(*args, **options.merge(run_at: e.reset_at))
       end
     end
   end

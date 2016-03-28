@@ -18,8 +18,6 @@ module Taxonomist
 
           list_ids.shift
         end
-
-        destroy
       end
     end
   end

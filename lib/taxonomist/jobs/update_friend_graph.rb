@@ -12,8 +12,6 @@ module Taxonomist
 
           user_ids.shift
         end
-
-        destroy
       end
     end
   end

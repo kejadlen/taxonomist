@@ -20,8 +20,6 @@ module Taxonomist
 
           batches.shift
         end
-
-        destroy
       end
     end
   end

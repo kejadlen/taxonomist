@@ -13,14 +13,11 @@ module Taxonomist
         lists = self.twitter.lists_ownerships(user_id: self.user.twitter_id)
         list_ids = lists.map {|list| list["id"] }
 
-        DB.transaction do
-          self.update_user(user_info, friend_ids, list_ids)
-          self.update_lists(lists)
-          self.create_friends(friend_ids)
+        self.update_user(user_info, friend_ids, list_ids)
+        self.update_lists(lists)
+        self.create_friends(friend_ids)
 
-          self.enqueue_child_jobs
-          destroy
-        end
+        self.enqueue_child_jobs
       end
 
       def update_user(user_info, friend_ids, list_ids)
