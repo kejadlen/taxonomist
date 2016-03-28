@@ -1,10 +1,11 @@
+require_relative 'twitter'
+
 module Taxonomist
   class Timeline
     include Enumerable
 
-    attr_reader :twitter, :endpoint, :user_id, :since_id
-    attr_accessor :max_id
-    attr_reader :data
+    attr_reader :twitter, :endpoint, :user_id, :since_id, :max_id
+    attr_reader :rate_limited
 
     def initialize(twitter, endpoint, user_id, since_id=nil, max_id=nil)
       @twitter, @endpoint, @user_id = twitter, endpoint, user_id
@@ -14,11 +15,13 @@ module Taxonomist
 
     def each
       loop do
-        self._fetch if self.data.empty?
-        break if self.data.empty?
+        self._fetch if @data.empty?
+        break if @data.empty?
 
-        yield self.data.shift
+        yield @data.shift
       end
+    rescue Twitter::RateLimitedError => error
+      @rate_limited = error
     end
 
     def _fetch
@@ -28,8 +31,8 @@ module Taxonomist
                                max_id: self.max_id)
       return data if data.empty?
 
-      self.max_id = data.last['id'] - 1
-      self.data.concat(data)
+      @max_id = data.last['id'] - 1
+      @data.concat(data)
     end
   end
 end
