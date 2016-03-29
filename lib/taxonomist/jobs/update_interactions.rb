@@ -5,10 +5,6 @@ require_relative '../timeline'
 module Taxonomist
   module Jobs
     class UpdateInteractions < Job
-      def counts
-        raise NotImplementedError
-      end
-
       def run_rate_limited(endpoint, since_id=nil, max_id=nil)
         timeline = Taxonomist::Timeline.new(twitter,
                                             endpoint,
