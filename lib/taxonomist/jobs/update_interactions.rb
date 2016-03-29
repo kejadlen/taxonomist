@@ -10,11 +10,11 @@ module Taxonomist
       end
 
       def run_rate_limited(endpoint, since_id=nil, max_id=nil)
-        timeline = Timeline.new(twitter,
-                                endpoint,
-                                user.twitter_id,
-                                since_id,
-                                max_id)
+        timeline = Taxonomist::Timeline.new(twitter,
+                                            endpoint,
+                                            user.twitter_id,
+                                            since_id,
+                                            max_id)
         timeline.fetch!
 
         max_id = timeline.statuses.first['id']
