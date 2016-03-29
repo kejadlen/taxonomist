@@ -21,7 +21,7 @@ class Jobs::UpdateInteractions::TestTimeline < TestJob
 
     assert_equal 579, @user.tweet_marks['statuses_user_timeline']
 
-    interactions = @user.interactions
+    interactions = @user.interactions['statuses_user_timeline']
     assert_equal 2, interactions['123']
     assert_equal 1, interactions['456']
     assert_equal 1, interactions['789']
@@ -54,7 +54,7 @@ class Jobs::UpdateInteractions::TestTimeline < TestJob
 
     assert_equal 579, @user.tweet_marks['statuses_user_timeline']
 
-    interactions = @user.interactions
+    interactions = @user.interactions['statuses_user_timeline']
     assert_equal 2, interactions['123']
     assert_equal 1, interactions['456']
     assert_equal 1, interactions['789']
