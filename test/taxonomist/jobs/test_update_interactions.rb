@@ -1,6 +1,6 @@
-require_relative '../test_job'
+require_relative 'test_job'
 
-require 'taxonomist/jobs/update_interactions/timeline'
+require 'taxonomist/jobs/update_interactions'
 require 'taxonomist/twitter'
 
 class Jobs::UpdateInteractions::TestTimeline < TestJob
