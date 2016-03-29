@@ -6,8 +6,8 @@ require 'taxonomist/jobs'
 class TestJob < Test
   def setup
     without_warnings do
-      @original_twitter = Twitter::Authed
-      Twitter.const_set(:Authed, TwitterStub)
+      @original_twitter = Twitter::Client::Authed
+      Twitter::Client.const_set(:Authed, TwitterStub)
     end
 
     @user = Models::User.create(twitter_id: 1)
@@ -17,7 +17,7 @@ class TestJob < Test
     TwitterStub.stubs.clear
 
     without_warnings do
-      Twitter.const_set(:Authed, @original_twitter)
+      Twitter::Client.const_set(:Authed, @original_twitter)
     end
   end
 

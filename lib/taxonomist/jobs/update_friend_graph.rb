@@ -7,7 +7,7 @@ module Taxonomist
         until user_ids.empty?
           id = user_ids.first
 
-          friend_ids = self.twitter.friends_ids(user_id: id)
+          friend_ids = twitter.friends_ids(user_id: id)
           Models::User[twitter_id: id].update(friend_ids: Sequel.pg_array(friend_ids, :bigint))
 
           user_ids.shift

@@ -1,4 +1,4 @@
-require_relative "job"
+require_relative 'job'
 
 module Taxonomist
   module Jobs
@@ -10,10 +10,9 @@ module Taxonomist
         until batches.empty?
           ids = batches.first
 
-          friends = self.twitter.users_lookup(user_ids: ids)
-                                .each.with_object({}) do |friend, hash|
-                                  hash[friend["id"]] = friend
-                                end
+          friends = Hash[
+            twitter.users_lookup(user_ids: ids).map { |u| [u['id'], u] }
+          ]
           ids.each do |id|
             Models::User[twitter_id: id].update(raw: Sequel.pg_json(friends[id]))
           end
