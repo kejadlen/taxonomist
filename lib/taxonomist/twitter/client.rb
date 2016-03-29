@@ -71,6 +71,7 @@ module Taxonomist
                                token: access_token,
                                token_secret: access_token_secret
           conn.request :json
+          conn.request :url_encoded
 
           conn.response :raise_error
           conn.response :json, :content_type => /\bjson$/
@@ -82,6 +83,19 @@ module Taxonomist
       def friends_ids(user_id:)
         resp = get('friends/ids.json', user_id: user_id)
         cursored(resp.body['ids'], resp)
+      end
+
+      def lists_create(name:, mode: nil, description: nil)
+        params = { name: name }
+        params[:mode] = mode if mode
+        params[:description] = description if description
+        conn.post('lists/create.json', params) do |req|
+          req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        end
+      end
+
+      def lists_list
+        conn.get('lists/list.json').body
       end
 
       def lists_members(list_id:)
