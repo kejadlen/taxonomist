@@ -56,5 +56,25 @@ module Taxonomist
         ids.compact
       end
     end
+
+    class UpdateInteractions::DirectMessages < UpdateInteractions
+      def endpoint
+        :direct_messages_sent
+      end
+
+      def interactee_ids(status)
+        [status.dig('recipient', 'id')].compact
+      end
+    end
+
+    class UpdateInteractions::Favorites < UpdateInteractions
+      def endpoint
+        :favorites_list
+      end
+
+      def interactee_ids(status)
+        [status.dig('user', 'id')].compact
+      end
+    end
   end
 end

@@ -80,6 +80,24 @@ module Taxonomist
         end
       end
 
+      # This takes a user_id that's not actually used to adhere to the
+      # interface expected by the Timeline.
+      def direct_messages_sent(user_id: nil, since_id: nil, max_id: nil)
+        params = { count: 200, include_entities: false }
+        params[:since_id] = since_id if since_id
+        params[:max_id] = max_id if max_id
+        resp = get('direct_messages/sent.json', params)
+        resp.body
+      end
+
+      def favorites_list(user_id:, since_id: nil, max_id: nil)
+        params = { user_id: user_id, count: 200, include_entities: false }
+        params[:since_id] = since_id if since_id
+        params[:max_id] = max_id if max_id
+        resp = get('favorites/list.json', params)
+        resp.body
+      end
+
       def friends_ids(user_id:)
         resp = get('friends/ids.json', user_id: user_id)
         cursored(resp.body['ids'], resp)
