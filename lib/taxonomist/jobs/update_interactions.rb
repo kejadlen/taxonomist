@@ -26,11 +26,11 @@ module Taxonomist
           user.tweet_marks.fetch(endpoint.to_s, 0), max_id
         ].max
 
-        timeline.statuses.each do |status|
-          interactee_ids(status).map(&:to_s).each do |id|
-            user.interactions[id] ||= 0
-            user.interactions[id] += 1
-          end
+        timeline.statuses.flat_map { |status|
+          interactee_ids(status)
+        }.map(&:to_s).each do |id|
+          user.interactions[id] ||= 0
+          user.interactions[id] += 1
         end
 
         user.save
