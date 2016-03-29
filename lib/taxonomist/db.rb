@@ -1,5 +1,6 @@
 require "sequel"
 
+Sequel.extension :pg_json_ops
 Sequel::Model.plugin :timestamps, update_on_create: true
 
 module Taxonomist
