@@ -46,7 +46,7 @@ module Taxonomist
       end
 
       def enqueue_child_jobs
-        Jobs::UpdateLists.enqueue(user.id, user.list_ids)
+        # Jobs::UpdateLists.enqueue(user.id, user.list_ids)
         Jobs::HydrateUsers.enqueue(user.id, user.friend_ids)
         Jobs::UpdateFriendGraph.enqueue(user.id, user.friend_ids)
       end

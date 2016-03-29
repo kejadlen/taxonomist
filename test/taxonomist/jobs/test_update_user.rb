@@ -13,7 +13,7 @@ module Taxonomist
       @lists = @list_ids.map {|id| { "id" => id } }
 
       @mocked_jobs = {
-        UpdateLists: [@user.id, @list_ids],
+        # UpdateLists: [@user.id, @list_ids],
         HydrateUsers: [@user.id, @friend_ids],
         UpdateFriendGraph: [@user.id, @friend_ids],
       }
