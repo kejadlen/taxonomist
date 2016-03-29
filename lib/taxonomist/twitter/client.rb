@@ -94,10 +94,6 @@ module Taxonomist
         end
       end
 
-      def lists_list
-        conn.get('lists/list.json').body
-      end
-
       def lists_members(list_id:)
         resp = get('lists/members.json', list_id: list_id, count: 5_000)
         cursored(resp.body['users'], resp)
