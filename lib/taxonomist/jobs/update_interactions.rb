@@ -9,6 +9,10 @@ module Taxonomist
         raise NotImplementedError
       end
 
+      def interactee_ids(status)
+        raise NotImplementedError
+      end
+
       def run_rate_limited(since_id=nil, max_id=nil)
         timeline = Taxonomist::Timeline.new(twitter,
                                             endpoint,
@@ -23,12 +27,7 @@ module Taxonomist
         ].max
 
         timeline.statuses.each do |status|
-          user_mentions = Array(status.dig('entities', 'user_mentions'))
-          ids = user_mentions.map {|um| um['id'] }
-          ids << status.dig('quoted_status', 'user', 'id')
-          ids.compact!
-
-          ids.map(&:to_s).each do |id|
+          interactee_ids(status).map(&:to_s).each do |id|
             user.interactions[id] ||= 0
             user.interactions[id] += 1
           end
