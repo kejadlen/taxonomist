@@ -5,7 +5,11 @@ require_relative '../timeline'
 module Taxonomist
   module Jobs
     class UpdateInteractions < Job
-      def run_rate_limited(endpoint, since_id=nil, max_id=nil)
+      def endpoint
+        raise NotImplementedError
+      end
+
+      def run_rate_limited(since_id=nil, max_id=nil)
         timeline = Taxonomist::Timeline.new(twitter,
                                             endpoint,
                                             user.twitter_id,
@@ -33,7 +37,7 @@ module Taxonomist
         user.save
 
         if timeline.rate_limited
-          self.class.enqueue(user.id, endpoint, since_id, max_id)
+          self.class.enqueue(user.id, since_id, max_id)
         end
       end
     end

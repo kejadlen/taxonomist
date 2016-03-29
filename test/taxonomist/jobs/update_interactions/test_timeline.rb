@@ -15,7 +15,7 @@ class Jobs::UpdateInteractions::TestTimeline < TestJob
     responses = [statuses, []]
     TwitterStub.stubs = { statuses_user_timeline: ->(*) { responses.shift } }
 
-    Jobs::UpdateInteractions::Timeline.enqueue(@user.id, :statuses_user_timeline)
+    Jobs::UpdateInteractions::Timeline.enqueue(@user.id)
 
     @user.refresh
 
@@ -48,7 +48,7 @@ class Jobs::UpdateInteractions::TestTimeline < TestJob
       }
     }
 
-    Jobs::UpdateInteractions::Timeline.enqueue(@user.id, :statuses_user_timeline)
+    Jobs::UpdateInteractions::Timeline.enqueue(@user.id)
 
     @user.refresh
 
