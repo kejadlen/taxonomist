@@ -6,7 +6,7 @@ require_relative 'update_lists'
 
 module Taxonomist
   module Jobs
-    class UpdateUser < Job
+    class RefreshUser < Job
       private
 
       def run_rate_limited

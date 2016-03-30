@@ -1,16 +1,16 @@
-require_relative "test_job"
+require_relative 'test_job'
 
-require "taxonomist/jobs/update_user"
+require 'taxonomist/jobs/refresh_user'
 
 module Taxonomist
-  class TestUpdateUser < TestJob
+  class TestRefreshUser < TestJob
     def setup
       super
 
-      @raw = { "foo" => "bar" }
+      @raw = { 'foo' => 'bar' }
       @friend_ids = [2, 3, 5, 8]
       @list_ids = [10, 20, 30]
-      @lists = @list_ids.map {|id| { "id" => id } }
+      @lists = @list_ids.map {|id| { 'id' => id } }
 
       @mocked_jobs = {
         # UpdateLists: [@user.id, @list_ids],
@@ -27,7 +27,7 @@ module Taxonomist
 
     def test_update_user
       with_mocked_jobs(@mocked_jobs) do
-        Jobs::UpdateUser.enqueue(@user.id)
+        Jobs::RefreshUser.enqueue(@user.id)
       end
 
       @user.refresh
@@ -43,7 +43,7 @@ module Taxonomist
       assert_equal 2, Models::User.count
 
       with_mocked_jobs(@mocked_jobs) do
-        Jobs::UpdateUser.enqueue(@user.id)
+        Jobs::RefreshUser.enqueue(@user.id)
       end
 
       assert_equal @friend_ids.size, Models::User.where(twitter_id: @friend_ids).count
@@ -51,11 +51,11 @@ module Taxonomist
 
     def test_update_lists
       with_mocked_jobs(@mocked_jobs) do
-        Jobs::UpdateUser.enqueue(@user.id)
+        Jobs::RefreshUser.enqueue(@user.id)
       end
 
       @lists.each do |list|
-        assert_equal list, Models::List[twitter_id: list["id"]].raw
+        assert_equal list, Models::List[twitter_id: list['id']].raw
       end
     end
   end
