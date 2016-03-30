@@ -117,6 +117,20 @@ module Taxonomist
         cursored(resp.body['users'], resp)
       end
 
+      def lists_members_create_all(list_id:, user_ids:)
+        params = { list_id: list_id, user_id: user_ids.join(?,) }
+        conn.post('lists/members/create_all.json', params) do |req|
+          req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        end
+      end
+
+      def lists_members_destroy_all(list_id:, user_ids:)
+        params = { list_id: list_id, user_id: user_ids.join(?,) }
+        conn.post('lists/members/destroy_all.json', params) do |req|
+          req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        end
+      end
+
       def lists_ownerships(user_id:)
         resp = get('lists/ownerships.json', user_id: user_id, count: 1_000)
         cursored(resp.body['lists'], resp)
