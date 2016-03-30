@@ -4,7 +4,7 @@ require_relative '../timeline'
 
 module Taxonomist
   module Jobs
-    class UpdateInteractions < Job
+    class RefreshInteractions < Job
       def endpoint
         raise NotImplementedError
       end
@@ -44,7 +44,7 @@ module Taxonomist
       end
     end
 
-    class UpdateInteractions::Timeline < UpdateInteractions
+    class RefreshInteractions::Timeline < RefreshInteractions
       def endpoint
         :statuses_user_timeline
       end
@@ -57,7 +57,7 @@ module Taxonomist
       end
     end
 
-    class UpdateInteractions::DirectMessages < UpdateInteractions
+    class RefreshInteractions::DirectMessages < RefreshInteractions
       def endpoint
         :direct_messages_sent
       end
@@ -67,7 +67,7 @@ module Taxonomist
       end
     end
 
-    class UpdateInteractions::Favorites < UpdateInteractions
+    class RefreshInteractions::Favorites < RefreshInteractions
       def endpoint
         :favorites_list
       end

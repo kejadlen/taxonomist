@@ -1,9 +1,9 @@
 require_relative 'test_job'
 
-require 'taxonomist/jobs/update_interactions'
+require 'taxonomist/jobs/refresh_interactions'
 require 'taxonomist/twitter'
 
-class Jobs::UpdateInteractions::TestTimeline < TestJob
+class Jobs::RefreshInteractions::TestTimeline < TestJob
   def test_timeline
     statuses = [
       { 'id' => 579, 'quoted_status' => { 'user' => { 'id' => 456 }}},
@@ -15,7 +15,7 @@ class Jobs::UpdateInteractions::TestTimeline < TestJob
     responses = [statuses, []]
     TwitterStub.stubs = { statuses_user_timeline: ->(*) { responses.shift } }
 
-    Jobs::UpdateInteractions::Timeline.enqueue(@user.id)
+    Jobs::RefreshInteractions::Timeline.enqueue(@user.id)
 
     @user.refresh
 
@@ -48,7 +48,7 @@ class Jobs::UpdateInteractions::TestTimeline < TestJob
       }
     }
 
-    Jobs::UpdateInteractions::Timeline.enqueue(@user.id)
+    Jobs::RefreshInteractions::Timeline.enqueue(@user.id)
 
     @user.refresh
 
