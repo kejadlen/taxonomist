@@ -1,7 +1,7 @@
 require_relative 'job'
 
 require_relative 'hydrate_users'
-require_relative 'update_friend_graph'
+require_relative 'refresh_friend_graph'
 require_relative 'update_lists'
 
 module Taxonomist
@@ -48,7 +48,7 @@ module Taxonomist
       def enqueue_child_jobs
         # Jobs::UpdateLists.enqueue(user.id, user.list_ids)
         Jobs::HydrateUsers.enqueue(user.id, user.friend_ids)
-        Jobs::UpdateFriendGraph.enqueue(user.id, user.friend_ids)
+        Jobs::RefreshFriendGraph.enqueue(user.id, user.friend_ids)
       end
     end
   end

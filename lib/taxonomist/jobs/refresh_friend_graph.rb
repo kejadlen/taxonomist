@@ -1,8 +1,8 @@
-require_relative "job"
+require_relative 'job'
 
 module Taxonomist
   module Jobs
-    class UpdateFriendGraph < Job
+    class RefreshFriendGraph < Job
       def run_rate_limited(user_ids)
         until user_ids.empty?
           id = user_ids.first

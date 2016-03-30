@@ -15,7 +15,7 @@ module Taxonomist
       @mocked_jobs = {
         # UpdateLists: [@user.id, @list_ids],
         HydrateUsers: [@user.id, @friend_ids],
-        UpdateFriendGraph: [@user.id, @friend_ids],
+        RefreshFriendGraph: [@user.id, @friend_ids],
       }
 
       TwitterStub.stubs = {
