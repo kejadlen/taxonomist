@@ -1,13 +1,13 @@
-require_relative "test_job"
+require_relative 'test_job'
 
-require "taxonomist/jobs/update_lists"
+require 'taxonomist/jobs/refresh_lists'
 
 module Taxonomist
-  class TestUpdateLists < TestJob
+  class TestRefreshLists < TestJob
     def setup
       super
 
-      to_raw = ->(*ids) { ids.map {|id| { "id" => id } } }
+      to_raw = ->(*ids) { ids.map {|id| { 'id' => id } } }
       @lists = {
         1 => to_raw[10, 20, 30],
         3 => to_raw[1, 2, 3],
@@ -23,15 +23,15 @@ module Taxonomist
       }
     end
 
-    def test_update_lists
-      Jobs::UpdateLists.enqueue(@user.id, @lists.keys)
+    def test_refresh_lists
+      Jobs::RefreshLists.enqueue(@user.id, @lists.keys)
 
       @lists.each do |list_id, members|
-        member_ids = members.map {|member| member["id"]}
+        member_ids = members.map {|member| member['id']}
         assert_equal member_ids, Models::List[twitter_id: list_id].member_ids
 
         members.each do |member|
-          assert_equal member, Models::User[twitter_id: member["id"]].raw
+          assert_equal member, Models::User[twitter_id: member['id']].raw
         end
       end
     end

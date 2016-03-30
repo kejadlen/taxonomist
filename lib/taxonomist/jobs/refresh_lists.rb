@@ -2,7 +2,7 @@ require_relative 'job'
 
 module Taxonomist
   module Jobs
-    class UpdateLists < Job
+    class RefreshLists < Job
       def run_rate_limited(list_ids)
         until list_ids.empty?
           list_id = list_ids.first
