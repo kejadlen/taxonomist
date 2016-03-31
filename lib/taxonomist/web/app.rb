@@ -1,29 +1,29 @@
-require "dotenv"
+require 'dotenv'
 Dotenv.load
 
-require "roda"
-require "tilt/erb"
+require 'roda'
+require 'tilt/erb'
 
-require_relative "../../taxonomist"
+require_relative '../../taxonomist'
 
 module Taxonomist
   module Web
     class App < Roda
-      use Rack::Session::Cookie, secret: ENV["RODA_SECRET"]
+      use Rack::Session::Cookie, secret: ENV['RODA_SECRET']
 
-      opts[:root] = File.expand_path("..", __FILE__)
+      opts[:root] = File.expand_path('..', __FILE__)
 
-      plugin :render, views: "views"
-      plugin :static, %w[ /js ]
+      plugin :render, views: 'views'
+      plugin :static, %w[ /js ], root: '../../../public'
 
       plugin :multi_route
-      require_relative "routes/auth"
+      require_relative 'routes/auth'
 
       route do |r|
         r.multi_route
 
         r.root do
-          view r.session[:twitter_id] ? "app" : "sign_in"
+          view r.session[:twitter_id] ? 'app' : 'sign_in'
         end
       end
     end

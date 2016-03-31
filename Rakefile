@@ -4,18 +4,17 @@ require 'rake/testtask'
 
 $LOAD_PATH.unshift(File.expand_path('../lib', __FILE__))
 require 'taxonomist'
-
 include Taxonomist
 
-task default: %i[ test elm ]
+task default: %i[ elm test ]
 
-desc "Build Elm JS"
-task elm: FileList["lib/taxonomist/web/elm/*.elm"] do
-  cd "lib/taxonomist/web/elm" do
-    sh "elm-make Taxonomist.elm --output ../public/js/elm-taxonomist.js"
+desc 'Build Elm JS'
+task elm: FileList['elm/*.elm'] do
+  cd 'elm' do
+    sh 'elm-make Taxonomist.elm --output ../public/js/elm-taxonomist.js'
   end
 end
-CLOBBER.include("lib/taxonomist/web/public/Taxonomist.elm")
+CLOBBER.include('public/Taxonomist.elm')
 
 # web = "lib/taxonomist/web"
 # FileList[File.join(web, "elm/Taxonomist.elm")].each do |elm|
