@@ -118,6 +118,8 @@ module Taxonomist
       end
 
       def lists_members_create_all(list_id:, user_ids:)
+        return if user_ids.empty?
+
         params = { list_id: list_id, user_id: user_ids.join(?,) }
         conn.post('lists/members/create_all.json', params) do |req|
           req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
@@ -125,6 +127,8 @@ module Taxonomist
       end
 
       def lists_members_destroy_all(list_id:, user_ids:)
+        return if user_ids.empty?
+
         params = { list_id: list_id, user_id: user_ids.join(?,) }
         conn.post('lists/members/destroy_all.json', params) do |req|
           req.headers['Content-Type'] = 'application/x-www-form-urlencoded'

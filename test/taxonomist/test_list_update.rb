@@ -7,7 +7,7 @@ class TestListUpdate < Test
     @list_id = 1_337
 
     @twitter_mock = Minitest::Mock.new
-    @twitter_mock.expect :lists_members, [1, 2, 3, 7, 8, 9], [ @list_id ]
+    @twitter_mock.expect :lists_members, [1, 2, 3, 7, 8, 9], [{ list_id: @list_id }]
 
     ids = (3..7).to_a
     @list_update = ListUpdate.new(@twitter_mock, @list_id, ids: ids)

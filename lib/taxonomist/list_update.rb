@@ -28,7 +28,7 @@ module Taxonomist
     def remote_ids
       return @remote_ids if defined?(@remote_ids)
 
-      @remote_ids = twitter.lists_members(id)
+      @remote_ids = twitter.lists_members(list_id: id).map {|m| m['id'] }
     end
   end
 end

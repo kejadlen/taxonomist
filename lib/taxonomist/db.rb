@@ -9,8 +9,12 @@ module Taxonomist
 
   module Models
     class User < Sequel::Model
+      def name
+        raw.fetch('name', '')
+      end
+
       def screen_name
-        raw['screen_name']
+        raw.fetch('screen_name', '')
       end
 
       # def graph

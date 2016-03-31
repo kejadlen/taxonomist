@@ -32,7 +32,7 @@ Sequel.migration do
     create_table(:users) do
       primary_key :id
       column :twitter_id, "bigint", :null=>false
-      column :raw, "json"
+      column :raw, "json", :default=>Sequel::LiteralString.new("'{}'::json"), :null=>false
       column :created_at, "timestamp without time zone"
       column :updated_at, "timestamp without time zone"
       column :access_token, "text"
