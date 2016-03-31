@@ -1,5 +1,7 @@
 module Taxonomist
   class ListUpdate
+    attr_accessor :ids
+
     def initialize(twitter, id, ids: [])
       @twitter, @id, @ids = twitter, id, ids
     end
@@ -15,7 +17,7 @@ module Taxonomist
 
     private
 
-    attr_reader *%i[ twitter id ids ]
+    attr_reader *%i[ twitter id ]
 
     def insertions
       ids - remote_ids
