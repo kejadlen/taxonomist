@@ -9,12 +9,12 @@ include Taxonomist
 task default: %i[ elm test ]
 
 desc 'Build Elm JS'
-task elm: FileList['elm/*.elm'] do
+task elm: FileList['elm/src/*.elm'] do
   cd 'elm' do
-    sh 'elm-make Taxonomist.elm --output ../public/js/elm-taxonomist.js'
+    sh 'elm-make src/Taxonomist.elm --output ../public/js/elm-taxonomist.js'
   end
 end
-CLOBBER.include('public/Taxonomist.elm')
+CLOBBER.include('public/js/elm-taxonomist.js')
 
 # web = "lib/taxonomist/web"
 # FileList[File.join(web, "elm/Taxonomist.elm")].each do |elm|
