@@ -22,12 +22,20 @@ module Taxonomist
       end
 
       def run_rate_limited(since_id=nil, max_id=nil)
+        since_id ||= user.tweet_marks[endpoint.to_s]
+
         timeline = Taxonomist::Timeline.new(twitter,
                                             endpoint,
                                             user.twitter_id,
                                             since_id,
                                             max_id)
         timeline.fetch!
+
+        if timeline.rate_limited
+          run_at = timeline.rate_limited.reset_at
+          self.class.enqueue(user.id, since_id, max_id, run_at: run_at)
+          return
+        end
 
         max_id = timeline.statuses.first['id']
         user.tweet_marks[endpoint.to_s] = [
@@ -45,10 +53,6 @@ module Taxonomist
         end
 
         user.save
-
-        if timeline.rate_limited
-          self.class.enqueue(user.id, since_id, max_id)
-        end
       end
     end
 
