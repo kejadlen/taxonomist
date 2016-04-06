@@ -31,25 +31,24 @@ module Taxonomist
                                             max_id)
         timeline.fetch!
 
-        if timeline.rate_limited
-          run_at = timeline.rate_limited.reset_at
-          self.class.enqueue(user.id, since_id, max_id, run_at: run_at)
-          return
-        end
-
-        max_id = timeline.statuses.first['id']
-        user.tweet_marks[endpoint.to_s] = [
-          user.tweet_marks.fetch(endpoint.to_s, 0), max_id
-        ].max
-
         user.interactions[endpoint.to_s] ||= {}
-        interactions = user.interactions[endpoint.to_s]
-
         timeline.statuses.flat_map { |status|
           interactee_ids(status)
         }.map(&:to_s).each do |id|
-          interactions[id] ||= 0
-          interactions[id] += 1
+          user.interactions[endpoint.to_s][id] ||= 0
+          user.interactions[endpoint.to_s][id] += 1
+        end
+
+        unless timeline.statuses.empty?
+          max_id = timeline.statuses.first['id']
+          user.tweet_marks[endpoint.to_s] = [
+            user.tweet_marks.fetch(endpoint.to_s, 0), max_id
+          ].max
+        end
+
+        if timeline.rate_limited
+          run_at = timeline.rate_limited.reset_at
+          self.class.enqueue(user.id, since_id, max_id, run_at: run_at)
         end
 
         user.save
