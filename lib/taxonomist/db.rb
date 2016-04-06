@@ -17,6 +17,10 @@ module Taxonomist
         raw.fetch('screen_name', '')
       end
 
+      def to_s
+        "#{screen_name} (#{name})"
+      end
+
       # def graph
       #   graph = self.class.where(twitter_id: self.friend_ids.to_a - [self.twitter_id])
       #                     .select_hash(:twitter_id, :friend_ids)
