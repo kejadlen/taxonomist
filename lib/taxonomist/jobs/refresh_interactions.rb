@@ -5,6 +5,14 @@ require_relative '../timeline'
 module Taxonomist
   module Jobs
     class RefreshInteractions < Job
+      def self.enqueue_children(user_id)
+        ObjectSpace.each_object(Class)
+                   .select { |klass| klass < self }
+                   .each do |klass|
+          klass.enqueue(user_id)
+        end
+      end
+
       def endpoint
         raise NotImplementedError
       end
