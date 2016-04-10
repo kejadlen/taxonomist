@@ -1,6 +1,6 @@
-require_relative '../../test_helper'
+require_relative '../test_helper'
 
-require 'taxonomist/twitter/client'
+require 'taxonomist/twitter'
 
 class TestTwitterClient < Test
   def self.runnable_methods

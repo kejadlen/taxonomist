@@ -1,10 +1,12 @@
-require "sequel"
+require 'sequel'
 
 Sequel.extension :pg_json_ops
 Sequel::Model.plugin :timestamps, update_on_create: true
 
+require_relative 'twitter'
+
 module Taxonomist
-  DB = Sequel.connect(ENV.fetch("DATABASE_URL"))
+  DB = Sequel.connect(ENV.fetch('DATABASE_URL'))
   DB.extension :pg_array, :pg_json
 
   module Models
@@ -25,6 +27,15 @@ module Taxonomist
 
       def to_s
         "#{screen_name} (#{name})"
+      end
+
+      def twitter
+        twitter = Twitter::Client::Authed.new(
+          api_key: ENV.fetch('TWITTER_API_KEY'),
+          api_secret: ENV.fetch('TWITTER_API_SECRET'),
+          access_token: access_token,
+          access_token_secret: access_token_secret,
+        )
       end
 
       # def graph
