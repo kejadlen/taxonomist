@@ -45,5 +45,5 @@ console[USER_ID]`. `USER_ID` will generally be `1` assuming that the first
 authed user is the one you want to fetch data for.
 
 ``` ruby
-Jobs::UpdateUser.enqueue(user.id)
+Jobs::RefreshInteractions.enqueue_children(user.id)
 ```

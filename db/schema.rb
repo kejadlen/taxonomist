@@ -39,11 +39,21 @@ Sequel.migration do
       column :access_token_secret, "text"
       column :friend_ids, "bigint[]"
       column :list_ids, "bigint[]"
-      column :interactions, "json", :default=>Sequel::LiteralString.new("'{}'::json"), :null=>false
-      column :tweet_marks, "json", :default=>Sequel::LiteralString.new("'{}'::json"), :null=>false
 
       index [:twitter_id]
       index [:twitter_id], :name=>:users_twitter_id_key, :unique=>true
+    end
+
+    create_table(:interactions) do
+      primary_key :id
+      foreign_key :user_id, :users, :key=>[:id]
+      column :endpoint, "text", :null=>false
+      column :since_id, "bigint"
+      column :counts, "json", :default=>Sequel::LiteralString.new("'{}'::json"), :null=>false
+      column :created_at, "timestamp without time zone"
+      column :updated_at, "timestamp without time zone"
+
+      index [:since_id], :name=>:interactions_since_id_key, :unique=>true
     end
   end
 end

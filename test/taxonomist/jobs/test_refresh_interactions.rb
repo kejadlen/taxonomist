@@ -19,12 +19,13 @@ class Jobs::RefreshInteractions::TestTimeline < TestJob
 
     @user.refresh
 
-    assert_equal 579, @user.tweet_marks['statuses_user_timeline']
+    interactions = Models::Interactions[user: @user,
+                                        endpoint: 'statuses_user_timeline']
 
-    interactions = @user.interactions['statuses_user_timeline']
-    assert_equal 2, interactions['123']
-    assert_equal 1, interactions['456']
-    assert_equal 1, interactions['789']
+    assert_equal 579, interactions.since_id
+    assert_equal 2, interactions.counts['123']
+    assert_equal 1, interactions.counts['456']
+    assert_equal 1, interactions.counts['789']
   end
 
   def test_rate_limited
@@ -52,11 +53,12 @@ class Jobs::RefreshInteractions::TestTimeline < TestJob
 
     @user.refresh
 
-    assert_equal 579, @user.tweet_marks['statuses_user_timeline']
+    interactions = Models::Interactions[user: @user,
+                                        endpoint: 'statuses_user_timeline']
 
-    interactions = @user.interactions['statuses_user_timeline']
-    assert_equal nil, interactions['123']
-    assert_equal 1, interactions['456']
-    assert_equal nil, interactions['789']
+    assert_equal 579, interactions.since_id
+    assert_equal nil, interactions.counts['123']
+    assert_equal 1, interactions.counts['456']
+    assert_equal nil, interactions.counts['789']
   end
 end

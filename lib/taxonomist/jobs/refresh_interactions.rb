@@ -22,7 +22,10 @@ module Taxonomist
       end
 
       def run_rate_limited(since_id=nil, max_id=nil)
-        since_id ||= user.tweet_marks[endpoint.to_s]
+        interactions = Models::Interactions.find_or_create(user: user,
+                                                           endpoint: endpoint.to_s)
+
+        since_id ||= interactions.since_id
 
         timeline = Taxonomist::Timeline.new(twitter,
                                             endpoint,
@@ -31,19 +34,16 @@ module Taxonomist
                                             max_id)
         timeline.fetch!
 
-        user.interactions[endpoint.to_s] ||= {}
         timeline.statuses.flat_map { |status|
           interactee_ids(status)
         }.map(&:to_s).each do |id|
-          user.interactions[endpoint.to_s][id] ||= 0
-          user.interactions[endpoint.to_s][id] += 1
+          interactions.counts[id] ||= 0
+          interactions.counts[id] += 1
         end
 
         unless timeline.statuses.empty?
           max_id = timeline.statuses.first['id']
-          user.tweet_marks[endpoint.to_s] = [
-            user.tweet_marks.fetch(endpoint.to_s, 0), max_id
-          ].max
+          interactions.since_id = [ since_id, max_id ].compact.max
         end
 
         if timeline.rate_limited
@@ -51,6 +51,7 @@ module Taxonomist
           self.class.enqueue(user.id, since_id, max_id, run_at: run_at)
         end
 
+        interactions.save
         user.save
       end
     end

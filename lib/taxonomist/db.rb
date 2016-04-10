@@ -8,7 +8,13 @@ module Taxonomist
   DB.extension :pg_array, :pg_json
 
   module Models
+    class Interactions < Sequel::Model(:interactions)
+      many_to_one :user
+    end
+
     class User < Sequel::Model
+      one_to_many :interactions, class: Interactions
+
       def name
         raw.fetch('name', '')
       end
