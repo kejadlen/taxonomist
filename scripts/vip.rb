@@ -10,27 +10,22 @@ user_id = 1
 list_id = 714925948638875648
 
 user = Models::User[user_id]
-twitter = Twitter::Client::Authed.new(
-  api_key: ENV.fetch('TWITTER_API_KEY'),
-  api_secret: ENV.fetch('TWITTER_API_SECRET'),
-  access_token: user.access_token,
-  access_token_secret: user.access_token_secret,
-)
+twitter = user.twitter
 friends = Hash[
   Models::User.where(twitter_id: user.friend_ids.to_a).map { |u|
     [ u.twitter_id, u ]
   }
 ]
 
-vips = user.interactions.flat_map {|_, interactions|
-  interactions
+vips = user.interactions.map(&:counts).flat_map {|counts|
+  counts
     .sort_by(&:last)
     .reverse
     .map(&:first)
     .map(&:to_i)
     .map {|id| friends[id] }
     .compact
-    .take(0.1 * interactions.size)
+    .take(0.1 * counts.size)
 }.uniq
 
 mods = YAML.load_file(File.expand_path('../vip.private', __FILE__))
