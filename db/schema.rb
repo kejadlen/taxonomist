@@ -1,17 +1,5 @@
 Sequel.migration do
   change do
-    create_table(:lists) do
-      primary_key :id
-      column :twitter_id, "bigint", :null=>false
-      column :member_ids, "bigint[]"
-      column :raw, "json"
-      column :created_at, "timestamp without time zone"
-      column :updated_at, "timestamp without time zone"
-
-      index [:twitter_id]
-      index [:twitter_id], :name=>:lists_twitter_id_key, :unique=>true
-    end
-
     create_table(:que_jobs) do
       column :priority, "smallint", :default=>100, :null=>false
       column :run_at, "timestamp with time zone", :default=>Sequel::CURRENT_TIMESTAMP, :null=>false
@@ -38,7 +26,6 @@ Sequel.migration do
       column :access_token, "text"
       column :access_token_secret, "text"
       column :friend_ids, "bigint[]"
-      column :list_ids, "bigint[]"
 
       index [:twitter_id]
       index [:twitter_id], :name=>:users_twitter_id_key, :unique=>true

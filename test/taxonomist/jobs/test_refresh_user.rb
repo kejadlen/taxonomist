@@ -9,11 +9,8 @@ module Taxonomist
 
       @raw = { 'foo' => 'bar' }
       @friend_ids = [2, 3, 5, 8]
-      @list_ids = [10, 20, 30]
-      @lists = @list_ids.map {|id| { 'id' => id } }
 
       @mocked_jobs = {
-        RefreshLists: [@user.id, @list_ids],
         HydrateUsers: [@user.id, @friend_ids],
         RefreshFriendGraph: [@user.id, @friend_ids],
       }
@@ -21,7 +18,6 @@ module Taxonomist
       TwitterStub.stubs = {
         users_show: @raw,
         friends_ids: @friend_ids,
-        lists_ownerships: @lists,
       }
     end
 
@@ -33,7 +29,6 @@ module Taxonomist
       @user.refresh
       assert_equal @raw, @user.raw
       assert_equal @friend_ids, @user.friend_ids
-      assert_equal @list_ids, @user.list_ids
     end
 
     def test_create_friends
@@ -47,16 +42,6 @@ module Taxonomist
       end
 
       assert_equal @friend_ids.size, Models::User.where(twitter_id: @friend_ids).count
-    end
-
-    def test_update_lists
-      with_mocked_jobs(@mocked_jobs) do
-        Jobs::RefreshUser.enqueue(@user.id)
-      end
-
-      @lists.each do |list|
-        assert_equal list, Models::List[twitter_id: list['id']].raw
-      end
     end
   end
 end
